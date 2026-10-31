@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/5a73089ef6e0b7aeb0f3e351a39632667aab66b4).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/873911c8024a4257c9cf661ff7b046e5ef0803e2).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-5a73089ef6e0b7aeb0f3e351a39632667aab66b4`.
+   named `csv-change-report-873911c8024a4257c9cf661ff7b046e5ef0803e2`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -248,3 +248,10 @@ It writes pair outcomes and summed added/removed/changed/unchanged rows to
 any pair error still returns status 2. Candidate and fresh pinned public source
 each passed 53 existing tests and 11 focused synthetic checks on Linux, including
 the literal recipe. This is software evidence, not independent demand or earnings.
+
+
+Optional batch totals now require a regular temporary output file and return
+status 2 for output, rename or cleanup failures. Candidate and pinned public
+Linux tests covered nine synthetic cases and 53 existing unittest methods.
+Equal/changed batches retain status 0/1; mixed error batches retain partial totals
+and status 2. Fault injection does not prove safety under hostile directory edits.
