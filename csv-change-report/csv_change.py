@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-VERSION = '0.1.9-preview'
+VERSION = '0.1.10-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
