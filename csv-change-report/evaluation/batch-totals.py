@@ -3,11 +3,12 @@
 import argparse
 import json
 import re
+import runpy
 import sys
 from pathlib import Path
 
 
-def summarize(path, expected):
+def validated_table(path, expected):
     if expected < 1:
         raise ValueError('expected pairs must be positive')
     raw = Path(path).read_bytes()
@@ -35,15 +36,20 @@ def summarize(path, expected):
     if completed > expected:
         raise ValueError('table exceeds expected pair count')
     totals['incomplete'] = expected - completed
-    return dict(expected=expected, completed=completed, **totals)
+    return dict(expected=expected, completed=completed, **totals), [line.split("\t") for line in lines[1:]]
 
 
-def row_counts(path, totals):
+def summarize(path, expected):
+    return validated_table(path, expected)[0]
+
+
+def row_counts(path, totals, table_rows=None):
     """Only generated report names from an already validated table are opened."""
     rows = dict(added=0, removed=0, changed=0, unchanged=0)
     directory = Path(path).parent
-    for line in Path(path).read_text(encoding='utf-8').splitlines()[1:]:
-        stem, status, _, _ = line.split('\t')
+    if table_rows is None:
+        _, table_rows = validated_table(path, totals['expected'])
+    for stem, status, _, _ in table_rows:
         if status not in ('0', '1'):
             continue
         counts = json.loads((directory / (stem + '.json')).read_text(encoding='utf-8'))['counts']
@@ -55,17 +61,43 @@ def row_counts(path, totals):
     return dict(rows=rows, partial=bool(totals['error'] or totals['incomplete']))
 
 
+def column_counts(path, totals, table_rows):
+    """Aggregate successful report counts, never opening CSV inputs."""
+    tally = runpy.run_path(str(Path(__file__).with_name('column-tally.py')))['tally']
+    columns = {}
+    records = cells = reports = 0
+    for stem, status, _, _ in table_rows:
+        if status not in ('0', '1'):
+            continue
+        result = tally(Path(path).parent / (stem + '.json'))
+        if status == '0' and result['changed_records']:
+            raise ValueError('equal status contradicts report')
+        records += result['changed_records']
+        cells += result['changed_cells']
+        reports += 1
+        for column in result['columns']:
+            name = column['column']
+            columns[name] = columns.get(name, 0) + column['changed_cells']
+    return dict(column_tally=dict(reports=reports, changed_records=records,
+                changed_cells=cells, columns=[dict(column=name, changed_cells=columns[name])
+                                            for name in sorted(columns)]),
+                partial=bool(totals['error'] or totals['incomplete']))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('table')
     parser.add_argument('--expected-pairs', type=int, required=True)
     parser.add_argument('--row-counts', action='store_true', help='sum row counts from successful pair reports; failed pairs excluded')
+    parser.add_argument('--column-counts', action='store_true', help='sum changed-cell counts from successful reports; failed pairs excluded')
     args = parser.parse_args()
     try:
-        totals = summarize(args.table, args.expected_pairs)
+        totals, table_rows = validated_table(args.table, args.expected_pairs)
         if args.row_counts:
-            totals.update(row_counts(args.table, totals))
-    except (OSError, UnicodeError, ValueError, KeyError, TypeError):
+            totals.update(row_counts(args.table, totals, table_rows))
+        if args.column_counts:
+            totals.update(column_counts(args.table, totals, table_rows))
+    except (OSError, UnicodeError, ValueError, KeyError, TypeError, RecursionError):
         print('Cannot summarize: unreadable, malformed or inconsistent table/report; preserve it and inspect the run.', file=sys.stderr)
         return 2
     print(json.dumps(totals, sort_keys=True))
