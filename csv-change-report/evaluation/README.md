@@ -568,3 +568,20 @@ helpers/reports, prevent concurrent edits, provide crash durability, or approve
 exports. A changed manifest between preflight and execution can invalidate the
 preflight observation. Table validation does not verify report bytes. Reports
 retain the privacy limits described above. Tested with synthetic inputs on Linux; Windows/macOS are untested.
+
+### Run the automation regressions
+
+From the inner `csv-change-report` directory, run:
+
+```sh
+python3 -m unittest -v test_automate_batch
+python3 -O -m unittest -v test_automate_batch
+```
+
+These offline synthetic tests use temporary CSV fixtures and report directories.
+They check equal and mixed batches, error precedence and continuation, preservation
+of existing outputs, invalid manifests and arguments, and missing or file-valued
+output parents. An output-parent failure currently returns `E_STATUS` because no
+complete status table exists. No permission-denial, disk-fault, concurrent-edit or
+crash-recovery guarantee is tested by this suite. The suite uses only Python's
+standard library; the batch runner also requires the shell tools listed above.
