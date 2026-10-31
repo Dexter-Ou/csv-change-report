@@ -9,7 +9,5 @@ column names, hashes, paths, personal/customer information and secrets private.
 - Could you distinguish changed, unchanged and failed comparisons?
 - What was confusing or missing? What did you do instead?
 - Would you choose to use it again? Why or why not?
-- Optional: what would have to improve before you would consider paying?
 
-Do not promise or send payment. Interest is not a purchase. Participation is
-optional; no telemetry or automatic submission is included.
+Participation is optional; no telemetry or automatic submission is included.
