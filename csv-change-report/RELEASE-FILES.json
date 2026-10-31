@@ -16,5 +16,6 @@
   "examples/before.csv",
   "examples/expected-report.json",
   "test_csv_change.py",
-  "test_ignore_columns.py"
+  "test_ignore_columns.py",
+  "test_summary.py"
 ]
