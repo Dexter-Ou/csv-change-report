@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/40e61a90fe1233df474caf492d3e7d029ee6d099).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/709b775885c8307aab7e0325eed15c7564b97c6d).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-40e61a90fe1233df474caf492d3e7d029ee6d099`.
+   named `csv-change-report-709b775885c8307aab7e0325eed15c7564b97c6d`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -278,3 +278,6 @@ creating reports; missing CSVs still require a normal run to detect. See the
 [preflight example](csv-change-report/evaluation/README.md#manifest-preflight-without-comparisons).
 The candidate and pinned public download passed 71 synthetic Linux unittest
 methods, including no-runner and no-report checks. Windows/macOS remain untested.
+
+
+Follow the [manifest recovery walkthrough](csv-change-report/evaluation/RECOVERY.md#4-separate-manifest-preflight-from-csv-execution) to distinguish successful manifest preflight from a missing CSV during execution, preserve a failed attempt and retry with a corrected manifest in a new report directory. All six literal recovery blocks and 71 regression methods passed with synthetic Linux fixtures on the candidate and pinned download.
