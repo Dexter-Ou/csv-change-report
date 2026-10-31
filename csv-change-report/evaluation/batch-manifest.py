@@ -43,8 +43,19 @@ def diagnostic(code):
     print('Cannot run manifest [' + code + ']: ' + REASONS[code], file=sys.stderr)
 
 
+def json_result(code, pair_count=None):
+    # Only fixed metadata; never include supplied paths, keys or exception text.
+    print(json.dumps({'version': 1, 'valid': code == 'OK', 'code': code,
+                      'pair_count': pair_count, 'csv_files_checked': False,
+                      'reports_created': False}, sort_keys=True))
+
+
 class SafeParser(argparse.ArgumentParser):
+    json_output = False
+
     def error(self, message):
+        if self.json_output:
+            json_result('E_ARGUMENTS')
         diagnostic('E_ARGUMENTS')
         raise SystemExit(2)
 
@@ -125,15 +136,24 @@ def load_manifest(path):
 
 
 def main():
-    parser = SafeParser(description=__doc__)
+    parser = SafeParser(description=__doc__, allow_abbrev=False)
+    # Detect the exact flag before parsing so argument failures also use JSON.
+    # A literal -- ends option parsing; a filename after it is not a flag.
+    options = sys.argv[1:]
+    options = options[:options.index('--')] if '--' in options else options
+    parser.json_output = '--json' in options
     parser.add_argument('--max-input-bytes', type=int, default=10485760)
     parser.add_argument('--ignore-column')
     parser.add_argument('--totals', action='store_true')
     parser.add_argument('--validate-only', action='store_true',
                         help='validate and resolve manifest only; do not read CSVs or create reports')
+    parser.add_argument('--json', action='store_true',
+                        help='emit versioned JSON metadata; requires --validate-only')
     parser.add_argument('manifest')
     parser.add_argument('new_report_dir', nargs='?', help='required for execution; relative to current working directory')
     args = parser.parse_args()
+    if args.json and not args.validate_only:
+        parser.error('--json requires --validate-only')
     if not args.validate_only and args.new_report_dir is None:
         parser.error('report directory required')
     try:
@@ -143,8 +163,11 @@ def main():
             text(args.ignore_column)
         triples = load_manifest(args.manifest)
         if args.validate_only:
-            print('Manifest valid: ' + str(len(triples) // 3) +
-                  ' pair(s); CSV files not checked; no reports created.')
+            if args.json:
+                json_result('OK', len(triples) // 3)
+            else:
+                print('Manifest valid: ' + str(len(triples) // 3) +
+                      ' pair(s); CSV files not checked; no reports created.')
             return 0
         command = ['sh', str(Path(__file__).with_name('batch-review.sh').absolute()),
                    '--max-input-bytes', str(args.max_input_bytes)]
@@ -155,22 +178,23 @@ def main():
             command.append('--totals')
         command.extend(['--', args.new_report_dir, *triples])
     except ManifestError as exc:
-        diagnostic(exc.code)
-        return 2
+        code = exc.code
     except UnicodeError:
-        diagnostic('E_ENCODING')
-        return 2
+        code = 'E_ENCODING'
     except RecursionError:
-        diagnostic('E_DEPTH')
-        return 2
+        code = 'E_DEPTH'
     except ValueError:
-        diagnostic('E_JSON')
-        return 2
+        code = 'E_JSON'
     except IsADirectoryError:
-        diagnostic('E_FILE')
-        return 2
+        code = 'E_FILE'
     except OSError:
-        diagnostic('E_READ')
+        code = 'E_READ'
+    else:
+        code = None
+    if code is not None:
+        if args.json:
+            json_result(code)
+        diagnostic(code)
         return 2
     try:
         return subprocess.run(command, check=False).returncode
