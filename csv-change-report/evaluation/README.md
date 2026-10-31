@@ -70,6 +70,39 @@ case-sensitive; key columns and absent columns cannot be excluded. Repeat
 `--ignore-column NAME` for multiple fields. `review.sh` intentionally accepts
 only BEFORE, AFTER and KEY: use the raw CLI for exclusions.
 
+## Compare summary and detailed reports
+
+Use the same synthetic export pair to decide whether a compact overview is
+sufficient or you need record positions. Run from the extracted product folder.
+Each command safely captures the expected change status, including in a shell
+using `set -e`. These commands print reports; they do not save or modify files.
+
+```sh
+status=0
+python3 csv_change.py examples/before.csv examples/after.csv --key id --summary-only --check || status=$?
+printf 'Summary CLI status: %s\n' "$status"
+
+status=0
+python3 csv_change.py examples/before.csv examples/after.csv --key id --check || status=$?
+printf 'Detailed CLI status: %s\n' "$status"
+```
+
+Both statuses should be 1. Compare counts, full-input hashes and column totals;
+they should match. Which report identifies the changed record's position?
+Can the summary identify which added record needs review? Check `EXPECTED.md`.
+For a human-readable overview, add `--format text` to the summary command.
+Summary mode omits record positions and per-record changes. Neither mode prints
+cell values; use the original snapshots locally for that decision. Summary mode
+still reads both full snapshots into memory; smaller output is not a streaming
+or performance claim. It is not a privacy guarantee: hashes and column names
+remain in JSON. Use default detailed output when you need locations.
+
+To check equal/error handling, repeat the summary command using
+`examples/before.csv` as AFTER (expected status 0), then
+`evaluation/duplicate-key.csv` as AFTER (expected status 2, stderr diagnostic,
+empty stdout). Never interpret status 2 as an unchanged export. These are
+synthetic practice tasks; review speed and usefulness remain unmeasured.
+
 ## Optional feedback
 
 If you choose to share feedback, open an issue at
