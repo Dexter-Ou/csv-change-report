@@ -6,6 +6,9 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
+import contextlib
+import io
 
 ROOT = Path(__file__).resolve().parent
 SCRIPT = ROOT / 'evaluation/batch-manifest.py'
@@ -35,6 +38,78 @@ class ManifestTests(unittest.TestCase):
     def run_manifest(self, name='reports', options=()):
         return subprocess.run([sys.executable, str(SCRIPT), *options, str(self.manifest), name],
                               cwd=self.root, capture_output=True, timeout=20)
+
+    def assert_refusal(self, result, code=None, report='reports'):
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, b'')
+        expected = {('Cannot run manifest [' + k + ']: ' + v + '\n').encode()
+                    for k, v in manifest_module.REASONS.items()}
+        self.assertIn(result.stderr, expected)
+        if code is not None:
+            self.assertEqual(result.stderr, ('Cannot run manifest [' + code + ']: ' +
+                             manifest_module.REASONS[code] + '\n').encode())
+        self.assertFalse((self.root / report).exists())
+
+    def test_fixed_actionable_refusal_codes(self):
+        pair = self.valid['pairs'][0]
+        cases = [
+            (b'\xff', 'E_ENCODING'), (b'{', 'E_JSON'),
+            (b'{"version":NaN,"pairs":[]}', 'E_JSON'),
+            (b'[' * 2000 + b']' * 2000, 'E_DEPTH'),
+            (b' ' * 65537, 'E_SIZE'),
+            (b'{"version":1,"version":1,"pairs":[]}', 'E_DUPLICATE'),
+            (b'{"version":1,"pairs":[{"before":"a","before":"b"}]}', 'E_DUPLICATE'),
+            (json.dumps(dict(self.valid, secret='PRIVATE_SENTINEL')).encode(), 'E_SCHEMA'),
+            (json.dumps(dict(self.valid, version=True)).encode(), 'E_VERSION'),
+            (json.dumps(dict(self.valid, pairs=[])).encode(), 'E_PAIRS'),
+            (json.dumps(dict(self.valid, pairs=[pair, {}])).encode(), 'E_PAIR'),
+            (json.dumps(dict(self.valid, pairs=[dict(pair, key='PRIVATE_SENTINEL\n')])).encode(), 'E_TEXT'),
+        ]
+        for raw, code in cases:
+            with self.subTest(code=code):
+                self.manifest.write_bytes(raw)
+                self.assert_refusal(self.run_manifest(), code)
+        self.manifest.unlink()
+        self.assert_refusal(self.run_manifest(), 'E_READ')
+        self.manifest.mkdir()
+        self.assert_refusal(self.run_manifest(), 'E_FILE')
+        self.manifest.rmdir()
+        import os
+        os.mkfifo(self.manifest)
+        self.assert_refusal(self.run_manifest(), 'E_FILE')
+        self.manifest.unlink()
+        self.write()
+        for options, code in [
+            (('--max-input-bytes', '0'), 'E_BUDGET'),
+            (('--max-input-bytes', 'PRIVATE_SENTINEL'), 'E_ARGUMENTS'),
+            (('--PRIVATE_SENTINEL',), 'E_ARGUMENTS'),
+            (('--ignore-column', 'PRIVATE_SENTINEL\n'), 'E_TEXT'),
+        ]:
+            with self.subTest(options=options):
+                self.assert_refusal(self.run_manifest(options=options), code)
+
+    def test_nesting_budget_and_quoted_brackets(self):
+        # Exactly 32 structural levels parse, then fail the top-level schema.
+        self.manifest.write_bytes(b'[' * 32 + b']' * 32)
+        self.assert_refusal(self.run_manifest(), 'E_SCHEMA')
+        self.manifest.write_bytes(b'[' * 33 + b']' * 33)
+        self.assert_refusal(self.run_manifest(), 'E_DEPTH')
+        # Brackets and escaped quotes/backslashes in strings do not count.
+        key = '[{' * 100 + '"' + chr(92) + '}]' * 100
+        self.valid['pairs'][0]['key'] = key
+        self.write()
+        self.assertEqual(manifest_module.load_manifest(self.manifest)[-1], key)
+
+    def test_runner_launch_error_is_fixed_and_does_not_create_reports(self):
+        self.write()
+        errors = io.StringIO()
+        with mock.patch.object(sys, 'argv', ['batch-manifest.py', str(self.manifest), str(self.root/'reports')]), \
+             mock.patch.object(manifest_module.subprocess, 'run', side_effect=OSError('PRIVATE_SENTINEL')), \
+             contextlib.redirect_stderr(errors):
+            self.assertEqual(manifest_module.main(), 2)
+        self.assertEqual(errors.getvalue(), 'Cannot run manifest [E_RUNNER]: ' +
+                         manifest_module.REASONS['E_RUNNER'] + '\n')
+        self.assertFalse((self.root/'reports').exists())
 
     def test_equivalence_and_literal_paths(self):
         self.valid['pairs'] += [dict(self.valid['pairs'][0], after=self.before.name),
@@ -88,8 +163,7 @@ class ManifestTests(unittest.TestCase):
             with self.subTest(data=data):
                 self.manifest.write_text(json.dumps(data),encoding='utf-8')
                 result=self.run_manifest()
-                self.assertEqual(result.returncode,2)
-                self.assertFalse((self.root/'reports').exists())
+                self.assert_refusal(result)
 
     def test_invalid_encoding_duplicates_depth_size_and_special_files(self):
         cases=[b'\xff', b'{', b'{"version":1,"version":1,"pairs":[]}',
@@ -98,17 +172,15 @@ class ManifestTests(unittest.TestCase):
                b'{"version":NaN,"pairs":[]}']
         for raw in cases:
             self.manifest.write_bytes(raw)
-            self.assertEqual(self.run_manifest().returncode,2)
-            self.assertFalse((self.root/'reports').exists())
+            self.assert_refusal(self.run_manifest())
         self.manifest.unlink()
-        self.assertEqual(self.run_manifest().returncode,2)
+        self.assert_refusal(self.run_manifest(), 'E_READ')
         self.manifest.mkdir()
-        self.assertEqual(self.run_manifest().returncode,2)
+        self.assert_refusal(self.run_manifest(), 'E_FILE')
         self.manifest.rmdir()
         import os
         os.mkfifo(self.manifest)
-        self.assertEqual(self.run_manifest().returncode,2)
-        self.assertFalse((self.root/'reports').exists())
+        self.assert_refusal(self.run_manifest(), 'E_FILE')
 
     def test_manifest_limits_and_path_resolution(self):
         self.valid['pairs'] *= 100
