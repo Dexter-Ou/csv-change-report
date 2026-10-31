@@ -634,9 +634,9 @@ Column grouping is by the exact case-sensitive name only, with no schema or
 pair identifier. Compared columns with no changes remain present with a zero
 count. For example, `amount` changed once in each of two different
 schemas is emitted once with `changed_cells: 2`; this does not establish that
-the two fields have the same meaning or units. Run separate batch summaries
-for unrelated schemas when that distinction matters. No schema-aware grouping
-option is provided. Names are JSON data (control characters are escaped), not
+the two fields have the same meaning or units. Use `--pair-column-counts`
+when that distinction matters. Automatic schema-aware grouping is not provided.
+Names are JSON data (control characters are escaped), not
 paths to open. Status-table report and diagnostic fields must match the exact
 generated pair filenames; absolute, parent-relative and alternate names are
 rejected with exit 2 and no totals, including with `--column-counts`.
@@ -655,3 +655,6 @@ separately. Exit codes remain 0 equal, 1 changed, 2 error/incomplete.
 Malformed successful reports produce no totals. No CSV cell values are copied;
 column names remain visible and counts are not authenticated. This option does
 not add symlink confinement or support hostile concurrent report changes.
+
+Copy and run the [two-schema example](TWO-SCHEMA-EXAMPLE.md) to compare merged
+and per-pair tallies for invoice amounts and stock quantities.
