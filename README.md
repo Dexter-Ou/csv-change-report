@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/bc0147ab30f89d6292266805932a76afe405ccfd).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/c676116d013ad2cce33f32cbb552bb0f85c5f6b0).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-bc0147ab30f89d6292266805932a76afe405ccfd`.
+   named `csv-change-report-c676116d013ad2cce33f32cbb552bb0f85c5f6b0`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -162,3 +162,8 @@ text from 378,026 to 203 bytes. This is not a performance or customer benchmark.
 ```sh
 python3 csv_change.py examples/before.csv examples/after.csv --key id --summary-only
 ```
+
+The offline evaluation kit now includes a summary-versus-detail exercise with
+counts, omitted locations and explicit check statuses 0/1/2. Its documented
+changed-pair commands also passed under `sh -ec`. This remains synthetic practice,
+not measured human review speed or independent feedback.
