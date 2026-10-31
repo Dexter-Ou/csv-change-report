@@ -465,6 +465,7 @@ with tempfile.TemporaryDirectory(prefix='csv-json-walkthrough-') as temporary:
             {'before': 'before.csv', 'after': after, 'key': 'id'}]})
     cases = [
         ('changed', manifest('after.csv'), 0, 'OK', 1),
+        ('equal', manifest('before.csv'), 0, 'OK', 0),
         ('malformed', '{', 2, 'E_JSON', None),
         ('missing-csv', manifest('absent.csv'), 0, 'OK', 2),
     ]
@@ -505,6 +506,7 @@ PYCODE
 ```
 
 Expected: `changed` preflight 0/OK then execution 1 (differences);
+`equal` preflight 0/OK then execution 0 (no retained differences);
 `malformed` preflight 2/E_JSON with execution skipped; `missing-csv` preflight
 0/OK then execution 2 (input error). Execution 0 means no retained differences,
 1 means differences, and 2 means an error; inspect `status.tsv` before using
