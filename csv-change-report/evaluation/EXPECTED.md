@@ -37,3 +37,19 @@ status changed from pending to active in the original synthetic snapshots.
 No command modifies input snapshots. A workflow that excludes `status` too would
 hide that meaningful change; choosing exclusions is the reviewer's decision.
 These are synthetic mechanical examples, not independent user feedback.
+
+## Summary-versus-detail exercise
+
+Both changed-pair reports have before=3, after=3, added=1, removed=1,
+changed=1, unchanged=1, column totals name=0 and status=1, and the same
+full-input hashes. Both `--check` statuses are 1. Summary JSON has
+format_version=2 and report_mode="summary"; detailed JSON keeps format_version=1.
+Summary omits added_after_records, removed_before_records and changed_records
+entirely. Detailed output locates the addition at after record 2, removal at
+before record 2 and status change at before/after record 1. The summary alone
+cannot locate these records. Neither output reveals old/new cell values.
+
+Self-comparison summary has before=3, after=3, unchanged=3, all change counts
+and column totals zero; status 0. Duplicate-key comparison has no report,
+fixed JSON diagnostic on stderr and status 2. Text summary retains counts and
+column totals but no per-record locations; JSON retains full-input hashes.
