@@ -412,3 +412,6 @@ that a comparison will succeed or that inputs will remain unchanged.
 An optional report-directory argument is ignored in this mode, including an
 existing directory; it is still required for normal execution. Budget and
 ignore-column options are validated; totals has no effect until execution.
+
+For a literal missing-CSV preflight, failed execution and preserved retry, follow
+[RECOVERY.md, steps 4–5](RECOVERY.md#4-separate-manifest-preflight-from-csv-execution).
