@@ -2,7 +2,7 @@
 
 This free 0.1.10-preview needs an existing Python 3.10+ installation. Extract the
 ZIP and enter its inner `csv-change-report` directory. Linux synthetic command
-checks are available; human usability and Windows/macOS remain untested.
+checks are available; Windows/macOS remain untested.
 No install, account or network is needed to run. Examples below are invented.
 
 | Your task | Choose | What it leaves out |
