@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/8cd36a2d7fdaec11b50707a2336a7275fb0c1f4b).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/aa6084e8d7ee691920c168ff3f918ca7c66fcfbd).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-8cd36a2d7fdaec11b50707a2336a7275fb0c1f4b`.
+   named `csv-change-report-aa6084e8d7ee691920c168ff3f918ca7c66fcfbd`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -36,7 +36,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Twenty-five synthetic test methods passed on the isolated Linux worker. These are
+Twenty-eight synthetic test methods passed on the isolated Linux worker. These are
 software checks, not customer validation or an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -48,7 +48,12 @@ python3 csv_change.py /path/to/before.csv /path/to/after.csv --key id
 
 Use copies of snapshots you are authorized to process. Do not redirect output
 onto either input: the shell can truncate it before the tool runs. Successful
-comparisons exit 0 even when changes exist; errors exit 2 with JSON on stderr.
+comparisons exit 0 by default even when changes exist; errors exit 2 with JSON on stderr.
+Add `--check` for local scripts: exit 1 means added, removed or changed keyed
+records; exit 0 means equal content. Row/header reordering alone is equal.
+The report is still produced. Output errors take precedence and exit 2; check
+the status even if a report file looks complete. See the full product rules
+for a shell example that handles all three statuses.
 For command errors, consult `--help`; the error deliberately omits supplied text.
 
 For a terminal summary without input hashes, add `--format text`:
