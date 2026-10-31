@@ -1,12 +1,12 @@
 # Optional offline reader exercise
 
-This complete candidate bundle includes the existing 0.1.10-preview product and
+This source bundle includes the existing 0.1.10-preview product and
 an optional six-task worksheet. No installation, network or account is needed.
 Requires Python 3.10+ and a POSIX shell. Linux command checks only; human
-usefulness and willingness to pay are unverified. All examples are synthetic.
+usability has not been measured. All examples are synthetic.
 
-Extract reader-evaluation.zip into a new trusted directory using your archive
-manager, then enter its csv-change-report folder. Read QUICKSTART.md and
+Extract the source ZIP linked from the repository README into a new trusted
+directory, then enter its inner csv-change-report folder. Read QUICKSTART.md and
 evaluation/READER-TASK.md. Record answers locally before opening
 evaluation/ANSWER-KEY.md. Read evaluation/README.md for batch commands and
 continuation behavior. Use only the bundled invented CSVs for this exercise.
