@@ -91,3 +91,82 @@ needs change review; a successful retry is not approval. Both previous snapshots
 remain useful evidence. Reusing attempt-1 or attempt-2 is refused; choose a new
 unused directory for every later attempt. Do not delete a failed run to reuse its
 name. Windows/macOS, concurrent writers and crash recovery remain untested.
+
+## 4. Separate manifest preflight from CSV execution
+
+This separate synthetic exercise uses a schema-valid manifest whose second AFTER
+file is missing. Run from the product directory in the same trusted workspace.
+Preflight checks the manifest, not whether its CSVs exist or can be compared.
+
+```sh
+mkdir './manifest recovery' || exit 2
+python3 - <<'PY'
+import json
+from pathlib import Path
+base = Path('manifest recovery')
+pairs = [
+    {'before': '../examples/before.csv', 'after': '../examples/after.csv', 'key': 'id'},
+    {'before': '../examples/before.csv', 'after': 'missing.csv', 'key': 'id'},
+    {'before': '../examples/before.csv', 'after': '../examples/before.csv', 'key': 'id'},
+]
+(base / 'original.json').write_text(json.dumps({'version': 1, 'pairs': pairs}), encoding='utf-8')
+PY
+python3 evaluation/batch-manifest.py --validate-only \
+  './manifest recovery/original.json' './manifest recovery/preflight-reports'
+[ ! -e './manifest recovery/preflight-reports' ] || exit 2
+[ ! -e './manifest recovery/missing.csv' ] || exit 2
+```
+
+Expected preflight status: 0, with `Manifest valid: 3 pair(s); CSV files not checked; no reports created.`
+No report directory is created. The missing CSV remains missing.
+
+```sh
+status=0
+python3 evaluation/batch-manifest.py --totals \
+  './manifest recovery/original.json' './manifest recovery/attempt-1' || status=$?
+printf 'Manifest execution status: %s\n' "$status"
+[ "$status" -eq 2 ] || exit 2
+cat './manifest recovery/attempt-1/status.tsv'
+cat './manifest recovery/attempt-1/pair-0002.stderr'
+cat './manifest recovery/attempt-1/totals.json'
+[ ! -e './manifest recovery/attempt-1/pair-0002.json' ] || exit 2
+```
+
+Expected pair statuses: 1, 2, 0. The missing file produces an error with report
+`-`; the final pair still runs. Totals are partial: completed=3, changed=1,
+error=1, equal=1, incomplete=0. Row totals cover only successful comparisons;
+they are not totals for the whole intended batch. Keep the original manifest,
+status table, reports and diagnostics together. Diagnostics may contain paths.
+
+## 5. Correct a separate manifest and preserve the failed run
+
+For this exercise only, the intended second AFTER is the unchanged baseline.
+Create a corrected manifest under a new name, pointing to that known fixture.
+For real data, resolve the missing export with its owner; do not substitute an
+unrelated CSV just to obtain a successful status. Preflight does not pin inputs.
+
+```sh
+python3 - <<'PY'
+import json
+from pathlib import Path
+base = Path('manifest recovery')
+data = json.loads((base / 'original.json').read_text(encoding='utf-8'))
+data['pairs'][1]['after'] = '../examples/before.csv'
+with (base / 'corrected.json').open('x', encoding='utf-8') as stream:
+    stream.write(json.dumps(data))
+PY
+python3 evaluation/batch-manifest.py --validate-only './manifest recovery/corrected.json'
+status=0
+python3 evaluation/batch-manifest.py --totals \
+  './manifest recovery/corrected.json' './manifest recovery/attempt-2' || status=$?
+printf 'Corrected manifest execution status: %s\n' "$status"
+[ "$status" -eq 1 ] || exit 2
+cat './manifest recovery/attempt-2/status.tsv'
+cat './manifest recovery/attempt-2/totals.json'
+```
+
+Expected pair statuses: 1, 0, 0, with complete totals: completed=3, changed=1,
+equal=2, error=0, incomplete=0. Changed records still need review. Attempt-1 and
+original.json remain unchanged; the corrected manifest does not repair old reports.
+Choose a new unused report directory for each execution. This walkthrough tests
+synthetic files on Linux, not crash recovery or concurrent edits.
