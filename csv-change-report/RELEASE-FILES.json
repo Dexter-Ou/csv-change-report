@@ -1,11 +1,17 @@
 [
   "LICENSE",
   "README.md",
-  "RELEASE.md",
   "RELEASE-FILES.json",
+  "RELEASE.md",
   "csv_change.py",
-  "test_csv_change.py",
+  "evaluation/EXPECTED.md",
+  "evaluation/FEEDBACK.md",
+  "evaluation/README.md",
+  "evaluation/duplicate-key.csv",
+  "evaluation/review.sh",
   "examples/after.csv",
   "examples/before.csv",
-  "examples/expected-report.json"
+  "examples/expected-report.json",
+  "test_csv_change.py",
+  "test_ignore_columns.py"
 ]
