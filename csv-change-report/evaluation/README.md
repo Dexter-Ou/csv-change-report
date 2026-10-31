@@ -1,7 +1,7 @@
 # Try an offline export review
 
 Audience hypothesis: someone who reviews recurring CSV exports by a stable unique
-record key. This is a free, speculative evaluation kit for 0.1.9-preview, not
+record key. This is a free, speculative evaluation kit for 0.1.10-preview, not
 customer evidence or a paid offer. All supplied names and records are synthetic.
 Python 3.10+ and a POSIX shell are required; no install, network or account needed
 to run. Windows shell behavior has not been tested.
@@ -222,3 +222,19 @@ An account is needed only for GitHub feedback. Public issues are public: do not
 paste private exports, cell values, column names, paths, hashes, customer details
 or secrets. Describe behavior in general terms or use a tiny invented example.
 No feedback is sent automatically. A lack of issues does not demonstrate success.
+
+### Optional batch input budget
+
+For a tighter raw-byte limit on each before/after input, place the option first:
+
+```sh
+sh evaluation/batch-review.sh --max-input-bytes 4096 './budget reports' \
+  examples/before.csv examples/after.csv id
+```
+
+Omitting the option retains the 10 MiB limit. N must be a canonical positive
+base-10 integer from 1 through 10485760 (no leading zeros). Invalid options fail
+before creating a directory. An over-budget pair records status 2 and no JSON
+report; later pairs still run. Batch status 2 overrides changed status 1.
+The limit bounds raw bytes per input, not total memory. Preserve a failed batch
+and retry reviewed inputs in a fresh directory; see RECOVERY.md.
