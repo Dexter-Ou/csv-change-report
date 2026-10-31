@@ -6,7 +6,7 @@ records without uploading their data. This usefulness hypothesis is unverified.
 No customer testing, price, willingness to pay or earnings is established.
 
 **Synthetic runtime checks passed** on the isolated worker (Python 3.12.15,
-2026-10-31): twenty-five test methods, fresh extraction, example oracle and help.
+2026-10-31): twenty-eight test methods, fresh extraction, example oracle and help.
 No independent user testing has occurred. This is a preview, not a hardened parser.
 Requires Python 3.10+; standard library only, no installation or service.
 
@@ -64,10 +64,30 @@ opened read-only. No network, telemetry, formula evaluation, automatic cleaning
 or spreadsheet export. Do not redirect output onto either input path: shell
 redirection can truncate it before this program starts. Invalid command arguments produce a fixed message without echoing supplied text;
 long option abbreviations are rejected. `--help` prints usage and exits 0. `--version` prints
-`csv-change-report 0.1.4-preview` and exits 0 without input files. Include this
+`csv-change-report 0.1.5-preview` and exits 0 without input files. Include this
 version when voluntarily reporting a problem; do not include private CSV data.
 Failures exit 2 with JSON
-on stderr; successful comparisons exit 0, including when changes exist.
+on stderr. By default successful comparisons exit 0, including when changes exist.
+With `--check`, a completed comparison exits 1 for added, removed or changed
+records and 0 otherwise. Row/header order, BOM and line-ending differences alone
+do not count as content changes. Reports are still produced in either format;
+`--output` must finish successfully before status 0 or 1 is returned. Errors,
+including output failures, take precedence and exit 2. A full-looking output file
+after exit 2 must not be treated as a completed report.
+
+For a local review script (POSIX shell), handle each status explicitly:
+
+```sh
+status=0
+python3 csv_change.py before.csv after.csv --key id --check --format text || status=$?
+case "$status" in
+  0) echo "No keyed content changes" ;;
+  1) echo "Content changed; review the report" ;;
+  *) echo "Comparison failed" >&2; exit "$status" ;;
+esac
+```
+
+This is a local scripting feature hypothesis, not evidence of customer use.
 
 Recovery: preserve original snapshots, source version and hashes; correct invalid
 inputs in copies, then rerun. No database, persistent service or migration.
