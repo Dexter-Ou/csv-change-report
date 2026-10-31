@@ -10,6 +10,8 @@ No customer testing, price, willingness to pay or earnings is established.
 No independent user testing has occurred. This is a preview, not a hardened parser.
 Requires Python 3.10+; standard library only, no installation or service.
 
+Start with [the short report-choice guide](QUICKSTART.md) for a local review.
+
 From this directory on the isolated worker:
 
 ```sh
@@ -156,6 +158,6 @@ line endings and all encoded bytes. An input exactly at the limit is accepted if
 otherwise valid; one byte over is refused with status 2 before any report is
 created. Only up to N+1 raw bytes are read per input. The limit is not a bound on
 total process memory: parsed objects, decoded text and reports also consume memory.
-Row, column, data-cell and CSV parser field limits still apply. The batch helper
-currently uses the default ceiling and does not expose this option. Existing
+Row, column, data-cell and CSV parser field limits still apply. The batch helper accepts the same option in first position; see
+[evaluation instructions](evaluation/README.md#optional-batch-input-budget). Existing
 report paths and both original inputs remain protected by the usual refusal rules.
