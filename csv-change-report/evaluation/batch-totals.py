@@ -45,6 +45,7 @@ def summarize(path, expected):
 
 def row_counts(path, totals, table_rows=None):
     """Only generated report names from an already validated table are opened."""
+    reader = runpy.run_path(str(Path(__file__).with_name('column-tally.py')))
     rows = dict(added=0, removed=0, changed=0, unchanged=0)
     directory = Path(path).parent
     if table_rows is None:
@@ -52,12 +53,11 @@ def row_counts(path, totals, table_rows=None):
     for stem, status, _, _ in table_rows:
         if status not in ('0', '1'):
             continue
-        counts = json.loads((directory / (stem + '.json')).read_text(encoding='utf-8'))['counts']
+        counts = reader['validated_report'](directory / (stem + '.json'))['counts']
+        if status == '0' and any(counts[name] for name in ('added', 'removed', 'changed')):
+            raise ValueError('equal status contradicts report')
         for name in rows:
-            value = counts[name]
-            if type(value) is not int or value < 0:
-                raise ValueError('invalid row count')
-            rows[name] += value
+            rows[name] += counts[name]
     return dict(rows=rows, partial=bool(totals['error'] or totals['incomplete']))
 
 
