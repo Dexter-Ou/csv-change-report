@@ -64,7 +64,7 @@ opened read-only. No network, telemetry, formula evaluation, automatic cleaning
 or spreadsheet export. Do not redirect output onto either input path: shell
 redirection can truncate it before this program starts. Invalid command arguments produce a fixed message without echoing supplied text;
 long option abbreviations are rejected. `--help` prints usage and exits 0. `--version` prints
-`csv-change-report 0.1.5-preview` and exits 0 without input files. Include this
+`csv-change-report 0.1.6-preview` and exits 0 without input files. Include this
 version when voluntarily reporting a problem; do not include private CSV data.
 Failures exit 2 with JSON
 on stderr. By default successful comparisons exit 0, including when changes exist.
@@ -96,3 +96,8 @@ Original source by the Gong LLC economic experiment; no downloaded code/assets.
 MIT licensed; see `LICENSE`. The exact archive inventory and worker
 release checks are in `RELEASE-FILES.json` and `RELEASE.md`. Public source is intended for GitHub download; a repository is not a hosted site.
 Local copies are not off-VM backups. Keep your own verified source copy.
+
+Stdout is flushed before reporting completion. A broken pipe or detected stdout
+write/flush failure returns 2 with a fixed JSON diagnostic. Bytes may already have
+reached the consumer; treat the report as incomplete on failure. This does not
+prove that a downstream program saved or accepted the report.
