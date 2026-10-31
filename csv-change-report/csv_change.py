@@ -5,10 +5,11 @@ import csv
 import hashlib
 import io
 import json
+import os
 import sys
 from pathlib import Path
 
-VERSION = '0.1.3-preview'
+VERSION = '0.1.4-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -134,6 +135,7 @@ def main(argv=None):
     parser.add_argument('--key', required=True, help='exact, case-sensitive unique column name')
     parser.add_argument('--format', choices=('json', 'text'), default='json',
                         help='output format (default: json); text omits input hashes')
+    parser.add_argument('--output', help='create a new report file; existing paths are refused')
     try:
         parser.add_argument('--version', action='version',
                             version=f'csv-change-report {VERSION}')
@@ -144,8 +146,25 @@ def main(argv=None):
         message = str(error) if isinstance(error, InputError) else 'input file could not be read'
         print(json.dumps({'error': message}), file=sys.stderr)
         return 2
-    print(render_text(result) if args.format == 'text' else
-          json.dumps(result, indent=2, ensure_ascii=True))
+    report = (render_text(result) if args.format == 'text' else
+              json.dumps(result, indent=2, ensure_ascii=True)) + '\n'
+    if args.output is None:
+        print(report, end='')
+        return 0
+    try:
+        target = Path(args.output)
+        if target.resolve() in (Path(args.before).resolve(), Path(args.after).resolve()):
+            raise InputError('output path matches an input')
+        # O_EXCL rejects existing paths, including dangling symlinks. No truncation.
+        fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as stream:
+            stream.write(report)
+    except (InputError, OSError, RuntimeError) as error:
+        message = (str(error) if isinstance(error, InputError) else
+                   'output path already exists' if isinstance(error, FileExistsError) else
+                   'output file could not be written')
+        print(json.dumps({'error': message}), file=sys.stderr)
+        return 2
     return 0
 
 
