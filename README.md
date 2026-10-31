@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/49cc139c73b86a8ae0b3d97b87ca90aa8c02fcac).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/8ffc20cad78e747083b5cdedca84962466867710).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-49cc139c73b86a8ae0b3d97b87ca90aa8c02fcac`.
+   named `csv-change-report-8ffc20cad78e747083b5cdedca84962466867710`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -251,3 +251,12 @@ and status 2. Fault injection does not prove safety under hostile directory edit
 Batch status-file initialization and append failures now return error 2 with an incomplete-batch diagnostic. Existing pair reports after a failed run are not proof of a complete batch. Five injected status-write faults and three normal batch cases passed on the candidate; fault injection is synthetic Linux evidence.
 
 Batch review validates version 2 JSON summaries, row and column counts, and agreement with comparator exit status before recording status 0 or 1. Malformed or inconsistent reports record error 2 and report `-`; later pairs continue. Ninety-eight focused synthetic checks and 59 unittest methods passed on Linux, plus 26 prior output-fault checks. Validation checks report structure and internal consistency; it does not prove source provenance or protection from concurrent edits.
+
+
+Repeat an offline batch with a data-only JSON manifest using
+`evaluation/batch-manifest.py`; see the [manifest example and rules](csv-change-report/evaluation/README.md#optional-repeat-review-manifest-prototype).
+Relative CSV paths use the manifest directory. The revised suite passed 66
+unittest methods on synthetic Linux inputs, including exact path/key handling,
+manifest refusal and equivalence to explicit triples. The pinned download and
+its five literal guide/setup/manifest shell blocks were checked on Linux.
+Windows/macOS and hostile concurrent edits remain untested.
