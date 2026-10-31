@@ -30,7 +30,7 @@
     "examples/before.csv": "47a72c33f86207715fd3f1784d61f65e5449307dee4fa565d11e54560c625e88",
     "examples/expected-report.json": "aad6ad2981d1c2116513b25e9530161e27109b5463c2297a365d55ccdf64426c",
     "test_batch_budget.py": "2095c8ffc532cfef2d4bcad669a21196383f4de37b2f0767890ac180ef793be5",
-    "test_batch_manifest.py": "9df2da639a72f98562c357af4339b5cdcc264dee3861af07241af83a95af5720",
+    "test_batch_manifest.py": "eb77ebbe45adc0b0baeec96b5507f860ba6c7d184ba5b3f967830d3e6f007e2b",
     "test_batch_reports.py": "9fe167cd7ac891fc429f18a3daa38fb2deb3f7c6d33309d0f37150a0c2d60cf6",
     "test_csv_change.py": "1979381681a438aaf2f052f2d4cc212e6d2e962b71facbb9b030f91fb3ccfa0f",
     "test_ignore_columns.py": "2350310b08888512ebe4017b53cb1ce87b0fb2e881d56d739d6768844cef8f7b",
