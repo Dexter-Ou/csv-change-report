@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-VERSION = '0.1.8-preview'
+VERSION = '0.1.9-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -27,12 +27,20 @@ class SafeArgumentParser(argparse.ArgumentParser):
         raise InputError('invalid arguments; use --help for usage')
 
 
-def load(path, key):
+def input_byte_limit(value):
+    """Allow a smaller budget, never a bypass of the fixed safety ceiling."""
+    if type(value) is not int or not 1 <= value <= MAX_BYTES:
+        raise InputError('max input bytes must be an integer from 1 to 10485760')
+    return value
+
+
+def load(path, key, max_input_bytes=None):
     """Read one bounded snapshot; reject ambiguity instead of guessing."""
+    limit = MAX_BYTES if max_input_bytes is None else input_byte_limit(max_input_bytes)
     with Path(path).open('rb') as stream:
-        data = stream.read(MAX_BYTES + 1)
-    if len(data) > MAX_BYTES:
-        raise InputError('input exceeds 10 MiB limit')
+        data = stream.read(limit + 1)
+    if len(data) > limit:
+        raise InputError('input exceeds max input bytes limit')
     try:
         text = data.decode('utf-8-sig')
     except UnicodeDecodeError:
@@ -70,9 +78,9 @@ def load(path, key):
     return header, rows, hashlib.sha256(data).hexdigest()
 
 
-def compare(before, after, key, ignore_columns=(), summary_only=False):
-    old_header, old, old_hash = load(before, key)
-    new_header, new, new_hash = load(after, key)
+def compare(before, after, key, ignore_columns=(), summary_only=False, max_input_bytes=None):
+    old_header, old, old_hash = load(before, key, max_input_bytes)
+    new_header, new, new_hash = load(after, key, max_input_bytes)
     # Header order may differ; column additions/removals require explicit review.
     if set(old_header) != set(new_header):
         raise InputError('column sets differ; reconcile schemas before comparison')
@@ -163,12 +171,15 @@ def main(argv=None):
                         help='ignore one exact non-key column; repeat for multiple columns')
     parser.add_argument('--summary-only', action='store_true',
                         help='omit record positions and per-record details; retain counts and column totals')
+    parser.add_argument('--max-input-bytes', type=int, default=MAX_BYTES, metavar='N',
+                        help='per-input byte limit, 1 to 10485760 (default: 10485760)')
     parser.add_argument('--output', help='create a new report file; existing paths are refused')
     try:
         parser.add_argument('--version', action='version',
                             version=f'csv-change-report {VERSION}')
         args = parser.parse_args(argv)
-        result = compare(args.before, args.after, args.key, args.ignore_column, args.summary_only)
+        limit = input_byte_limit(args.max_input_bytes)
+        result = compare(args.before, args.after, args.key, args.ignore_column, args.summary_only, limit)
     except (InputError, OSError) as error:
         # Do not echo file paths or cell values in diagnostics.
         message = str(error) if isinstance(error, InputError) else 'input file could not be read'
