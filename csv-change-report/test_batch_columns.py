@@ -1,5 +1,9 @@
 """Synthetic CLI checks for optional batch column counts."""
 import json
+import contextlib
+import io
+import runpy
+from unittest.mock import patch
 from pathlib import Path
 import subprocess
 import sys
@@ -91,6 +95,41 @@ class BatchColumnTests(unittest.TestCase):
         self.report(1);r=self.invoke([1],extra=['--row-counts']);d=json.loads(r.stdout)
         self.assertEqual(r.returncode,1);self.assertEqual(d['rows']['changed'],1)
         self.assertEqual(d['column_tally']['changed_records'],1)
+
+    def test_combined_options_open_each_report_once(self):
+        module = runpy.run_path(str(ROOT/'evaluation/batch-totals.py'))
+        for summary in (True, False):
+            for options in (['--column-counts'], ['--pair-column-counts'],
+                            ['--column-counts', '--pair-column-counts']):
+                with self.subTest(summary=summary, options=options):
+                    self.report(1, equal=True, summary=summary)
+                    self.report(2, summary=summary)
+                    self.invoke([0, 1])
+                    before = {p.name: p.read_bytes() for p in self.root.iterdir() if p.is_file()}
+                    opens = {}
+                    original = Path.open
+                    def open_once(path, *args, **kwargs):
+                        if path.parent == self.root and path.suffix == '.json':
+                            opens[path.name] = opens.get(path.name, 0) + 1
+                            if opens[path.name] > 1:
+                                raise OSError('synthetic second-read refusal')
+                        return original(path, *args, **kwargs)
+                    stdout, stderr = io.StringIO(), io.StringIO()
+                    argv = ['batch-totals', str(self.table), '--expected-pairs', '2',
+                            '--row-counts'] + options
+                    with patch.object(sys, 'argv', argv), patch.object(Path, 'open', open_once), \
+                            contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                        code = module['main']()
+                    self.assertEqual(code, 1, stderr.getvalue())
+                    self.assertEqual(opens, {'pair-0001.json': 1, 'pair-0002.json': 1})
+                    data = json.loads(stdout.getvalue())
+                    self.assertEqual(data['rows'], dict(added=0, removed=0, changed=1, unchanged=1))
+                    if '--column-counts' in options:
+                        self.assertEqual(data['column_tally']['changed_records'], 1)
+                    if '--pair-column-counts' in options:
+                        self.assertEqual([x['changed_records'] for x in data['pair_column_tallies']], [0, 1])
+                    self.assertNotIn('PRIVATE_', stdout.getvalue() + stderr.getvalue())
+                    self.assertEqual(before, {p.name: p.read_bytes() for p in self.root.iterdir() if p.is_file()})
 
     def test_added_only_is_valid_changed_status(self):
         self.before.write_text('id,z,a\n')
