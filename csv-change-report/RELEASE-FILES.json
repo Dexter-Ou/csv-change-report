@@ -18,6 +18,7 @@
   "examples/after.csv",
   "examples/before.csv",
   "examples/expected-report.json",
+  "test_batch_budget.py",
   "test_csv_change.py",
   "test_ignore_columns.py",
   "test_input_budget.py",
