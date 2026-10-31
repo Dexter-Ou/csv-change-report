@@ -1,7 +1,7 @@
 # CSV Change Report
 
 Compare two CSV exports by a stable unique key, offline, without uploading data.
-The JSON report locates added, removed and changed records and names changed
+The JSON or optional text report locates added, removed and changed records and names changed
 columns without including cell values. This free MIT-licensed preview is an
 experiment by Gong LLC. Usefulness and willingness to pay remain unverified.
 
@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/f4a14b2b8a34bb4fe123494003c5cfbbde959f95).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/003da90913106101c8fc16ac53421823e88b1948).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-f4a14b2b8a34bb4fe123494003c5cfbbde959f95`.
+   named `csv-change-report-003da90913106101c8fc16ac53421823e88b1948`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -36,7 +36,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Eighteen synthetic test methods passed on the isolated Linux worker. These are
+Twenty-two synthetic test methods passed on the isolated Linux worker. These are
 software checks, not customer validation or an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -50,6 +50,17 @@ Use copies of snapshots you are authorized to process. Do not redirect output
 onto either input: the shell can truncate it before the tool runs. Successful
 comparisons exit 0 even when changes exist; errors exit 2 with JSON on stderr.
 For command errors, consult `--help`; the error deliberately omits supplied text.
+
+For a terminal summary without input hashes, add `--format text`:
+
+```sh
+python3 csv_change.py examples/before.csv examples/after.csv --key id --format text
+```
+
+Text shows the same counts and record locations, with quoted column names and
+per-column change counts. Unicode and control characters in column names are
+escaped. JSON remains the default; `--format json` selects it explicitly.
+Both formats omit cell values and paths; errors remain JSON on stderr.
 
 ## Fit and limits
 
