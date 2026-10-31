@@ -30,3 +30,17 @@ The revised suite passed 66 unittest methods on Linux with synthetic inputs,
 including manifest boundaries, path/key handling and explicit-triple equivalence.
 The CLI version remains 0.1.10-preview. Windows/macOS and hostile concurrent
 writes remain untested.
+
+
+## Actionable manifest refusals
+
+Manifest validation now emits fixed reason codes and recovery actions without
+including supplied paths, JSON contents or exception messages. Command argument
+errors also use fixed text. JSON nesting is limited to 32 structural levels;
+brackets inside JSON strings do not count. Validation refusals create no report
+directory. After validation, the batch runner retains its existing output rules.
+
+The revised suite passed 69 unittest methods on synthetic Linux inputs, including
+all refusal categories, no-output assertions, 32/33-level nesting boundaries and
+quoted brackets. The unavailable-shell case uses fault injection. CLI version
+remains 0.1.10-preview; Windows/macOS and hostile concurrent edits are untested.
