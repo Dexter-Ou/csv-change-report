@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/709b775885c8307aab7e0325eed15c7564b97c6d).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/9a7503a9ec48ac541851feb11ec5d222535799fe).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-709b775885c8307aab7e0325eed15c7564b97c6d`.
+   named `csv-change-report-9a7503a9ec48ac541851feb11ec5d222535799fe`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -281,3 +281,5 @@ methods, including no-runner and no-report checks. Windows/macOS remain untested
 
 
 Follow the [manifest recovery walkthrough](csv-change-report/evaluation/RECOVERY.md#4-separate-manifest-preflight-from-csv-execution) to distinguish successful manifest preflight from a missing CSV during execution, preserve a failed attempt and retry with a corrected manifest in a new report directory. All six literal recovery blocks and 71 regression methods passed with synthetic Linux fixtures on the candidate and pinned download.
+
+Leading UTF-8 BOM manifests receive fixed `E_BOM` guidance. Follow [recovery step 6](csv-change-report/evaluation/RECOVERY.md#6-recover-a-manifest-exported-with-a-leading-utf-8-bom) to preserve the original and create a separate same-directory copy. Candidate checks passed 73 synthetic Linux unittest methods and both new literal recovery blocks; Windows/macOS remain untested.
