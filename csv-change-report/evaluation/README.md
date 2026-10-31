@@ -100,7 +100,7 @@ To check equal/error handling, repeat the summary command using
 `examples/before.csv` as AFTER (expected status 0), then
 `evaluation/duplicate-key.csv` as AFTER (expected status 2, stderr diagnostic,
 empty stdout). Never interpret status 2 as an unchanged export. These are
-synthetic practice tasks; review speed and usefulness remain unmeasured.
+synthetic practice tasks.
 
 ## Review several pairs offline
 
@@ -128,8 +128,13 @@ empty). Pair order is the only mapping to the supplied paths; retain your comman
 locally if needed. The table contains no input paths or key names.
 
 Batch exit status is 2 if any pair errors (including unexpected CLI statuses),
-otherwise 1 if any pair changed, otherwise 0. Inspect each raw status: an error
-is never equality. A missing Python interpreter may produce raw status 127.
+otherwise 1 if any pair changed, otherwise 0. Inspect each pair status: an error
+is never equality. Unexpected comparator statuses (including a missing interpreter)
+are normalized to 2. Before recording 0 or 1, the helper validates a regular,
+nonempty version 2 summary: JSON fields, counts, hashes, column totals and
+agreement with the comparator status. Invalid reports are retained for inspection
+but have report `-` in the table. Validation checks structure and internal
+consistency; it does not prove source provenance or protect against concurrent edits.
 An interruption or disk/write failure can leave an incomplete directory/table;
 there is no resume, transaction or crash-durability guarantee. Treat incomplete
 runs as failures, preserve diagnostics and rerun into a different new directory.
@@ -176,7 +181,7 @@ needs no content-change review under this keyed comparison; pair-0003 still need
 a domain decision about repeated keys. Reviewing pair-0002 does not repair that
 error or approve the batch. Preserve the partial/error evidence; after correcting
 a copy of invalid input, use a different new report directory. See the answer key
-for exact expected results. This exercise tests mechanics, not human review speed.
+for exact expected results.
 
 ## Count batch results, including missing pairs
 
@@ -219,7 +224,7 @@ https://github.com/Dexter-Ou/csv-change-report/issues using `FEEDBACK.md` as a p
 An account is needed only for GitHub feedback. Public issues are public: do not
 paste private exports, cell values, column names, paths, hashes, customer details
 or secrets. Describe behavior in general terms or use a tiny invented example.
-No feedback is sent automatically. A lack of issues does not demonstrate success.
+No feedback is sent automatically.
 
 ### Optional batch input budget
 
@@ -241,7 +246,7 @@ and retry reviewed inputs in a fresh directory; see RECOVERY.md.
 
 Start at [READER-START.md](READER-START.md). Record your answers to
 [READER-TASK.md](READER-TASK.md) before consulting [ANSWER-KEY.md](ANSWER-KEY.md).
-These tasks use bundled synthetic inputs; no independent reader results exist.
+These tasks use bundled synthetic inputs.
 
 ### Optional batch ignored column
 
