@@ -85,10 +85,11 @@ while [ "$#" -gt 0 ]; do
     report=-
     case "$status" in
         0|1)
-            if [ -f "$report_dir/$stem.json" ] && [ -s "$report_dir/$stem.json" ]; then
+            if [ -f "$report_dir/$stem.json" ] && [ -s "$report_dir/$stem.json" ] &&
+               (python3 "$kit_dir/report_schema.py" "$report_dir/$stem.json" "$status" >> "$report_dir/$stem.stdout" 2>> "$report_dir/$stem.stderr"); then
                 report=$stem.json
             else
-                echo "Missing regular nonempty report for $stem; comparison is incomplete." >&2
+                echo "Missing, invalid or inconsistent summary report for $stem; comparison is incomplete." >&2
                 status=2
             fi ;;
         *) status=2 ;;
