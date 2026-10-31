@@ -74,14 +74,28 @@ while [ "$#" -gt 0 ]; do
     case "$before" in /*) ;; *) before=./$before ;; esac
     case "$after" in /*) ;; *) after=./$after ;; esac
     status=0
-    run_compare "$before" "$after" --key "$key" --check --summary-only --max-input-bytes "$max_input_bytes" \
-        --output "$report_dir/$stem.json" > "$report_dir/$stem.stdout" 2> "$report_dir/$stem.stderr" || status=$?
+    # Isolate setup so a shell redirection failure cannot look like differences.
+    if ! (: > "$report_dir/$stem.stdout" 2> "$report_dir/$stem.stderr"); then
+        status=2
+        echo "Cannot initialize output streams for $stem." >&2
+    else
+        (run_compare "$before" "$after" --key "$key" --check --summary-only --max-input-bytes "$max_input_bytes" \
+            --output "$report_dir/$stem.json" > "$report_dir/$stem.stdout" 2> "$report_dir/$stem.stderr") || status=$?
+    fi
     report=-
     case "$status" in
-        0) report=$stem.json ;;
-        1) report=$stem.json
-           if [ "$batch_status" -eq 0 ]; then batch_status=1; fi ;;
-        *) batch_status=2 ;;
+        0|1)
+            if [ -f "$report_dir/$stem.json" ] && [ -s "$report_dir/$stem.json" ]; then
+                report=$stem.json
+            else
+                echo "Missing regular nonempty report for $stem; comparison is incomplete." >&2
+                status=2
+            fi ;;
+        *) status=2 ;;
+    esac
+    case "$status" in
+        1) if [ "$batch_status" -eq 0 ]; then batch_status=1; fi ;;
+        2) batch_status=2 ;;
     esac
     if ! (printf '%s\t%s\t%s\t%s\n' "$stem" "$status" "$report" "$stem.stderr" >> "$report_dir/status.tsv"); then
         echo 'Cannot append batch status; batch is incomplete. Do not treat existing pair reports as a complete batch.' >&2
