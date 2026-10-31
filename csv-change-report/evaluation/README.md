@@ -238,3 +238,9 @@ before creating a directory. An over-budget pair records status 2 and no JSON
 report; later pairs still run. Batch status 2 overrides changed status 1.
 The limit bounds raw bytes per input, not total memory. Preserve a failed batch
 and retry reviewed inputs in a fresh directory; see RECOVERY.md.
+
+## Optional six-task reader worksheet
+
+Start at [READER-START.md](READER-START.md). Record your answers to
+[READER-TASK.md](READER-TASK.md) before consulting [ANSWER-KEY.md](ANSWER-KEY.md).
+These tasks use bundled synthetic inputs; no independent reader results exist.
