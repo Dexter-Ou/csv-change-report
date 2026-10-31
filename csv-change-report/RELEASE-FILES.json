@@ -1,0 +1,11 @@
+[
+  "LICENSE",
+  "README.md",
+  "RELEASE.md",
+  "RELEASE-FILES.json",
+  "csv_change.py",
+  "test_csv_change.py",
+  "examples/after.csv",
+  "examples/before.csv",
+  "examples/expected-report.json"
+]
