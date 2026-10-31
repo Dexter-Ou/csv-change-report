@@ -2,8 +2,7 @@
 
 Compare two UTF-8 CSV exports by one stable unique key and produce a JSON or text change
 summary. For an operator reviewing recurring exports who wants to locate changed
-records without uploading their data. This usefulness hypothesis is unverified.
-No customer testing, price, willingness to pay or earnings is established.
+records without uploading their data. Free, MIT-licensed preview from Gong LLC.
 
 **Synthetic runtime checks passed** on the isolated worker (Python 3.12.15,
 2026-10-31): the included test suite, fresh extraction, example oracle and help.
@@ -89,12 +88,12 @@ case "$status" in
 esac
 ```
 
-This is a local scripting feature hypothesis, not evidence of customer use.
+Use these exit statuses when scripting local comparisons.
 
 Recovery: preserve original snapshots, source version and hashes; correct invalid
 inputs in copies, then rerun. No database, persistent service or migration.
 
-Original source by the Gong LLC economic experiment; no downloaded code/assets.
+Original source by Gong LLC.
 MIT licensed; see `LICENSE`. The exact archive inventory and worker
 release checks are in `RELEASE-FILES.json` and `RELEASE.md`. Public source is intended for GitHub download; a repository is not a hosted site.
 Local copies are not off-VM backups. Keep your own verified source copy.
@@ -111,7 +110,7 @@ Ignore explicitly selected volatile fields with repeated `--ignore-column NAME`:
 python3 csv_change.py before.csv after.csv --key id --check --ignore-column updated_at --ignore-column export_nonce
 ```
 
-This is a speculative export-review workflow, without independent demand evidence.
+Use ignored columns to filter selected export metadata.
 Names are exact and case-sensitive; duplicate selections are deduplicated. Key
 columns and missing names are rejected. Both full column sets must still match.
 Every input cell and row remains subject to validation/limits, and hashes cover
@@ -140,7 +139,7 @@ It retains full-input SHA-256 hashes. Summary text omits record details and, lik
 all text output, input hashes. Default detailed JSON remains format version 1.
 This is an output-size feature, not streaming: both input snapshots remain in
 memory. Column names, counts and hashes can still disclose sensitive metadata.
-Independent usefulness and willingness to pay remain unverified.
+
 
 
 ### Smaller input byte budgets
