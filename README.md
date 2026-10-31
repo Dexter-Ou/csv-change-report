@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/b52d2bd2cb3dbfdf51adf41af3be1bf582ab2ae8).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/ba5959c993eeeb7956087e4462b135c137c5f6ac).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-b52d2bd2cb3dbfdf51adf41af3be1bf582ab2ae8`.
+   named `csv-change-report-ba5959c993eeeb7956087e4462b135c137c5f6ac`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -36,8 +36,8 @@ python3 csv_change.py --help
 python3 -m unittest -v test_column_tally test_batch_columns
 ```
 
-One hundred eighteen synthetic test methods passed on the isolated Linux worker. These are
-synthetic software checks, not an assurance for hostile inputs.
+The 21-method batch-column suite and the two-schema example passed on Linux. These
+synthetic software checks are not an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
 For your own files, replace both paths and the key column name:
@@ -309,3 +309,7 @@ Summarize per-column changed cells across successful batch reports with
 from the inner product directory. Errors and unfinished pairs produce `partial: true`
 and exit 2; malformed successful reports produce no totals. See the
 [batch tally instructions](csv-change-report/evaluation/README.md) for limits.
+
+Compare merged and separate column counts with the copyable
+[two-schema batch example](csv-change-report/evaluation/TWO-SCHEMA-EXAMPLE.md).
+It keeps same-named invoice and stock fields separate by generated pair ID.
