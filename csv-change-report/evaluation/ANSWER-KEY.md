@@ -17,5 +17,4 @@
    locally for cell values. Preserve old outputs and choose an unused batch
    directory; the parent must exist.
 
-Answers were checked mechanically against bundled fixtures on Linux;
-human usability has not been measured.
+Answers were checked mechanically against bundled synthetic fixtures on Linux.
