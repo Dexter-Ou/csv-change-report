@@ -165,7 +165,7 @@ class ProcessTests(unittest.TestCase):
     def test_process_version(self):
         result = self.run_cli('--version')
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, 'csv-change-report 0.1.3-preview\n')
+        self.assertEqual(result.stdout, 'csv-change-report 0.1.4-preview\n')
         self.assertEqual(result.stderr, '')
         self.assertEqual(list(self.root.iterdir()), [])
 
@@ -189,7 +189,7 @@ class ProcessTests(unittest.TestCase):
         for result in (default, explicit, text):
             self.assertEqual((result.returncode, result.stderr), (0, ''))
         self.assertEqual(default.stdout, explicit.stdout)
-        self.assertEqual(text.stdout, 'CSV Change Report 0.1.3-preview\n'
+        self.assertEqual(text.stdout, 'CSV Change Report 0.1.4-preview\n'
                          'Records: before 3, after 3\n'
                          'Changes: added 1, removed 1, changed 1, unchanged 1\n'
                          'Added after records: 2\nRemoved before records: 2\n'
@@ -222,7 +222,7 @@ class ProcessTests(unittest.TestCase):
         path.write_text('id\n')
         result = self.run_cli(path, path, '--key', 'id', '--format', 'text')
         self.assertEqual((result.returncode, result.stderr), (0, ''))
-        self.assertEqual(result.stdout, 'CSV Change Report 0.1.3-preview\n'
+        self.assertEqual(result.stdout, 'CSV Change Report 0.1.4-preview\n'
                          'Records: before 0, after 0\n'
                          'Changes: added 0, removed 0, changed 0, unchanged 0\n'
                          'Added after records: none\nRemoved before records: none\n'
@@ -236,6 +236,73 @@ class ProcessTests(unittest.TestCase):
                        else 'input file could not be read')
             self.assertEqual(json.loads(result.stderr), {'error': message})
             self.assertNotIn('Private-', result.stderr)
+
+    def test_process_output_matches_stdout_and_private_mode(self):
+        before = self.source / 'examples' / 'before.csv'
+        after = self.source / 'examples' / 'after.csv'
+        snapshots = (before.read_bytes(), after.read_bytes())
+        for fmt in ('json', 'text'):
+            target = self.root / ('report.' + fmt)
+            expected = self.run_cli(before, after, '--key', 'id', '--format', fmt)
+            result = self.run_cli(before, after, '--key', 'id', '--format', fmt,
+                                  '--output', target)
+            self.assertEqual((result.returncode, result.stdout, result.stderr), (0, '', ''))
+            self.assertEqual(target.read_bytes(), expected.stdout.encode('utf-8'))
+            self.assertEqual(target.stat().st_mode & 0o777, 0o600)
+        self.assertEqual((before.read_bytes(), after.read_bytes()), snapshots)
+
+    def test_process_output_refuses_existing_links_and_inputs(self):
+        import os
+        before = self.root / 'before.csv'
+        after = self.root / 'after.csv'
+        before.write_text('id,x\na,Private-Old\n')
+        after.write_text('id,x\na,Private-New\n')
+        snapshots = (before.read_bytes(), after.read_bytes())
+        existing = self.root / 'Private-Existing'
+        existing.write_bytes(b'Private-Preserved')
+        link = self.root / 'Private-Link'
+        link.symlink_to(existing)
+        dangling = self.root / 'Private-Dangling'
+        dangling.symlink_to(self.root / 'absent')
+        input_link = self.root / 'Private-Input-Link'
+        input_link.symlink_to(before)
+        hard = self.root / 'Private-Hardlink'
+        os.link(after, hard)
+        directory = self.root / 'Private-Directory'
+        directory.mkdir()
+        for target, message in [
+                (before, 'output path matches an input'),
+                (after, 'output path matches an input'),
+                (before.parent / '.' / before.name, 'output path matches an input'),
+                (input_link, 'output path matches an input'),
+                *[(p, 'output path already exists') for p in
+                  (existing, link, dangling, hard, directory)]]:
+            for fmt in ('json', 'text'):
+                with self.subTest(target=target.name, fmt=fmt):
+                    result = self.run_cli(before, after, '--key', 'id', '--format', fmt,
+                                          '--output', target)
+                    self.assertEqual((result.returncode, result.stdout), (2, ''))
+                    self.assertEqual(json.loads(result.stderr), {'error': message})
+                    self.assertNotIn('Private-', result.stderr)
+                    self.assertEqual((before.read_bytes(), after.read_bytes()), snapshots)
+                    self.assertEqual(existing.read_bytes(), b'Private-Preserved')
+                    self.assertTrue(link.is_symlink() and dangling.is_symlink())
+                    self.assertFalse((self.root / 'absent').exists())
+
+    def test_process_output_failure_and_invalid_input_create_nothing(self):
+        valid = self.root / 'valid.csv'
+        valid.write_text('id\na\n')
+        target = self.root / 'Private-Missing-Parent' / 'report'
+        result = self.run_cli(valid, valid, '--key', 'id', '--output', target)
+        self.assertEqual((result.returncode, result.stdout), (2, ''))
+        self.assertEqual(json.loads(result.stderr), {'error': 'output file could not be written'})
+        self.assertNotIn('Private-', result.stderr)
+        self.assertFalse(target.parent.exists())
+        target = self.root / 'report'
+        result = self.run_cli(self.root / 'missing', valid, '--key', 'id', '--output', target)
+        self.assertEqual((result.returncode, result.stdout), (2, ''))
+        self.assertEqual(json.loads(result.stderr), {'error': 'input file could not be read'})
+        self.assertFalse(target.exists())
 
     def test_process_help(self):
         result = self.run_cli('--help')
