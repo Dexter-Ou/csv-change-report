@@ -92,6 +92,93 @@ class ManifestTests(unittest.TestCase):
             cwd=self.root, capture_output=True, timeout=20)
         self.assert_refusal(missing_report, 'E_ARGUMENTS')
 
+    def assert_json_result(self, result, code, pairs=None):
+        self.assertEqual(result.returncode, 0 if code == 'OK' else 2)
+        self.assertEqual(json.loads(result.stdout), {
+            'version': 1, 'valid': code == 'OK', 'code': code,
+            'pair_count': pairs, 'csv_files_checked': False, 'reports_created': False})
+        self.assertEqual(len(result.stdout.splitlines()), 1)
+        self.assertNotIn(b'PRIVATE_SENTINEL', result.stdout + result.stderr)
+        if code == 'OK':
+            self.assertEqual(result.stderr, b'')
+        else:
+            self.assertEqual(result.stderr, ('Cannot run manifest [' + code + ']: ' +
+                manifest_module.REASONS[code] + '\n').encode())
+        self.assertFalse((self.root / 'reports').exists())
+
+    def test_json_preflight_success_counts_and_preserves_inputs(self):
+        for count in (1, 100):
+            self.valid['pairs'] = [dict(before='PRIVATE_SENTINEL missing.csv',
+                after='PRIVATE_SENTINEL $(touch NEVER).csv', key='PRIVATE_SENTINEL')] * count
+            self.write()
+            before = {p: p.read_bytes() for p in self.data.iterdir()}
+            self.assert_json_result(self.run_manifest(options=('--json', '--validate-only')),
+                                    'OK', count)
+            self.assertEqual(before, {p: p.read_bytes() for p in self.data.iterdir()})
+            self.assertFalse((self.root / 'NEVER').exists())
+
+    def test_json_preflight_fixed_failure_codes(self):
+        pair = self.valid['pairs'][0]
+        cases = [
+            (b'\xffPRIVATE_SENTINEL', 'E_ENCODING'),
+            (b'\xef\xbb\xbfPRIVATE_SENTINEL', 'E_BOM'),
+            (b'{PRIVATE_SENTINEL', 'E_JSON'),
+            (b'[' * 33 + b']' * 33, 'E_DEPTH'),
+            (b' ' * 65537, 'E_SIZE'),
+            (b'{"version":1,"version":1,"pairs":[]}', 'E_DUPLICATE'),
+            (b'{"PRIVATE_SENTINEL":1}', 'E_SCHEMA'),
+            (json.dumps(dict(self.valid, version=True)).encode(), 'E_VERSION'),
+            (json.dumps(dict(self.valid, pairs=[])).encode(), 'E_PAIRS'),
+            (json.dumps(dict(self.valid, pairs=[pair, {}])).encode(), 'E_PAIR'),
+            (json.dumps(dict(self.valid, pairs=[dict(pair, key='PRIVATE_SENTINEL\n')])).encode(), 'E_TEXT'),
+        ]
+        for raw, code in cases:
+            with self.subTest(code=code):
+                self.manifest.write_bytes(raw)
+                self.assert_json_result(self.run_manifest(options=('--validate-only', '--json')), code)
+                self.assertEqual(self.manifest.read_bytes(), raw)
+        self.manifest.unlink()
+        self.assert_json_result(self.run_manifest(options=('--validate-only', '--json')), 'E_READ')
+        self.manifest.mkdir()
+        self.assert_json_result(self.run_manifest(options=('--validate-only', '--json')), 'E_FILE')
+
+    def test_json_argument_errors_refuse_execution(self):
+        self.write()
+        for options, code in [
+            (('--json',), 'E_ARGUMENTS'),
+            (('--json', '--validate-only', '--PRIVATE_SENTINEL'), 'E_ARGUMENTS'),
+            (('--validate-only', '--max-input-bytes=PRIVATE_SENTINEL', '--json'), 'E_ARGUMENTS'),
+            (('--json', '--validate-only', '--max-input-bytes=0'), 'E_BUDGET'),
+            (('--json', '--validate-only', '--ignore-column=PRIVATE_SENTINEL\n'), 'E_TEXT'),
+        ]:
+            with self.subTest(options=options):
+                self.assert_json_result(self.run_manifest(options=options), code)
+        result = subprocess.run([sys.executable, str(SCRIPT), '--json', '--validate-only'],
+                                cwd=self.root, capture_output=True, timeout=20)
+        self.assert_json_result(result, 'E_ARGUMENTS')
+
+    def test_json_preflight_never_launches_runner(self):
+        self.write()
+        output = io.StringIO()
+        with mock.patch.object(sys, 'argv', ['batch-manifest.py', '--json', '--validate-only',
+                str(self.manifest), str(self.before)]), \
+             mock.patch.object(manifest_module.subprocess, 'run') as runner, \
+             contextlib.redirect_stdout(output):
+            self.assertEqual(manifest_module.main(), 0)
+        runner.assert_not_called()
+        self.assertEqual(json.loads(output.getvalue())['pair_count'], 1)
+        self.assertEqual(self.before.read_text(), 'id,value,time\n1,a,x\n')
+
+    def test_json_flag_after_double_dash_is_literal_filename(self):
+        self.write()
+        literal = self.root / '--json'
+        literal.write_bytes(self.manifest.read_bytes())
+        result = subprocess.run([sys.executable, str(SCRIPT), '--validate-only', '--', '--json'],
+                                cwd=self.root, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0)
+        self.assertTrue(result.stdout.startswith(b'Manifest valid: 1 pair(s);'))
+        self.assertEqual(result.stderr, b'')
+
     def test_leading_bom_refusal_and_separate_copy_recovery(self):
         for newline in ('\n', '\r\n'):
             with self.subTest(newline=newline):
