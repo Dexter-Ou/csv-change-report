@@ -611,3 +611,21 @@ access. Cell values are not copied, but column names remain visible and may be
 sensitive. JSON escaping keeps control characters escaped. Validation checks
 count types and arithmetic, not report authenticity or agreement with source CSVs.
 Untrusted reports can forge valid counts or put arbitrary text in column names.
+
+Optional batch column counts (offline, report-only):
+
+```sh
+python3 evaluation/batch-totals.py /path/to/status.tsv --expected-pairs 3 --column-counts
+```
+
+`column_tally` sums changed cells and changed records across successful reports,
+with sorted column names and a count of included reports. Failed pairs are
+excluded even if stale report files exist. `partial: true` means errors or
+unfinished pairs were excluded; an empty tally does not imply a successful run.
+Exit status remains 0 for equal, 1 for changed, 2 for errors/incomplete runs.
+An unreadable or invalid successful report fails with no JSON totals.
+Combine with `--row-counts` when row totals are also wanted. Added/removed rows
+are excluded from column counts, so an added-only batch can have zero changed
+cells. No CSV is opened or cell values copied. Column names remain visible.
+Counts and status tables are not authenticated; reports from different schemas
+combine identical column names. Concurrent report mutation is not supported.
