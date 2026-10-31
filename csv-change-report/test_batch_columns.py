@@ -27,12 +27,12 @@ class BatchColumnTests(unittest.TestCase):
         path.write_text(json.dumps(data))
         return path
 
-    def invoke(self, statuses, expected=None, extra=()):
+    def invoke(self, statuses, expected=None, extra=(), table_text=None):
         lines = ['pair\tstatus\treport\tdiagnostic']
         for i, status in enumerate(statuses, 1):
             stem = f'pair-{i:04d}'
             lines.append(f'{stem}\t{status}\t' + (stem+'.json' if status in (0,1) else '-') + f'\t{stem}.stderr')
-        self.table.write_text('\n'.join(lines)+'\n')
+        self.table.write_text(table_text if table_text is not None else '\n'.join(lines)+'\n')
         before = {p.name:p.read_bytes() for p in self.root.iterdir() if p.is_file()}
         r = subprocess.run(PYTHON + [str(ROOT/'evaluation/batch-totals.py'),str(self.table),
             '--expected-pairs',str(expected or len(statuses)), '--column-counts'] + list(extra),capture_output=True)
@@ -97,5 +97,87 @@ class BatchColumnTests(unittest.TestCase):
         self.report(1);r=self.invoke([1]);d=json.loads(r.stdout)
         self.assertEqual(r.returncode,1);self.assertFalse(d['partial'])
         self.assertEqual(d['column_tally']['changed_cells'],0)
+
+    def test_rejects_report_path_and_name_substitutions(self):
+        self.report(1)
+        for name in ('../pair-0001.json', '/pair-0001.json',
+                     r'..\pair-0001.json', 'sub/pair-0001.json',
+                     './pair-0001.json', 'pair-0002.json', '-',
+                     'pair-0001.json ', 'PAIR-0001.json'):
+            for extra in ((), ('--row-counts',)):
+                with self.subTest(name=name, extra=extra):
+                    table = 'pair\tstatus\treport\tdiagnostic\n' + (
+                        f'pair-0001\t1\t{name}\tpair-0001.stderr\n')
+                    r = self.invoke([1], extra=extra, table_text=table)
+                    self.assertEqual(r.returncode, 2)
+                    self.assertEqual(r.stdout, b'')
+                    self.assertTrue(r.stderr.startswith(b'Cannot summarize:'))
+
+    def test_rejects_pair_and_diagnostic_substitutions(self):
+        self.report(1)
+        for pair, diagnostic in (
+                ('../pair-0001', 'pair-0001.stderr'),
+                ('pair-0002', 'pair-0001.stderr'),
+                ('pair-0001', '../pair-0001.stderr'),
+                ('pair-0001', '/pair-0001.stderr'),
+                ('pair-0001', 'pair-0002.stderr'),
+                ('pair-0001', '-')):
+            with self.subTest(pair=pair, diagnostic=diagnostic):
+                table = 'pair\tstatus\treport\tdiagnostic\n' + (
+                    f'{pair}\t1\tpair-0001.json\t{diagnostic}\n')
+                r = self.invoke([1], table_text=table)
+                self.assertEqual(r.returncode, 2)
+                self.assertEqual(r.stdout, b'')
+
+    def test_rejects_report_name_on_failed_pair(self):
+        self.report(1)
+        table = ('pair\tstatus\treport\tdiagnostic\n'
+                 'pair-0001\t2\tpair-0001.json\tpair-0001.stderr\n')
+        r = self.invoke([2], table_text=table)
+        self.assertEqual(r.returncode, 2)
+        self.assertEqual(r.stdout, b'')
+
+    def test_rejects_malformed_table_records(self):
+        self.report(1)
+        header = 'pair\tstatus\treport\tdiagnostic\n'
+        row = 'pair-0001\t1\tpair-0001.json\tpair-0001.stderr'
+        for text in (header + row, header + row + '\textra\n',
+                     header + row + '\n' + row + '\n',
+                     header + row.replace('\t1\t', '\t01\t') + '\n',
+                     header + row.replace('\t1\t', '\t-1\t') + '\n'):
+            with self.subTest(text=text):
+                r = self.invoke([1], table_text=text)
+                self.assertEqual(r.returncode, 2)
+                self.assertEqual(r.stdout, b'')
+
+    def test_same_names_merge_across_different_schemas(self):
+        self.report(1)
+        self.before.write_text('id,a,other\n1,old,same\n')
+        self.after.write_text('id,a,other\n1,new,same\n')
+        self.report(2)
+        r = self.invoke([1, 1])
+        self.assertEqual(r.returncode, 1, r.stderr)
+        tally = json.loads(r.stdout)['column_tally']
+        self.assertEqual(tally['columns'], [dict(column='a', changed_cells=2),
+                                          dict(column='other', changed_cells=0),
+                                          dict(column='z', changed_cells=1)])
+        self.assertEqual(tally['changed_cells'], 3)
+        self.assertEqual(tally['reports'], 2)
+
+    def test_column_names_are_data_and_json_escaped(self):
+        import csv
+        names = ['../report', 'a\tb', 'line\nbreak', 'é', 'A', 'a']
+        for path, value in ((self.before, 'old'), (self.after, 'new')):
+            with path.open('w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['id'] + names)
+                writer.writerow(['1'] + [value] * len(names))
+        self.report(1)
+        r = self.invoke([1])
+        self.assertEqual(r.returncode, 1, r.stderr)
+        self.assertEqual([c['column'] for c in json.loads(r.stdout)['column_tally']['columns']],
+                         sorted(names))
+        self.assertEqual(r.stdout.count(b'\n'), 1)
+        self.assertNotIn(b'\t', r.stdout)
 
 if __name__ == '__main__':unittest.main()
