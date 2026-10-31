@@ -17,6 +17,5 @@
    locally for cell values. Preserve old outputs and choose an unused batch
    directory; the parent must exist.
 
-No human completed this exercise. Mechanical agreement validates these answer
-claims for bundled fixtures on Linux; it cannot establish discoverability,
-comprehension, task success rate, usefulness or willingness to pay.
+Answers were checked mechanically against bundled fixtures on Linux;
+human usability has not been measured.
