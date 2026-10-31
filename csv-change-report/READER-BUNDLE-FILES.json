@@ -1,6 +1,6 @@
 {
-  "base_commit": "d0a89d3110a401c2ae3489b167046346bf59703a",
-  "status": "reader bundle with optional batch row totals",
+  "base_commit": "5a73089ef6e0b7aeb0f3e351a39632667aab66b4",
+  "status": "reader bundle with normalized totals output I/O errors",
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
     "QUICKSTART.md": "a373bc2b551028280589c30c7ff7dc410147e3933c5c0d53f49a145abc7f688c",
@@ -16,7 +16,7 @@
     "evaluation/README.md": "5a5ff611a9cca6dfd73b77d1f41ac378f22145f299c97339e7d2bcd22b6a1630",
     "evaluation/RECOVERY.md": "ede9d0204b80016a2e74d1d73dace8bf37fb05b175547889ed822d4dae4d7fcb",
     "evaluation/TIMESTAMP-RECIPE.md": "5ba8b799a39a0c02ed841f31f15ecb909e2c6f514db574124b90066c8387b939",
-    "evaluation/batch-review.sh": "660ee64debe467a9aedb0e9e13b5931d308a718d2f59231da8932a41d76ddbac",
+    "evaluation/batch-review.sh": "f708d41614372126a1521411a01e2f6b5485ee301655145c4346b718142fcffc",
     "evaluation/batch-totals.py": "29e93fc170526c14ea46c13db843607d674f4caf108b55d911ee144e49c9b42e",
     "evaluation/duplicate-key.csv": "33adb2b84dcd9323c8a543454cb67642bb45d5694102e0bfd177f77811f4945d",
     "evaluation/retained-change.csv": "24fadd3a080e261ded1a9bc74d2817e974030b1072920a39495d4c6cc59e94a5",
