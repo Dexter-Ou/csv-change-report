@@ -527,3 +527,44 @@ Unexpected or non-JSON preflight output stops this block before comparison.
 Execution output has its own privacy limits; this example captures it without
 printing supplied paths or CSV content. Files may change after preflight; no
 concurrent-edit protection is provided. Tested on Linux only.
+
+### Standalone checked batch automation
+
+From the extracted product directory, run:
+
+```sh
+status=0
+python3 evaluation/automate-batch.py evaluation/sample-manifest.json './automated reports' || status=$?
+printf 'Automation status: %s\n' "$status"
+```
+
+Use an existing manifest in place of `evaluation/sample-manifest.json` if needed;
+see the manifest format above. The report directory must be new and its parent
+must exist. The helper also runs from other working directories when you supply
+its path and your manifest/report paths. Manifest CSV paths remain relative to
+the manifest directory. Python 3.10+ and the bundled POSIX shell runner are needed.
+
+Exit status is 0 for equal, 1 for changed and 2 for error. A single JSON object on
+stdout contains version=1, code, status and pair_count (null when preflight was
+not accepted). Codes: EQUAL, CHANGED, E_COMPARISON (completed with pair errors),
+E_ARGUMENTS, E_PREFLIGHT, E_OUTPUT (report path already exists),
+E_EXECUTION (unexpected runner exit), E_STATUS (missing,
+incomplete, malformed or inconsistent status table). `--help` prints ordinary
+usage text. Full option names are required; use `--` before positional arguments
+that start with a dash.
+
+The helper checks exact successful preflight field types, executes only accepted
+preflight, then checks complete status-table counts and agreement with execution.
+Preflight does not check CSV contents. Reports and per-pair diagnostics remain in
+the requested directory; existing directories are refused. Failures before a
+complete table produce E_STATUS; an existing report path produces E_OUTPUT. The
+helper captures child stdout/stderr without echoing paths or CSV values; inspect
+preserved diagnostics locally. Interpreter/OS launch failures before this script
+starts are outside that output contract. There is no automatic cleanup or resume.
+Preserve failed runs and use a different new directory after correction.
+
+This is an offline example for a trusted local directory. It does not authenticate
+helpers/reports, prevent concurrent edits, provide crash durability, or approve
+exports. A changed manifest between preflight and execution can invalidate the
+preflight observation. Table validation does not verify report bytes. Reports
+retain the privacy limits described above. Tested with synthetic inputs on Linux; Windows/macOS are untested.
