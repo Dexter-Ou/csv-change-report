@@ -53,3 +53,22 @@ Self-comparison summary has before=3, after=3, unchanged=3, all change counts
 and column totals zero; status 0. Duplicate-key comparison has no report,
 fixed JSON diagnostic on stderr and status 2. Text summary retains counts and
 column totals but no per-record locations; JSON retains full-input hashes.
+
+## Mixed-batch interpretation
+
+Batch status 2 means at least one error, not that every pair failed. The complete
+three-row table has pair-0001 status 0 and pair-0001.json, pair-0002 status 1 and
+pair-0002.json, pair-0003 status 2 and report `-`. The invalid pair has no JSON
+report; inspect pair-0003.stderr for the fixed repeated-key diagnostic. No usable
+comparison result exists for that pair. Do not interpret it as equality.
+
+The changed pair is the second BEFORE/AFTER/KEY triple: examples/before.csv,
+examples/after.csv, id. Its summary counts are before=3, after=3, added=1,
+removed=1, changed=1, unchanged=1. The separate detail command exits 1 and retains
+those counts and both full-input hashes. It locates addition at after record 2,
+removal at before record 2 and changed column status at before/after record 1.
+Summary omits these locations. The detail report is a separate file and does not
+change the table or summary. Repeating the detail command against its existing
+output exits 2 and preserves that file. Neither report contains old/new values.
+Pair-0003 requires input correction based on domain knowledge, then a new batch
+report directory; this exercise deliberately leaves it unresolved.
