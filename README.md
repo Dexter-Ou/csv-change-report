@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/3b436070b0a5820ba8206623d7795d7c0c957375).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/40e61a90fe1233df474caf492d3e7d029ee6d099).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-3b436070b0a5820ba8206623d7795d7c0c957375`.
+   named `csv-change-report-40e61a90fe1233df474caf492d3e7d029ee6d099`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -270,3 +270,11 @@ See the [diagnostic reference](csv-change-report/evaluation/README.md#manifest-r
 The candidate and pinned public extraction each passed 69 synthetic Linux unittest
 methods, including refusal codes and no-output checks. The unavailable-shell case
 uses fault injection. All five literal guide/setup/manifest shell blocks passed.
+
+
+Validate a batch manifest without running comparisons using `--validate-only`.
+It checks the schema and resolves literal paths without opening CSV files or
+creating reports; missing CSVs still require a normal run to detect. See the
+[preflight example](csv-change-report/evaluation/README.md#manifest-preflight-without-comparisons).
+The candidate and pinned public download passed 71 synthetic Linux unittest
+methods, including no-runner and no-report checks. Windows/macOS remain untested.
