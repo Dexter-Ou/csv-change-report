@@ -103,6 +103,44 @@ To check equal/error handling, repeat the summary command using
 empty stdout). Never interpret status 2 as an unchanged export. These are
 synthetic practice tasks; review speed and usefulness remain unmeasured.
 
+## Review several pairs offline
+
+Run from the extracted product folder in a trusted local directory. The helper
+accepts a new report directory followed by BEFORE, AFTER, KEY triples. Quote
+paths and key names. No manifest is evaluated as shell code. Numeric names follow
+argument order, so repeated basenames and spaces cannot collide. It runs every
+pair even when one comparison fails; it does not approve exports automatically.
+
+```sh
+status=0
+sh evaluation/batch-review.sh './batch reports' \
+  examples/before.csv examples/before.csv id \
+  examples/before.csv examples/after.csv id \
+  examples/before.csv evaluation/duplicate-key.csv id || status=$?
+printf 'Batch status: %s\n' "$status"
+cat './batch reports/status.tsv'
+```
+
+Expected batch status: 2. The tab-separated status table records pair-0001,
+pair-0002, pair-0003 with raw CLI statuses 0, 1, 2 respectively. The first two
+have summary JSON reports; the invalid pair has report `-` and its fixed
+diagnostic in `pair-0003.stderr`. Each pair also has a `.stdout` capture (normally
+empty). Pair order is the only mapping to the supplied paths; retain your command
+locally if needed. The table contains no input paths or key names.
+
+Batch exit status is 2 if any pair errors (including unexpected CLI statuses),
+otherwise 1 if any pair changed, otherwise 0. Inspect each raw status: an error
+is never equality. A missing Python interpreter may produce raw status 127.
+An interruption or disk/write failure can leave an incomplete directory/table;
+there is no resume, transaction or crash-durability guarantee. Treat incomplete
+runs as failures, preserve diagnostics and rerun into a different new directory.
+Existing report directories are refused, never reused. Parent directory must
+exist. No input file is edited. Avoid untrusted/shared writable directories;
+this helper does not defend against another process altering its files.
+Reports retain hashes and column names, and summary reports omit positions.
+Use detailed CLI output separately to locate changes. Synthetic examples are
+not customer evidence; independent batch-review usefulness remains unverified.
+
 ## Optional feedback
 
 If you choose to share feedback, open an issue at
