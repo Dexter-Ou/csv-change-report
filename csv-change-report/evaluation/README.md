@@ -435,3 +435,82 @@ ignore-column options are validated; totals has no effect until execution.
 
 For a literal missing-CSV preflight, failed execution and preserved retry, follow
 [RECOVERY.md, steps 4–5](RECOVERY.md#4-separate-manifest-preflight-from-csv-execution).
+
+
+### Automate preflight and handle execution separately
+
+Run this synthetic walkthrough from the inner `csv-change-report` directory with
+Python 3.10+ and a POSIX shell. It creates its own temporary CSVs/manifests, consumes
+JSON metadata and process exit status, then compares only accepted manifests.
+It does not read your CSVs or make network calls. Temporary reports are removed
+when the block exits; use a trusted persistent directory for your own reports.
+
+```sh
+python3 - <<'PYCODE'
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+
+runner = Path('evaluation/batch-manifest.py').resolve()
+assert runner.is_file(), 'Run from the inner csv-change-report directory'
+with tempfile.TemporaryDirectory(prefix='csv-json-walkthrough-') as temporary:
+    work = Path(temporary)
+    (work / 'before.csv').write_text('id,value\n1,old\n', encoding='utf-8')
+    (work / 'after.csv').write_text('id,value\n1,new\n', encoding='utf-8')
+    def manifest(after):
+        return json.dumps({'version': 1, 'pairs': [
+            {'before': 'before.csv', 'after': after, 'key': 'id'}]})
+    cases = [
+        ('changed', manifest('after.csv'), 0, 'OK', 1),
+        ('malformed', '{', 2, 'E_JSON', None),
+        ('missing-csv', manifest('absent.csv'), 0, 'OK', 2),
+    ]
+    for name, document, expected_preflight, expected_code, expected_run in cases:
+        source = work / (name + '.json')
+        source.write_text(document, encoding='utf-8')
+    originals = {p: hashlib.sha256(p.read_bytes()).hexdigest()
+                 for p in work.iterdir() if p.is_file()}
+    for name, _, expected_preflight, expected_code, expected_run in cases:
+        source = work / (name + '.json')
+        reports = work / (name + '-reports')
+        preflight = subprocess.run(
+            [sys.executable, str(runner), '--validate-only', '--json', str(source)],
+            capture_output=True, text=True, check=False)
+        # Unexpected interpreter/OS output fails closed: never launch comparison.
+        metadata = json.loads(preflight.stdout)
+        expected = {'version': 1, 'valid': expected_preflight == 0,
+                    'code': expected_code,
+                    'pair_count': 1 if expected_preflight == 0 else None,
+                    'csv_files_checked': False, 'reports_created': False}
+        assert preflight.returncode == expected_preflight
+        assert metadata == expected
+        assert not reports.exists()
+        print(f'{name}: preflight={preflight.returncode} code={metadata["code"]}')
+        if preflight.returncode != 0 or metadata['valid'] is not True:
+            print('  execution skipped; no reports')
+            continue
+        # Preflight success permits comparison; it does not predict its result.
+        run = subprocess.run([sys.executable, str(runner), str(source), str(reports)],
+                             capture_output=True, text=True, check=False)
+        assert run.returncode == expected_run
+        assert (reports / 'status.tsv').is_file()
+        print(f'  execution={run.returncode}; status.tsv created')
+    assert all(hashlib.sha256(p.read_bytes()).hexdigest() == digest
+               for p, digest in originals.items())
+    print('Original fixture bytes preserved; temporary reports removed on exit.')
+PYCODE
+```
+
+Expected: `changed` preflight 0/OK then execution 1 (differences);
+`malformed` preflight 2/E_JSON with execution skipped; `missing-csv` preflight
+0/OK then execution 2 (input error). Execution 0 means no retained differences,
+1 means differences, and 2 means an error; inspect `status.tsv` before using
+partial reports. Preflight 0 never proves CSV existence or content validity.
+The assertions are checks for these fixtures, not a general production wrapper.
+Unexpected or non-JSON preflight output stops this block before comparison.
+Execution output has its own privacy limits; this example captures it without
+printing supplied paths or CSV content. Files may change after preflight; no
+concurrent-edit protection is provided. Tested on Linux only.
