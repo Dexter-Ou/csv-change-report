@@ -18,7 +18,7 @@
     "evaluation/TIMESTAMP-RECIPE.md": "e52fc177bdee711a8f1d5c53fcc08eaca3f638ab5b22547140aab50654ba58ea",
     "evaluation/batch-manifest.py": "e4c75a8e80d76ec9c810e1a9733ca128a124b091cadc75ed1c07bf3ba87f2ed4",
     "evaluation/batch-review.sh": "4210d3b796697ed13778cac482c1a13f0a512191a1ba96e104e2b77e22846284",
-    "evaluation/batch-totals.py": "e580fec79e520ff3939860dd573a12e60cc82239c5534a7772a318c541c12886",
+    "evaluation/batch-totals.py": "0c19bd7c5aea3388caba284e31f530cd4c4aea73f6f12b96294c7d946bc16fce",
     "evaluation/duplicate-key.csv": "33adb2b84dcd9323c8a543454cb67642bb45d5694102e0bfd177f77811f4945d",
     "evaluation/report_schema.py": "361fa6916a08710db3c6d916709f3bcf77ae6f527e8ee0a6a70fe27c6d106e20",
     "evaluation/retained-change.csv": "24fadd3a080e261ded1a9bc74d2817e974030b1072920a39495d4c6cc59e94a5",
@@ -41,7 +41,7 @@
     "test_automate_batch.py": "af79a44f785be3e41620c1d811298cec80a2de516a8885e41daf47f95e01f696",
     "evaluation/column-tally.py": "39c8f0f332e8a9c51cd139c22aabfd538e7feefbd5ba0ed1f1af49714c8c90b1",
     "test_column_tally.py": "397b65ac1fc52422212dc8a604608aa419a2c8a974177e8827e44732a2192d27",
-    "test_batch_columns.py": "09381510869174dc6a5f045bc315aa984c9da158cd275a01c77ea79f8b2aa7d3",
+    "test_batch_columns.py": "8e3d574fae4aaf0b5217d9042096dfd9ea40ab613aad01aa75d5cbd74db3aa1a",
     "evaluation/TWO-SCHEMA-EXAMPLE.md": "b096642a62333f9d3fa59889c9d4ec3fef16eab7d5d5b5a66459d8c0add9cb41"
   }
 }
