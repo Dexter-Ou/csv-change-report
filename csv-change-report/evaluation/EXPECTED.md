@@ -17,3 +17,23 @@ diagnostic and wrapper failure notice. Neither snapshot should change.
 These fixtures validate mechanics only. They do not establish that a real user
 can find relevant changes or would pay. Header/row reordering alone does not
 count as a keyed content change; a changed key is a removal plus addition.
+
+
+## Volatile-field exercise (raw CLI)
+
+All three comparisons have two records per input and zero added/removed keys.
+Without exclusions, `volatile-before.csv` to `volatile-only.csv` has two changed,
+zero unchanged, and column totals `exported_at: 2`; `--check` exits 1.
+
+With `--ignore-column exported_at`, the same pair has zero changed, two unchanged,
+zero changed-cell totals for retained columns, `ignored_columns: ["exported_at"]` and exit 0.
+Both full-input SHA-256 values still describe different original bytes.
+
+With that same exclusion, `volatile-before.csv` to `retained-change.csv` has one
+changed, one unchanged, column totals `status: 1` and exit 1. The changed record
+has key B2, before/after record position 2, and changed columns ["status"]. The
+status changed from pending to active in the original synthetic snapshots.
+
+No command modifies input snapshots. A workflow that excludes `status` too would
+hide that meaningful change; choosing exclusions is the reviewer's decision.
+These are synthetic mechanical examples, not independent user feedback.
