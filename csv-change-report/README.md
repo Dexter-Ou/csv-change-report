@@ -1,12 +1,12 @@
 # CSV Change Report — tested preview
 
-Compare two UTF-8 CSV exports by one stable unique key and produce a JSON change
+Compare two UTF-8 CSV exports by one stable unique key and produce a JSON or text change
 summary. For an operator reviewing recurring exports who wants to locate changed
 records without uploading their data. This usefulness hypothesis is unverified.
 No customer testing, price, willingness to pay or earnings is established.
 
 **Synthetic runtime checks passed** on the isolated worker (Python 3.12.15,
-2026-10-31): eighteen test methods, fresh extraction, example oracle and help.
+2026-10-31): twenty-two test methods, fresh extraction, example oracle and help.
 No independent user testing has occurred. This is a preview, not a hardened parser.
 Requires Python 3.10+; standard library only, no installation or service.
 
@@ -36,14 +36,25 @@ resource guarantee. Output lists follow source record order; changed column list
 follow the before-header order. Identical input bytes produce identical JSON
 under the same Python/parser configuration. No timestamps or random IDs are added.
 
-The report includes input SHA-256, column names and record positions, but no cell
+JSON remains the default; use `--format json` explicitly or add `--format text`
+for a terminal summary of counts, added/removed record positions, changed record
+positions and per-column change counts. Text omits input hashes. Column names
+are JSON-quoted with Unicode and control characters escaped for terminal safety.
+Both formats omit cell values and paths; errors remain fixed JSON on stderr.
+For example:
+
+```sh
+python3 csv_change.py examples/before.csv examples/after.csv --key id --format text
+```
+
+The JSON report includes input SHA-256, column names and record positions, but no cell
 values or file paths. Column names and counts can themselves be sensitive: review
 before sharing. Hashes support reproducibility, not anonymization. Inputs are
 opened read-only. No network, telemetry, formula evaluation, automatic cleaning
 or spreadsheet export. Do not redirect output onto either input path: shell
 redirection can truncate it before this program starts. Invalid command arguments produce a fixed message without echoing supplied text;
 long option abbreviations are rejected. `--help` prints usage and exits 0. `--version` prints
-`csv-change-report 0.1.2-preview` and exits 0 without input files. Include this
+`csv-change-report 0.1.3-preview` and exits 0 without input files. Include this
 version when voluntarily reporting a problem; do not include private CSV data.
 Failures exit 2 with JSON
 on stderr; successful comparisons exit 0, including when changes exist.
