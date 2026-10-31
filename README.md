@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/9f902e2a35cc2df57037446c5a4273e40e24ece0).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/7a8a9e6fd924d2ace6d7c8c7ca0c8f60d41655c1).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-9f902e2a35cc2df57037446c5a4273e40e24ece0`.
+   named `csv-change-report-7a8a9e6fd924d2ace6d7c8c7ca0c8f60d41655c1`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -288,3 +288,7 @@ For scripts, `--validate-only --json` emits versioned metadata with a fixed code
 
 For a runnable example that consumes JSON preflight metadata and handles comparison
 status separately, see [the automation walkthrough](csv-change-report/evaluation/README.md#automate-preflight-and-handle-execution-separately).
+
+The walkthrough covers equal CSVs (execution 0), changed CSVs (1), malformed
+manifests (execution skipped), and missing CSVs (2). All four literal branches
+passed on the candidate and pinned download with synthetic Linux fixtures.
