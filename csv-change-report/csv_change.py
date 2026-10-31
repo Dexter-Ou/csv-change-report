@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-VERSION = '0.1.5-preview'
+VERSION = '0.1.6-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -153,7 +153,12 @@ def main(argv=None):
     report = (render_text(result) if args.format == 'text' else
               json.dumps(result, indent=2, ensure_ascii=True)) + '\n'
     if args.output is None:
-        print(report, end='')
+        try:
+            sys.stdout.write(report)
+            sys.stdout.flush()
+        except (OSError, RuntimeError):
+            print(json.dumps({'error': 'standard output could not be written'}), file=sys.stderr)
+            return 2
         return status
     try:
         target = Path(args.output)
@@ -173,4 +178,18 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    status = main()
+    if status == 2:
+        # Avoid a failed buffered stdout flush overriding exit 2 at shutdown.
+        try:
+            stdout_fd = None
+            fd = os.open(os.devnull, os.O_WRONLY)
+            try:
+                stdout_fd = sys.stdout.fileno()
+                os.dup2(fd, stdout_fd)
+            finally:
+                if fd != stdout_fd:
+                    os.close(fd)
+        except (OSError, ValueError, AttributeError):
+            sys.stdout = None
+    sys.exit(status)
