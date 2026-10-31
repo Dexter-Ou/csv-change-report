@@ -207,6 +207,13 @@ edited table can mislead. Preserve the original command and diagnostics. Do not
 summarize a running batch; no concurrent-write/crash guarantee is provided.
 The helper writes only stdout/stderr and never modifies the table or reports.
 
+## Practice preserving a stopped run
+
+Follow [the offline recovery exercise](RECOVERY.md) to inspect missing work,
+retain invalid originals, correct a separate synthetic input copy and rerun all
+pairs into a new directory. It explicitly simulates a stopped table; it does not
+test process interruption or crash durability.
+
 ## Optional feedback
 
 If you choose to share feedback, open an issue at
