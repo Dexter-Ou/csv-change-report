@@ -6,7 +6,7 @@ records without uploading their data. This usefulness hypothesis is unverified.
 No customer testing, price, willingness to pay or earnings is established.
 
 **Synthetic runtime checks passed** on the isolated worker (Python 3.12.15,
-2026-10-31): twenty-eight test methods, fresh extraction, example oracle and help.
+2026-10-31): thirty-six test methods, fresh extraction, example oracle and help.
 No independent user testing has occurred. This is a preview, not a hardened parser.
 Requires Python 3.10+; standard library only, no installation or service.
 
@@ -64,7 +64,7 @@ opened read-only. No network, telemetry, formula evaluation, automatic cleaning
 or spreadsheet export. Do not redirect output onto either input path: shell
 redirection can truncate it before this program starts. Invalid command arguments produce a fixed message without echoing supplied text;
 long option abbreviations are rejected. `--help` prints usage and exits 0. `--version` prints
-`csv-change-report 0.1.6-preview` and exits 0 without input files. Include this
+`csv-change-report 0.1.7-preview` and exits 0 without input files. Include this
 version when voluntarily reporting a problem; do not include private CSV data.
 Failures exit 2 with JSON
 on stderr. By default successful comparisons exit 0, including when changes exist.
@@ -101,3 +101,25 @@ Stdout is flushed before reporting completion. A broken pipe or detected stdout
 write/flush failure returns 2 with a fixed JSON diagnostic. Bytes may already have
 reached the consumer; treat the report as incomplete on failure. This does not
 prove that a downstream program saved or accepted the report.
+
+
+Ignore explicitly selected volatile fields with repeated `--ignore-column NAME`:
+
+```sh
+python3 csv_change.py before.csv after.csv --key id --check --ignore-column updated_at --ignore-column export_nonce
+```
+
+This is a speculative export-review workflow, without independent demand evidence.
+Names are exact and case-sensitive; duplicate selections are deduplicated. Key
+columns and missing names are rejected. Both full column sets must still match.
+Every input cell and row remains subject to validation/limits, and hashes cover
+original full input bytes. Only selected non-key value differences are excluded;
+added and removed keys still count even if every non-key column is ignored.
+
+When exclusions are active, JSON adds `ignored_columns` in before-header order;
+text lists escaped ignored names. Per-column counts omit those columns. `--check`
+uses the filtered result: status 0 means no changes among compared fields, not
+complete export equality. Without exclusions, report structure/content remains
+unchanged except the tool version. Reports do not expose ignored cell contents.
+For an included example, add `--ignore-column status` to the example command:
+the changed count becomes 0, unchanged becomes 2, and added/removed stay 1 each.
