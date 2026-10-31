@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/003da90913106101c8fc16ac53421823e88b1948).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/8cd36a2d7fdaec11b50707a2336a7275fb0c1f4b).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-003da90913106101c8fc16ac53421823e88b1948`.
+   named `csv-change-report-8cd36a2d7fdaec11b50707a2336a7275fb0c1f4b`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -36,7 +36,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Twenty-two synthetic test methods passed on the isolated Linux worker. These are
+Twenty-five synthetic test methods passed on the isolated Linux worker. These are
 software checks, not customer validation or an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -61,6 +61,12 @@ Text shows the same counts and record locations, with quoted column names and
 per-column change counts. Unicode and control characters in column names are
 escaped. JSON remains the default; `--format json` selects it explicitly.
 Both formats omit cell values and paths; errors remain JSON on stderr.
+
+Save directly to a new file with `--output report.json`, or combine
+`--format text --output report.txt`. Existing paths and input-path collisions
+are refused; successful file output leaves stdout empty. On Linux new report
+permissions are owner-only. A write failure may leave a partial new report;
+inspect it and use a new name when retrying. Use a trusted output directory.
 
 ## Fit and limits
 
