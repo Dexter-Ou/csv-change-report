@@ -31,4 +31,5 @@ command check is not evidence that an independent person understood the guide.
 Feedback is voluntary through the public issue route described in
 evaluation/FEEDBACK.md. Send general observations or invented examples only;
 never private CSVs, reports, paths, hashes, identifiers or secrets. Nothing is
-sent automatically. This candidate bundle is not yet published.
+sent automatically. See evaluation/TIMESTAMP-RECIPE.md for a worked timestamp-export example
+with expected counts. The public source archive includes this reader exercise.
