@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/73a3a28cd96f439afca20ca6b5e2af69902831cb).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/8c4537846f18b6c33401571ef9be254180b27ae1).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-73a3a28cd96f439afca20ca6b5e2af69902831cb`.
+   named `csv-change-report-8c4537846f18b6c33401571ef9be254180b27ae1`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -35,7 +35,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Fifty-nine synthetic test methods passed on the isolated Linux worker. These are
+Seventy-eight synthetic test methods passed on the isolated Linux worker. These are
 synthetic software checks, not an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -292,3 +292,10 @@ status separately, see [the automation walkthrough](csv-change-report/evaluation
 The walkthrough covers equal CSVs (execution 0), changed CSVs (1), malformed
 manifests (execution skipped), and missing CSVs (2). All four literal branches
 passed on the candidate and pinned download with synthetic Linux fixtures.
+
+Run checked preflight, comparison and complete status-table checks with
+`python3 evaluation/automate-batch.py evaluation/sample-manifest.json "./automated reports"`
+from the inner product folder. This bundled two-pair sample returns status 1;
+0 means equal and 2 means an error. The report path must be new.
+See [standalone automation](csv-change-report/evaluation/README.md#standalone-checked-batch-automation)
+for fixed JSON codes, preserved diagnostics and limits.
