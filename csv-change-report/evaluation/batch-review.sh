@@ -84,13 +84,18 @@ while [ "$#" -gt 0 ]; do
 done
 if [ "$write_totals" -eq 1 ]; then
     totals_status=0
-    python3 "$kit_dir/batch-totals.py" "$report_dir/status.tsv" --expected-pairs "$pair" --row-counts \
-        > "$report_dir/totals.json.tmp" 2> "$report_dir/totals.stderr" || totals_status=$?
-    if [ -s "$report_dir/totals.json.tmp" ] && [ "$totals_status" -le 2 ]; then
-        mv "$report_dir/totals.json.tmp" "$report_dir/totals.json"
+    # A subshell also catches shells that exit on redirection failure.
+    (python3 "$kit_dir/batch-totals.py" "$report_dir/status.tsv" --expected-pairs "$pair" --row-counts \
+        > "$report_dir/totals.json.tmp" 2> "$report_dir/totals.stderr") || totals_status=$?
+    if [ -f "$report_dir/totals.json.tmp" ] && [ -s "$report_dir/totals.json.tmp" ] && \
+       [ "$totals_status" -le 2 ] && [ ! -e "$report_dir/totals.json" ] && [ ! -L "$report_dir/totals.json" ]; then
+        if ! mv "$report_dir/totals.json.tmp" "$report_dir/totals.json"; then
+            totals_status=2
+            rm -f "$report_dir/totals.json.tmp" || totals_status=2
+        fi
     else
-        rm -f "$report_dir/totals.json.tmp"
         totals_status=2
+        rm -f "$report_dir/totals.json.tmp" || totals_status=2
     fi
     if [ "$totals_status" -eq 2 ]; then batch_status=2; fi
 fi
