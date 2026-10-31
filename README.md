@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/aa6084e8d7ee691920c168ff3f918ca7c66fcfbd).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/d7e907b4c30ecbc499deb69a0548dc58a09b7141).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-aa6084e8d7ee691920c168ff3f918ca7c66fcfbd`.
+   named `csv-change-report-d7e907b4c30ecbc499deb69a0548dc58a09b7141`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -87,6 +87,26 @@ evaluation. Preserve original files and version information for recovery.
 See the [full product rules](csv-change-report/README.md),
 [release notes](csv-change-report/RELEASE.md) and [license](csv-change-report/LICENSE).
 This repository is downloadable source, not a hosted application.
+
+## Offline evaluation kit
+
+From the inner `csv-change-report` folder, try:
+
+```sh
+sh evaluation/review.sh examples/before.csv examples/after.csv id
+sh evaluation/review.sh examples/before.csv examples/before.csv id
+sh evaluation/review.sh examples/before.csv evaluation/duplicate-key.csv id
+```
+
+The wrapper handles the raw CLI's expected change status 1: changed and equal
+comparisons both exit 0 after a notice; invalid input exits 2. See the
+[task and recovery steps](csv-change-report/evaluation/README.md),
+[synthetic answer key](csv-change-report/evaluation/EXPECTED.md) and
+[voluntary feedback prompts](csv-change-report/evaluation/FEEDBACK.md).
+The tested public kit passed the 28-method suite and 11 scripted checks on Linux
+Python 3.12.15. These are synthetic checks, not usability or customer evidence.
+Use the inner `csv-change-report/evaluation` directory; the separate top-level
+`product/evaluation` directory is a superseded misplaced draft, not runnable.
 
 ## Optional five-minute feedback task
 
