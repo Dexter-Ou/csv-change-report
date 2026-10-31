@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/f8da3d6a3cb147e77e65aa3e02ea6e8237b741e3).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/f3e7f6c8defb91a7c38a75df4058cf9899627df7).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-f8da3d6a3cb147e77e65aa3e02ea6e8237b741e3`.
+   named `csv-change-report-f3e7f6c8defb91a7c38a75df4058cf9899627df7`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -36,7 +36,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Forty-seven synthetic test methods passed on the isolated Linux worker. These are
+Fifty-three synthetic test methods passed on the isolated Linux worker. These are
 software checks, not customer validation or an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -103,7 +103,7 @@ comparisons both exit 0 after a notice; invalid input exits 2. See the
 [task and recovery steps](csv-change-report/evaluation/README.md),
 [synthetic answer key](csv-change-report/evaluation/EXPECTED.md) and
 [voluntary feedback prompts](csv-change-report/evaluation/FEEDBACK.md).
-The tested public kit passed the 47-method suite and the changed-export journey on Linux
+The tested public kit passed the 53-method suite and the changed-export journey on Linux
 Python 3.12.15. These are synthetic checks, not usability or customer evidence.
 Use the inner `csv-change-report/evaluation` directory; the separate top-level
 `product/evaluation` directory is a superseded misplaced draft, not runnable.
@@ -188,12 +188,27 @@ snapshot is simulated; process interruption and crash durability are untested.
 Version 0.1.9-preview accepts `--max-input-bytes N` (1..10485760) for a smaller
 per-input raw byte budget. The default remains 10 MiB. Encoded bytes, header, BOM
 and line endings count. Exactly N bytes may pass; N+1 is refused before report
-creation. This is not a total-memory bound. The batch helper uses the default.
+creation. This is not a total-memory bound. The batch helper defaults to the same ceiling; a leading budget option is available below.
 
 ```sh
 python3 csv_change.py examples/before.csv examples/after.csv --key id --max-input-bytes 4096
 ```
 
-The pinned public download passed 47 synthetic unittest methods, this byte-budget
+The pinned public download passed 53 synthetic unittest methods, this byte-budget
 example and the three evaluation wrapper journeys on the isolated Linux worker.
 No independent user feedback, customers or revenue are established.
+
+
+Version 0.1.10-preview adds a leading optional per-input byte budget to batch review:
+
+```sh
+sh evaluation/batch-review.sh --max-input-bytes 4096 './budget reports' examples/before.csv examples/after.csv id
+```
+
+Use an unused report directory. Expected status 1 means changed; inspect status.tsv
+and pair reports. Status 2 indicates an error. The helper continues after a failed
+pair; an existing directory is refused. The default remains 10 MiB per input.
+Canonical decimal budgets 1..10485760 are accepted before directory creation.
+See the evaluation guide for retry and interpretation steps. This bounds raw input
+reads, not total process memory. The pinned public extraction passed 53 synthetic
+unittest methods and this command on Linux. No customers or revenue established.
