@@ -59,3 +59,5 @@ RECOVERY.md steps 4–5 show a schema-valid manifest with a missing CSV, partial
 execution totals and a separate corrected manifest/new report directory. Both
 attempts remain available for review. Commands use synthetic fixtures; Linux
 execution is checked. No CSV existence check was added to preflight.
+
+Leading UTF-8 BOM manifests now receive fixed E_BOM guidance. Strict refusal is retained; evaluation/RECOVERY.md documents a separate same-directory copy. Synthetic Linux tests cover refusal privacy, no reports, LF/CRLF recovery and literal interior U+FEFF.
