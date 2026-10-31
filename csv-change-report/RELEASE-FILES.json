@@ -8,6 +8,7 @@
   "evaluation/FEEDBACK.md",
   "evaluation/README.md",
   "evaluation/batch-review.sh",
+  "evaluation/batch-totals.py",
   "evaluation/duplicate-key.csv",
   "evaluation/retained-change.csv",
   "evaluation/review.sh",
