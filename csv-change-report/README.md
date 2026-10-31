@@ -6,7 +6,7 @@ records without uploading their data. Free, MIT-licensed preview from Gong LLC.
 
 **Synthetic runtime checks passed** on the isolated worker (Python 3.12.15,
 2026-10-31): the included test suite, fresh extraction, example oracle and help.
-No independent user testing has occurred. This is a preview, not a hardened parser.
+This is a preview, not a hardened parser.
 Requires Python 3.10+; standard library only, no installation or service.
 
 Start with [the short report-choice guide](QUICKSTART.md) for a local review.
