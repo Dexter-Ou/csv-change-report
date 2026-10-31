@@ -180,6 +180,33 @@ error or approve the batch. Preserve the partial/error evidence; after correctin
 a copy of invalid input, use a different new report directory. See the answer key
 for exact expected results. This exercise tests mechanics, not human review speed.
 
+## Count batch results, including missing pairs
+
+Run after the batch process has stopped. Supply the number of BEFORE/AFTER/KEY
+triples in your original command; the table alone cannot reveal missing trailing
+pairs. For the three-pair mixed example above:
+
+```sh
+status=0
+python3 evaluation/batch-totals.py './batch reports/status.tsv' --expected-pairs 3 || status=$?
+printf 'Totals status: %s\n' "$status"
+```
+
+Expected JSON counts: expected=3, completed=3, equal=1, changed=1, error=1,
+incomplete=0; status 2. A header plus only the first equal row, with expected=3,
+gives completed=1, equal=1, incomplete=2 and status 2. Header-only means every
+expected pair is incomplete. Status 0 means every expected row says equal;
+1 means completed rows include changes with no errors or missing pairs; 2 means
+an error, incomplete run or invalid table. Malformed tables emit a fixed diagnostic
+and no totals. Unexpected numeric CLI statuses count as errors. Duplicate,
+out-of-order, excess, truncated and inconsistent rows are rejected.
+
+This reads only the status table; it does not verify report bytes, diagnose why
+pairs are missing, or certify export approval. An incorrect expected count or
+edited table can mislead. Preserve the original command and diagnostics. Do not
+summarize a running batch; no concurrent-write/crash guarantee is provided.
+The helper writes only stdout/stderr and never modifies the table or reports.
+
 ## Optional feedback
 
 If you choose to share feedback, open an issue at
