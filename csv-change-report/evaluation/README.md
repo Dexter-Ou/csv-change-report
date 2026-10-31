@@ -377,7 +377,7 @@ before the batch runner starts, so a malformed manifest creates no report direct
 
 | Code | Action |
 | --- | --- |
-| `E_ARGUMENTS` | Check option names/values and the two required arguments. |
+| `E_ARGUMENTS` | Check options; supply a manifest and, unless validating only, a report directory. |
 | `E_BUDGET` | Use an input budget from 1 to 10485760 bytes. |
 | `E_READ` | Check manifest existence and read permission. |
 | `E_FILE` | Supply a regular file; regular-file symlinks are allowed. |
@@ -396,3 +396,19 @@ before the batch runner starts, so a malformed manifest creates no report direct
 Codes describe the first detected problem; fix it and validate again. Once the
 runner starts, its own existing output and status rules apply. These diagnostics
 are not a privacy guarantee for subprocess output or a filesystem sandbox.
+
+### Manifest preflight without comparisons
+
+```sh
+python3 evaluation/batch-manifest.py --validate-only examples/batch.json
+```
+
+Preflight checks the same full manifest schema, limits, encoding and literal
+path/key resolution as execution. Success prints only the number of pairs and
+returns 0; a refusal uses the fixed reason diagnostic and returns 2. No CSV is
+opened or checked, no batch runner is launched, and no report directory is
+created. Missing CSVs therefore do not fail preflight. This does not establish
+that a comparison will succeed or that inputs will remain unchanged.
+An optional report-directory argument is ignored in this mode, including an
+existing directory; it is still required for normal execution. Budget and
+ignore-column options are validated; totals has no effect until execution.
