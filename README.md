@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/a601ee32295cba61f9d9ce0748f5103018392e63).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/ccd3afdc3da427210bffd92d94f116a133d32496).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-a601ee32295cba61f9d9ce0748f5103018392e63`.
+   named `csv-change-report-ccd3afdc3da427210bffd92d94f116a133d32496`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -103,7 +103,7 @@ comparisons both exit 0 after a notice; invalid input exits 2. See the
 [task and recovery steps](csv-change-report/evaluation/README.md),
 [synthetic answer key](csv-change-report/evaluation/EXPECTED.md) and
 [voluntary feedback prompts](csv-change-report/evaluation/FEEDBACK.md).
-The tested public kit passed the 36-method suite and the changed-export journey on Linux
+The tested public kit passed the 40-method suite and the changed-export journey on Linux
 Python 3.12.15. These are synthetic checks, not usability or customer evidence.
 Use the inner `csv-change-report/evaluation` directory; the separate top-level
 `product/evaluation` directory is a superseded misplaced draft, not runnable.
@@ -174,3 +174,6 @@ a new directory, continues after invalid pairs and refuses existing directories.
 Five synthetic batches (11 pairs), documented commands and 40 existing tests
 passed on the candidate and fresh public extraction. Human usefulness remains
 unverified. See the inner evaluation README for run and failure recovery steps.
+
+The offline kit includes a mixed-batch interpretation exercise: distinguish errors
+from changed pairs, then locate changes in a separate detailed report.
