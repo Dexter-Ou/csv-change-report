@@ -8,7 +8,7 @@ import json
 import sys
 from pathlib import Path
 
-VERSION = '0.1.1-preview'
+VERSION = '0.1.2-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -91,7 +91,7 @@ def compare(before, after, key):
             unchanged += 1
     return {
         'format_version': 1,
-        'tool_version': '0.1.0-draft',
+        'tool_version': VERSION,
         'before_sha256': old_hash,
         'after_sha256': new_hash,
         'counts': {'before': len(old), 'after': len(new), 'added': len(added),
