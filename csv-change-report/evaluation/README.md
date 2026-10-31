@@ -324,6 +324,10 @@ before creating the report directory. The underlying CSV CLI is unchanged.
 
 For a preserved batch, the equivalent manual command is
 `python3 evaluation/batch-totals.py REPORT_DIR/status.tsv --expected-pairs N --row-counts`.
+Row-only totals use the same strict report reader as column tallies: at most
+16 MiB per report, unique JSON fields, supported report versions and consistent
+row/column counts. Invalid reports and equal statuses with nonzero row changes
+produce exit 2 and no totals. Valid-looking counts are not authenticated.
 Only use row aggregation on a trusted batch directory you generated; do not let
 another process edit its reports while summarizing. Tests used synthetic inputs on Linux.
 
