@@ -1,6 +1,6 @@
 # Draft release procedure
 
-Status: 0.1.2-preview tested preview. Eighteen synthetic test methods and the
+Status: 0.1.3-preview tested preview. Twenty-two synthetic test methods and the
 fresh-start example/help passed on the isolated worker on 2026-10-31.
 No independent customer testing or demand evidence. All fixture data is synthetic.
 
@@ -27,8 +27,8 @@ python3 -c 'import json; from pathlib import Path; assert json.loads(Path("actua
 python3 csv_change.py --help
 ```
 
-Require Python 3.10+, all eighteen synthetic test methods passing, the fixture
-comparison passing and help exiting 0. Six subprocess methods cover the real entry point from an unrelated working
+Require Python 3.10+, all twenty-two synthetic test methods passing, the fixture
+comparison passing and help exiting 0. Ten subprocess methods cover the real entry point from an unrelated working
 directory, fixture output, deterministic bytes, unchanged inputs, version, help, missing
 files, invalid UTF-8, duplicate keys and argument errors. These passed on the approved worker. The suite covers missing input and
 argument errors; confirm their exit code 2 and fixed JSON diagnostics from the
