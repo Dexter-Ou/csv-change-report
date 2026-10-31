@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/8c4537846f18b6c33401571ef9be254180b27ae1).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/8a5ca388a2f79cb2dc90dd538435e7770e5324a5).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-8c4537846f18b6c33401571ef9be254180b27ae1`.
+   named `csv-change-report-8a5ca388a2f79cb2dc90dd538435e7770e5324a5`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -299,3 +299,6 @@ from the inner product folder. This bundled two-pair sample returns status 1;
 0 means equal and 2 means an error. The report path must be new.
 See [standalone automation](csv-change-report/evaluation/README.md#standalone-checked-batch-automation)
 for fixed JSON codes, preserved diagnostics and limits.
+
+Run the bundled automation regressions with `python3 -m unittest -v test_automate_batch`
+from the inner product directory; see [the test instructions](csv-change-report/evaluation/README.md#run-the-automation-regressions).
