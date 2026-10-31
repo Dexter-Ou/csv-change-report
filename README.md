@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/8ffc20cad78e747083b5cdedca84962466867710).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/3b436070b0a5820ba8206623d7795d7c0c957375).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-8ffc20cad78e747083b5cdedca84962466867710`.
+   named `csv-change-report-3b436070b0a5820ba8206623d7795d7c0c957375`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -260,3 +260,13 @@ unittest methods on synthetic Linux inputs, including exact path/key handling,
 manifest refusal and equivalence to explicit triples. The pinned download and
 its five literal guide/setup/manifest shell blocks were checked on Linux.
 Windows/macOS and hostile concurrent edits remain untested.
+
+
+Manifest validation refusals now include fixed reason codes and recovery actions,
+without printing supplied paths or JSON contents. Argument errors also use fixed
+text. Structural JSON nesting is limited to 32 levels. Validation refusals create
+no report directory; once the batch runner starts, its usual output rules apply.
+See the [diagnostic reference](csv-change-report/evaluation/README.md#manifest-refusal-diagnostics).
+The candidate and pinned public extraction each passed 69 synthetic Linux unittest
+methods, including refusal codes and no-output checks. The unavailable-shell case
+uses fault injection. All five literal guide/setup/manifest shell blocks passed.
