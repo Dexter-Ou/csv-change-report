@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-VERSION = '0.1.7-preview'
+VERSION = '0.1.8-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -70,7 +70,7 @@ def load(path, key):
     return header, rows, hashlib.sha256(data).hexdigest()
 
 
-def compare(before, after, key, ignore_columns=()):
+def compare(before, after, key, ignore_columns=(), summary_only=False):
     old_header, old, old_hash = load(before, key)
     new_header, new, new_hash = load(after, key)
     # Header order may differ; column additions/removals require explicit review.
@@ -84,13 +84,16 @@ def compare(before, after, key, ignore_columns=()):
     added = sorted(set(new) - set(old), key=lambda k: new[k][0])
     removed = sorted(set(old) - set(new), key=lambda k: old[k][0])
     changed = []
+    changed_count = 0
     unchanged = 0
     by_column = {name: 0 for name in old_header if name != key and name not in ignored}
     for value in sorted(set(old) & set(new), key=lambda k: old[k][0]):
         columns = [name for name in by_column if old[value][1][name] != new[value][1][name]]
         if columns:
-            changed.append({'before_record': old[value][0], 'after_record': new[value][0],
-                            'columns': columns})
+            changed_count += 1
+            if not summary_only:
+                changed.append({'before_record': old[value][0], 'after_record': new[value][0],
+                                'columns': columns})
             for name in columns:
                 by_column[name] += 1
         else:
@@ -101,12 +104,17 @@ def compare(before, after, key, ignore_columns=()):
         'before_sha256': old_hash,
         'after_sha256': new_hash,
         'counts': {'before': len(old), 'after': len(new), 'added': len(added),
-                   'removed': len(removed), 'changed': len(changed), 'unchanged': unchanged},
+                   'removed': len(removed), 'changed': changed_count, 'unchanged': unchanged},
         'added_after_records': [new[k][0] for k in added],
         'removed_before_records': [old[k][0] for k in removed],
         'changed_records': changed,
         'changed_cells_by_column': by_column,
     }
+    if summary_only:
+        result['format_version'] = 2
+        result['report_mode'] = 'summary'
+        for field in ('added_after_records', 'removed_before_records', 'changed_records'):
+            del result[field]
     if ignored:
         result['ignored_columns'] = [name for name in old_header if name in ignored]
     return result
@@ -122,15 +130,18 @@ def render_text(result):
     if result.get('ignored_columns'):
         lines.append('Ignored columns: ' + ', '.join(
             json.dumps(name, ensure_ascii=True) for name in result['ignored_columns']))
-    for label, records in [('Added after records', result['added_after_records']),
-                           ('Removed before records', result['removed_before_records'])]:
-        lines.append(label + ': ' + (', '.join(map(str, records)) or 'none'))
-    lines.append('Changed records:')
-    for record in result['changed_records']:
-        columns = ', '.join(json.dumps(name, ensure_ascii=True) for name in record['columns'])
-        lines.append(f"  before {record['before_record']} -> after {record['after_record']}: {columns}")
-    if not result['changed_records']:
-        lines.append('  none')
+    if result.get('report_mode') == 'summary':
+        lines.append('Summary only: record details omitted')
+    else:
+        for label, records in [('Added after records', result['added_after_records']),
+                               ('Removed before records', result['removed_before_records'])]:
+            lines.append(label + ': ' + (', '.join(map(str, records)) or 'none'))
+        lines.append('Changed records:')
+        for record in result['changed_records']:
+            columns = ', '.join(json.dumps(name, ensure_ascii=True) for name in record['columns'])
+            lines.append(f"  before {record['before_record']} -> after {record['after_record']}: {columns}")
+        if not result['changed_records']:
+            lines.append('  none')
     lines.append('Changed cells by column:')
     for name, count in result['changed_cells_by_column'].items():
         lines.append('  ' + json.dumps(name, ensure_ascii=True) + ': ' + str(count))
@@ -150,12 +161,14 @@ def main(argv=None):
                         help='exit 1 for added, removed or changed records; 0 when equal')
     parser.add_argument('--ignore-column', action='append', default=[], metavar='NAME',
                         help='ignore one exact non-key column; repeat for multiple columns')
+    parser.add_argument('--summary-only', action='store_true',
+                        help='omit record positions and per-record details; retain counts and column totals')
     parser.add_argument('--output', help='create a new report file; existing paths are refused')
     try:
         parser.add_argument('--version', action='version',
                             version=f'csv-change-report {VERSION}')
         args = parser.parse_args(argv)
-        result = compare(args.before, args.after, args.key, args.ignore_column)
+        result = compare(args.before, args.after, args.key, args.ignore_column, args.summary_only)
     except (InputError, OSError) as error:
         # Do not echo file paths or cell values in diagnostics.
         message = str(error) if isinstance(error, InputError) else 'input file could not be read'
