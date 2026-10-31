@@ -326,3 +326,44 @@ For a preserved batch, the equivalent manual command is
 `python3 evaluation/batch-totals.py REPORT_DIR/status.tsv --expected-pairs N --row-counts`.
 Only use row aggregation on a trusted batch directory you generated; do not let
 another process edit its reports while summarizing. Tests used synthetic inputs on Linux.
+
+
+### Optional repeat-review manifest (prototype)
+
+For a repeat review, save pairs as data in a UTF-8 JSON file instead of repeating
+command triples. The bundled `examples/batch.json` uses invented inputs:
+
+```sh
+status=0
+python3 evaluation/batch-manifest.py --totals examples/batch.json './manifest reports' || status=$?
+printf 'Manifest batch status: %s\n' "$status"
+cat './manifest reports/status.tsv'
+cat './manifest reports/totals.json'
+```
+
+Expected status: 1, pair-0001 changed and pair-0002 equal. Relative CSV paths are
+relative to the manifest's containing directory (including when invoked from a
+different directory); absolute paths are allowed. The new report directory is
+relative to your current working directory. Use a new name for each run.
+For a symlinked manifest, the containing directory means the path you supplied,
+not the symlink target's directory. Paths may include `..`; this is not a sandbox.
+Use only your authorized local files and a trusted report directory.
+
+The schema is exactly `{"version":1,"pairs":[{"before":"before.csv",
+"after":"after.csv","key":"id"}]}`. Version must be integer 1. There must be
+1–100 pairs and at most 65,536 manifest bytes. Duplicate/unknown/missing fields,
+empty strings, control characters, Unicode surrogates, invalid UTF-8/JSON and
+nonregular manifests are refused with status 2 before report creation. Strings
+retain spaces, Unicode and exact key spelling; paths receive no environment,
+`~`, wildcard or shell expansion. The manifest cannot supply commands or options.
+It does not install code or make network calls.
+
+Optional `--totals`, `--ignore-column COLUMN` and `--max-input-bytes N` are supplied
+on the command line before the manifest, with the same batch meanings. Use
+`--ignore-column=-name` for a column starting with a dash. After valid manifest
+parsing, missing/invalid CSVs remain per-pair status 2, later pairs continue,
+and totals are partial. Files are read anew on every run: a manifest does not
+pin CSV contents. Preserve the original CSV snapshots alongside your reports.
+It provides no concurrent-edit protection or provenance verification. Python
+3.10+ and a POSIX shell are required; Windows/macOS remain untested. This optional
+workflow has synthetic Linux tests.
