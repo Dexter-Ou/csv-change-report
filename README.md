@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/efebadd1e3514a239f060b2a5ec37bb7d151193a).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/7d8ece95de05d0e55965e8116a7c8730f36cc3ba).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-efebadd1e3514a239f060b2a5ec37bb7d151193a`.
+   named `csv-change-report-7d8ece95de05d0e55965e8116a7c8730f36cc3ba`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -33,10 +33,10 @@ Optional acceptance checks, from the same inner folder:
 ```sh
 python3 -m unittest -v
 python3 csv_change.py --help
-python3 -m unittest -v test_column_tally
+python3 -m unittest -v test_column_tally test_batch_columns
 ```
 
-One hundred two synthetic test methods passed on the isolated Linux worker. These are
+One hundred twelve synthetic test methods passed on the isolated Linux worker. These are
 synthetic software checks, not an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -303,3 +303,9 @@ for fixed JSON codes, preserved diagnostics and limits.
 
 Run the bundled automation regressions with `python3 -m unittest -v test_automate_batch`
 from the inner product directory; see [the test instructions](csv-change-report/evaluation/README.md#run-the-automation-regressions).
+
+Summarize per-column changed cells across successful batch reports with
+`python3 evaluation/batch-totals.py /path/to/status.tsv --expected-pairs 3 --column-counts`
+from the inner product directory. Errors and unfinished pairs produce `partial: true`
+and exit 2; malformed successful reports produce no totals. See the
+[batch tally instructions](csv-change-report/evaluation/README.md) for limits.
