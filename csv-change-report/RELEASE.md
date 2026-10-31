@@ -1,3 +1,11 @@
+# JSON manifest preflight
+
+Adds `--validate-only --json` with versioned fixed-code metadata and validated
+pair count. Refusals retain status 2, fixed stderr and null count. No CSV read or
+report creation occurs in preflight. Full option names are now required.
+Synthetic Linux tests cover metadata privacy, malformed manifests, argument
+errors, missing CSVs and no execution; other platforms remain untested.
+
 # 0.1.10-preview batch report validation
 
 Batch review validates JSON summary structure, row/column counts and consistency
