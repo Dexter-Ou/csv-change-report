@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/00dc468ece30b132078ad259246a4e120c424036).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/1d2ee3b39dbe62c02f4851424624585e32558c4f).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-00dc468ece30b132078ad259246a4e120c424036`.
+   named `csv-change-report-1d2ee3b39dbe62c02f4851424624585e32558c4f`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -232,3 +232,10 @@ pinned download includes it; its literal shell block and expected output passed
 on the isolated Linux worker. Ignoring timestamps reduced changed records from
 two to one while preserving one addition and one removal. No independent user
 feedback or earnings are implied.
+
+The offline batch helper now accepts one `--ignore-column COLUMN` for every
+pair, together with its byte budget in either option order. See the
+[evaluation guide](csv-change-report/evaluation/README.md#optional-batch-ignored-column)
+for a worked timestamp-only versus meaningful-change batch. Candidate and fresh
+pinned public downloads passed 53 existing tests and 16 additional synthetic
+checks on Linux; independent usefulness and willingness to pay remain unverified.
