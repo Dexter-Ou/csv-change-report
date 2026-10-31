@@ -41,7 +41,7 @@
     "test_automate_batch.py": "af79a44f785be3e41620c1d811298cec80a2de516a8885e41daf47f95e01f696",
     "evaluation/column-tally.py": "39c8f0f332e8a9c51cd139c22aabfd538e7feefbd5ba0ed1f1af49714c8c90b1",
     "test_column_tally.py": "397b65ac1fc52422212dc8a604608aa419a2c8a974177e8827e44732a2192d27",
-    "test_batch_columns.py": "a11b8773a48d89a51c8d8a45b72872d74745784c51266787b191930b96d78cb4",
+    "test_batch_columns.py": "d421a663c124efbf6b3799d6f67fcde5f6abb34ba8e7340a8685eb12f35b2454",
     "evaluation/TWO-SCHEMA-EXAMPLE.md": "b096642a62333f9d3fa59889c9d4ec3fef16eab7d5d5b5a66459d8c0add9cb41",
     "evaluation/MIXED-BATCH-RECIPE.md": "4f9083105071fef4130593c07d57d475c54adf28522eaee021347c93ad93ecf3"
   }
