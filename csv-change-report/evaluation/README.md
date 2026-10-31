@@ -640,3 +640,18 @@ option is provided. Names are JSON data (control characters are escaped), not
 paths to open. Status-table report and diagnostic fields must match the exact
 generated pair filenames; absolute, parent-relative and alternate names are
 rejected with exit 2 and no totals, including with `--column-counts`.
+
+### Separate column counts for each pair
+
+For unrelated schemas, use `python3 evaluation/batch-totals.py /path/to/status.tsv --expected-pairs 2 --pair-column-counts`.
+The `pair_column_tallies` array contains each successful pair in table order,
+with its generated pair ID, changed-record count, changed-cell total and sorted
+column counts. Same-named columns stay separate across pairs; zero counts remain.
+Failed and unstarted pairs have no entry. Check the top-level error/incomplete
+counts and `partial` flag before treating the array as a complete batch.
+Add `--column-counts` for a merged tally too; both column outputs reuse one
+validated read of each successful report. `--row-counts` still reads reports
+separately. Exit codes remain 0 equal, 1 changed, 2 error/incomplete.
+Malformed successful reports produce no totals. No CSV cell values are copied;
+column names remain visible and counts are not authenticated. This option does
+not add symlink confinement or support hostile concurrent report changes.
