@@ -383,6 +383,7 @@ before the batch runner starts, so a malformed manifest creates no report direct
 | `E_FILE` | Supply a regular file; regular-file symlinks are allowed. |
 | `E_SIZE` | Reduce the manifest to at most 65536 bytes. |
 | `E_ENCODING` | Save as UTF-8. |
+| `E_BOM` | Create a separate UTF-8 copy without its leading BOM in the same directory; see [recovery step 6](RECOVERY.md#6-recover-a-manifest-exported-with-a-leading-utf-8-bom). |
 | `E_JSON` | Fix JSON syntax and remove NaN/Infinity constants. |
 | `E_DEPTH` | Reduce structural JSON nesting to at most 32 levels. |
 | `E_DUPLICATE` | Remove duplicate object fields. |
