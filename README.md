@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/edcc8f8f72d550354164366075de9180e8c0d8a7).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/bc0147ab30f89d6292266805932a76afe405ccfd).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-edcc8f8f72d550354164366075de9180e8c0d8a7`.
+   named `csv-change-report-bc0147ab30f89d6292266805932a76afe405ccfd`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -36,7 +36,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Thirty-six synthetic test methods passed on the isolated Linux worker. These are
+Forty synthetic test methods passed on the isolated Linux worker. These are
 software checks, not customer validation or an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -149,3 +149,16 @@ exported_at is explicitly excluded from the latter two comparisons. See the
 Fresh public extraction passed 36 synthetic test methods, six JSON/text exercise
 comparisons, the documented shell block, two invalid exclusions and three wrapper
 journeys on Linux Python 3.12.15. These are internal tests, not user feedback.
+
+
+Version 0.1.8-preview adds `--summary-only` for JSON and text. It omits record
+positions and per-record changed-column lists while retaining counts and column
+totals. JSON retains full-input hashes and uses format_version 2 with report_mode
+summary; default detailed JSON remains version 1. `--check` statuses are unchanged.
+Both input snapshots remain in memory. This is a speculative usability feature.
+On a synthetic 10,000-record changed diff, JSON shrank from 1,138,301 to 453 bytes;
+text from 378,026 to 203 bytes. This is not a performance or customer benchmark.
+
+```sh
+python3 csv_change.py examples/before.csv examples/after.csv --key id --summary-only
+```
