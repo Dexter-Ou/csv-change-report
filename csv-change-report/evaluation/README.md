@@ -1,8 +1,7 @@
 # Try an offline export review
 
-Audience hypothesis: someone who reviews recurring CSV exports by a stable unique
-record key. This is a free, speculative evaluation kit for 0.1.10-preview, not
-customer evidence or a paid offer. All supplied names and records are synthetic.
+Review recurring CSV exports by a stable unique record key. This free evaluation
+kit accompanies 0.1.10-preview. All supplied names and records are synthetic.
 Python 3.10+ and a POSIX shell are required; no install, network or account needed
 to run. Windows shell behavior has not been tested.
 
@@ -138,8 +137,7 @@ Existing report directories are refused, never reused. Parent directory must
 exist. No input file is edited. Avoid untrusted/shared writable directories;
 this helper does not defend against another process altering its files.
 Reports retain hashes and column names, and summary reports omit positions.
-Use detailed CLI output separately to locate changes. Synthetic examples are
-not customer evidence; independent batch-review usefulness remains unverified.
+Use detailed CLI output separately to locate changes. Examples use synthetic data.
 
 ## Interpret a mixed batch and choose a detailed review
 
@@ -267,8 +265,7 @@ column or the key is a per-pair error (2); later pairs still run. Additions and
 removals still count. Byte limits still apply to the complete raw input,
 including ignored fields. This helper supports a single ignored column, while
 the underlying CLI supports repeated `--ignore-column` arguments. Choose an
-unused output directory; existing reports are preserved. Synthetic examples
-only, with no independent customer or revenue evidence.
+unused output directory; existing reports are preserved. Examples use synthetic data.
 
 ### Quote a column name containing spaces
 
@@ -323,5 +320,4 @@ before creating the report directory. The underlying CSV CLI is unchanged.
 For a preserved batch, the equivalent manual command is
 `python3 evaluation/batch-totals.py REPORT_DIR/status.tsv --expected-pairs N --row-counts`.
 Only use row aggregation on a trusted batch directory you generated; do not let
-another process edit its reports while summarizing. Synthetic Linux tests do
-not establish independent usefulness or willingness to pay.
+another process edit its reports while summarizing. Tests used synthetic inputs on Linux.
