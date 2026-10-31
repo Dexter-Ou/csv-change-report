@@ -61,10 +61,11 @@ def row_counts(path, totals, table_rows=None):
     return dict(rows=rows, partial=bool(totals['error'] or totals['incomplete']))
 
 
-def column_counts(path, totals, table_rows):
+def column_counts(path, totals, table_rows, aggregate=True, per_pair=False):
     """Aggregate successful report counts, never opening CSV inputs."""
     tally = runpy.run_path(str(Path(__file__).with_name('column-tally.py')))['tally']
     columns = {}
+    pairs = []
     records = cells = reports = 0
     for stem, status, _, _ in table_rows:
         if status not in ('0', '1'):
@@ -72,16 +73,23 @@ def column_counts(path, totals, table_rows):
         result = tally(Path(path).parent / (stem + '.json'))
         if status == '0' and result['changed_records']:
             raise ValueError('equal status contradicts report')
+        if per_pair:
+            pairs.append(dict(pair=stem, **result))
         records += result['changed_records']
         cells += result['changed_cells']
         reports += 1
         for column in result['columns']:
             name = column['column']
             columns[name] = columns.get(name, 0) + column['changed_cells']
-    return dict(column_tally=dict(reports=reports, changed_records=records,
-                changed_cells=cells, columns=[dict(column=name, changed_cells=columns[name])
-                                            for name in sorted(columns)]),
-                partial=bool(totals['error'] or totals['incomplete']))
+    output = dict(partial=bool(totals['error'] or totals['incomplete']))
+    if aggregate:
+        output['column_tally'] = dict(reports=reports, changed_records=records,
+            changed_cells=cells, columns=[dict(column=name, changed_cells=columns[name])
+                                         for name in sorted(columns)])
+    if per_pair:
+        output['pair_column_tallies'] = pairs
+    return output
+
 
 
 def main():
@@ -90,13 +98,15 @@ def main():
     parser.add_argument('--expected-pairs', type=int, required=True)
     parser.add_argument('--row-counts', action='store_true', help='sum row counts from successful pair reports; failed pairs excluded')
     parser.add_argument('--column-counts', action='store_true', help='sum changed-cell counts from successful reports; failed pairs excluded')
+    parser.add_argument('--pair-column-counts', action='store_true', help='show separate changed-cell counts for each successful pair; failed pairs excluded')
     args = parser.parse_args()
     try:
         totals, table_rows = validated_table(args.table, args.expected_pairs)
         if args.row_counts:
             totals.update(row_counts(args.table, totals, table_rows))
-        if args.column_counts:
-            totals.update(column_counts(args.table, totals, table_rows))
+        if args.column_counts or args.pair_column_counts:
+            totals.update(column_counts(args.table, totals, table_rows,
+                                        aggregate=args.column_counts, per_pair=args.pair_column_counts))
     except (OSError, UnicodeError, ValueError, KeyError, TypeError, RecursionError):
         print('Cannot summarize: unreadable, malformed or inconsistent table/report; preserve it and inspect the run.', file=sys.stderr)
         return 2
