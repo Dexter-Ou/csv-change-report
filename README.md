@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/d0a89d3110a401c2ae3489b167046346bf59703a).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/5a73089ef6e0b7aeb0f3e351a39632667aab66b4).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-d0a89d3110a401c2ae3489b167046346bf59703a`.
+   named `csv-change-report-5a73089ef6e0b7aeb0f3e351a39632667aab66b4`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -239,3 +239,12 @@ pair, together with its byte budget in either option order. See the
 for a worked timestamp-only versus meaningful-change batch. Candidate and fresh
 pinned public downloads passed 53 existing tests and 16 additional synthetic
 checks on Linux; independent usefulness and willingness to pay remain unverified.
+
+
+For optional batch aggregate row counts, use `--totals` as described in the
+[evaluation guide](csv-change-report/evaluation/README.md#optional-aggregate-row-counts).
+It writes pair outcomes and summed added/removed/changed/unchanged rows to
+`totals.json`. Failed pairs are excluded and explicitly mark results partial;
+any pair error still returns status 2. Candidate and fresh pinned public source
+each passed 53 existing tests and 11 focused synthetic checks on Linux, including
+the literal recipe. This is software evidence, not independent demand or earnings.
