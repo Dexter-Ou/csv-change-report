@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "pairs": [
+    {"before": "../examples/before.csv", "after": "../examples/before.csv", "key": "id"},
+    {"before": "../examples/before.csv", "after": "../examples/after.csv", "key": "id"}
+  ]
+}
