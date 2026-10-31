@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/c7abdafdc84026db4e1c5b5d03bb83d45084585a).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/3708ec58db2c1a5ebe3d872d02907c1917c767d1).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-c7abdafdc84026db4e1c5b5d03bb83d45084585a`.
+   named `csv-change-report-3708ec58db2c1a5ebe3d872d02907c1917c767d1`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -36,7 +36,7 @@ python3 csv_change.py --help
 python3 -m unittest -v test_column_tally test_batch_columns
 ```
 
-The 126-method suite passed on Linux; the 36 batch/column methods also passed
+The 127-method suite passed on Linux; the 37 batch/column methods also passed
 with Python optimization. These synthetic software checks are not an assurance
 for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
