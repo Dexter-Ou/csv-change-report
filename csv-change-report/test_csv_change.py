@@ -165,7 +165,7 @@ class ProcessTests(unittest.TestCase):
     def test_process_version(self):
         result = self.run_cli('--version')
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, 'csv-change-report 0.1.2-preview\n')
+        self.assertEqual(result.stdout, 'csv-change-report 0.1.3-preview\n')
         self.assertEqual(result.stderr, '')
         self.assertEqual(list(self.root.iterdir()), [])
 
@@ -178,6 +178,64 @@ class ProcessTests(unittest.TestCase):
         self.assertEqual(version.stdout,
                          'csv-change-report ' + json.loads(report.stdout)['tool_version'] + '\n')
         self.assertEqual(list(self.root.iterdir()), [])
+
+    def test_process_text_exact_and_explicit_json(self):
+        before = self.source / 'examples' / 'before.csv'
+        after = self.source / 'examples' / 'after.csv'
+        snapshots = (before.read_bytes(), after.read_bytes())
+        default = self.run_cli(before, after, '--key', 'id')
+        explicit = self.run_cli(before, after, '--key', 'id', '--format', 'json')
+        text = self.run_cli(before, after, '--key', 'id', '--format', 'text')
+        for result in (default, explicit, text):
+            self.assertEqual((result.returncode, result.stderr), (0, ''))
+        self.assertEqual(default.stdout, explicit.stdout)
+        self.assertEqual(text.stdout, 'CSV Change Report 0.1.3-preview\n'
+                         'Records: before 3, after 3\n'
+                         'Changes: added 1, removed 1, changed 1, unchanged 1\n'
+                         'Added after records: 2\nRemoved before records: 2\n'
+                         'Changed records:\n  before 1 -> after 1: "status"\n'
+                         'Changed cells by column:\n  "name": 0\n  "status": 1\n')
+        self.assertEqual((before.read_bytes(), after.read_bytes()), snapshots)
+        self.assertEqual(list(self.root.iterdir()), [])
+
+    def test_process_text_escapes_headers_and_omits_values(self):
+        import csv
+        header = 'note\n\x1b[31m\t"雪'
+        old, new = self.root / 'old.csv', self.root / 'new.csv'
+        for path, value in [(old, 'Private-Old'), (new, 'Private-New')]:
+            with path.open('w', newline='', encoding='utf-8') as stream:
+                writer = csv.writer(stream)
+                writer.writerows([['id', header], ['Private-Key', value]])
+        snapshots = (old.read_bytes(), new.read_bytes())
+        result = self.run_cli(old, new, '--key', 'id', '--format', 'text')
+        self.assertEqual((result.returncode, result.stderr), (0, ''))
+        self.assertIn(json.dumps(header, ensure_ascii=True) + ': 1', result.stdout)
+        self.assertNotIn('Private-', result.stdout)
+        self.assertNotIn('\x1b', result.stdout)
+        self.assertNotIn('\t', result.stdout)
+        self.assertNotIn(str(self.root), result.stdout)
+        self.assertEqual(len(result.stdout.splitlines()), 9)
+        self.assertEqual((old.read_bytes(), new.read_bytes()), snapshots)
+
+    def test_process_text_empty_key_only(self):
+        path = self.root / 'empty.csv'
+        path.write_text('id\n')
+        result = self.run_cli(path, path, '--key', 'id', '--format', 'text')
+        self.assertEqual((result.returncode, result.stderr), (0, ''))
+        self.assertEqual(result.stdout, 'CSV Change Report 0.1.3-preview\n'
+                         'Records: before 0, after 0\n'
+                         'Changes: added 0, removed 0, changed 0, unchanged 0\n'
+                         'Added after records: none\nRemoved before records: none\n'
+                         'Changed records:\n  none\nChanged cells by column:\n  none\n')
+
+    def test_process_format_errors(self):
+        for fmt in ('json', 'text', 'Private-Format'):
+            result = self.run_cli('Private-Before', 'Private-After', '--key', 'id', '--format', fmt)
+            self.assertEqual((result.returncode, result.stdout), (2, ''))
+            message = ('invalid arguments; use --help for usage' if fmt == 'Private-Format'
+                       else 'input file could not be read')
+            self.assertEqual(json.loads(result.stderr), {'error': message})
+            self.assertNotIn('Private-', result.stderr)
 
     def test_process_help(self):
         result = self.run_cli('--help')
