@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+"""Compare two CSV exports without including cell contents in the report."""
+import argparse
+import csv
+import hashlib
+import io
+import json
+import sys
+from pathlib import Path
+
+MAX_BYTES = 10 * 1024 * 1024
+MAX_ROWS = 50000
+MAX_COLUMNS = 256
+MAX_CELLS = 250000
+
+
+class InputError(ValueError):
+    pass
+
+
+class SafeArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        # argparse's default diagnostic echoes supplied argument text.
+        raise InputError('invalid arguments; use --help for usage')
+
+
+def load(path, key):
+    """Read one bounded snapshot; reject ambiguity instead of guessing."""
+    with Path(path).open('rb') as stream:
+        data = stream.read(MAX_BYTES + 1)
+    if len(data) > MAX_BYTES:
+        raise InputError('input exceeds 10 MiB limit')
+    try:
+        text = data.decode('utf-8-sig')
+    except UnicodeDecodeError:
+        raise InputError('input must be UTF-8') from None
+    if '\x00' in text:
+        raise InputError('NUL bytes are unsupported')
+    try:
+        reader = csv.reader(io.StringIO(text, newline=''), strict=True)
+        header = next(reader, None)
+        if not header or any(not name.strip() for name in header):
+            raise InputError('header is missing or contains blank names')
+        if len(header) > MAX_COLUMNS:
+            raise InputError('input exceeds 256 columns')
+        if len(set(header)) != len(header):
+            raise InputError('header names must be unique')
+        if key not in header:
+            raise InputError('key column is missing')
+        key_index = header.index(key)
+        rows = {}
+        for number, row in enumerate(reader, 1):
+            if number > MAX_ROWS:
+                raise InputError('input exceeds 50000 records')
+            if number * len(header) > MAX_CELLS:
+                raise InputError('input exceeds 250000 data cells')
+            if len(row) != len(header):
+                raise InputError(f'record {number} has wrong field count')
+            value = row[key_index]
+            if not value.strip():
+                raise InputError(f'record {number} has a blank key')
+            if value in rows:
+                raise InputError(f'record {number} repeats a key')
+            rows[value] = (number, dict(zip(header, row)))
+    except csv.Error:
+        raise InputError('malformed CSV or field exceeds parser limit') from None
+    return header, rows, hashlib.sha256(data).hexdigest()
+
+
+def compare(before, after, key):
+    old_header, old, old_hash = load(before, key)
+    new_header, new, new_hash = load(after, key)
+    # Header order may differ; column additions/removals require explicit review.
+    if set(old_header) != set(new_header):
+        raise InputError('column sets differ; reconcile schemas before comparison')
+    added = sorted(set(new) - set(old), key=lambda k: new[k][0])
+    removed = sorted(set(old) - set(new), key=lambda k: old[k][0])
+    changed = []
+    unchanged = 0
+    by_column = {name: 0 for name in old_header if name != key}
+    for value in sorted(set(old) & set(new), key=lambda k: old[k][0]):
+        columns = [name for name in by_column if old[value][1][name] != new[value][1][name]]
+        if columns:
+            changed.append({'before_record': old[value][0], 'after_record': new[value][0],
+                            'columns': columns})
+            for name in columns:
+                by_column[name] += 1
+        else:
+            unchanged += 1
+    return {
+        'format_version': 1,
+        'tool_version': '0.1.0-draft',
+        'before_sha256': old_hash,
+        'after_sha256': new_hash,
+        'counts': {'before': len(old), 'after': len(new), 'added': len(added),
+                   'removed': len(removed), 'changed': len(changed), 'unchanged': unchanged},
+        'added_after_records': [new[k][0] for k in added],
+        'removed_before_records': [old[k][0] for k in removed],
+        'changed_records': changed,
+        'changed_cells_by_column': by_column,
+    }
+
+
+def main(argv=None):
+    parser = SafeArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument('before')
+    parser.add_argument('after')
+    parser.add_argument('--key', required=True, help='exact, case-sensitive unique column name')
+    try:
+        args = parser.parse_args(argv)
+        result = compare(args.before, args.after, args.key)
+    except (InputError, OSError) as error:
+        # Do not echo file paths or cell values in diagnostics.
+        message = str(error) if isinstance(error, InputError) else 'input file could not be read'
+        print(json.dumps({'error': message}), file=sys.stderr)
+        return 2
+    print(json.dumps(result, indent=2, ensure_ascii=True))
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
