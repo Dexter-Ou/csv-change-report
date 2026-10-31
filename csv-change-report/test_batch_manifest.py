@@ -50,6 +50,56 @@ class ManifestTests(unittest.TestCase):
                              manifest_module.REASONS[code] + '\n').encode())
         self.assertFalse((self.root / report).exists())
 
+    def test_corrected_manifest_collision_preserves_reports_and_inputs(self):
+        # Exercise the CLI adapter as well as its shell runner. Existing paths
+        # include reports, the manifest's directory, and regular input files.
+        def snapshot():
+            return {str(p.relative_to(self.root)): p.read_bytes()
+                    for p in self.root.rglob('*') if p.is_file()}
+
+        self.valid['pairs'].append(dict(self.valid['pairs'][0], key='missing'))
+        self.write()
+        partial = self.run_manifest('partial', ('--totals',))
+        self.assertEqual(partial.returncode, 2)
+        original_reports = {p.name: p.read_bytes()
+                            for p in (self.root / 'partial').iterdir()}
+        partial_totals = json.loads((self.root / 'partial/totals.json').read_text())
+        self.assertTrue(partial_totals['partial'])
+        self.valid['pairs'][1]['key'] = 'id'
+        self.write()
+        occupied = self.root / 'occupied'
+        (occupied / 'nested').mkdir(parents=True)
+        (occupied / 'nested/keep.bin').write_bytes(bytes(range(256)))
+        (occupied / 'status.tsv').write_bytes(b'existing status\n')
+        protected = snapshot()
+        for index, options in enumerate(((), ('--totals',))):
+            for target in ('partial', 'occupied', str(self.data),
+                           str(self.manifest), str(self.before)):
+                with self.subTest(options=options, target=target):
+                    refused = self.run_manifest(target, options)
+                    self.assertEqual(refused.returncode, 2)
+                    self.assertEqual(refused.stdout, b'')
+                    self.assertIn(b'Cannot create a new report directory; choose an unused path.',
+                                  refused.stderr)
+                    self.assertEqual(snapshot(), protected)
+                    self.assertFalse((self.root / 'NEVER').exists())
+            fresh = self.root / ('recovered-' + str(index))
+            recovered = self.run_manifest(str(fresh), options)
+            self.assertEqual(recovered.returncode, 1)
+            self.assertEqual(recovered.stderr, b'')
+            statuses = (fresh / 'status.tsv').read_text().splitlines()[1:]
+            self.assertEqual([row.split('\t')[1] for row in statuses], ['1', '1'])
+            self.assertEqual((fresh / 'totals.json').exists(), bool(options))
+            if options:
+                totals = json.loads((fresh / 'totals.json').read_text())
+                self.assertFalse(totals['partial'])
+            self.assertEqual(original_reports, {p.name: p.read_bytes()
+                             for p in (self.root / 'partial').iterdir()})
+            # Exclude only the newly created recovery subtree for this check.
+            current = snapshot()
+            self.assertEqual({n: current[n] for n in protected}, protected)
+            protected = current
+
     def test_validate_only_never_launches_runner_or_reads_csvs(self):
         # Nonexistent inputs and shell-looking strings are valid manifest data.
         self.valid['pairs'][0]['before'] = 'missing $(touch NEVER).csv'
