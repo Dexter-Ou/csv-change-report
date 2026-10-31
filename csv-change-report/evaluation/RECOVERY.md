@@ -90,5 +90,4 @@ Expected: completed=3, equal=2, changed=1, error=0, incomplete=0. Pair-0002 stil
 needs change review; a successful retry is not approval. Both previous snapshots
 remain useful evidence. Reusing attempt-1 or attempt-2 is refused; choose a new
 unused directory for every later attempt. Do not delete a failed run to reuse its
-name. These synthetic checks do not measure human understanding or willingness
-to pay. Windows/macOS, concurrent writers and crash recovery remain unverified.
+name. Windows/macOS, concurrent writers and crash recovery remain untested.
