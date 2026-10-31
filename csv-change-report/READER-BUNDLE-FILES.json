@@ -13,7 +13,7 @@
     "evaluation/FEEDBACK.md": "355fdd174ae223deb52fd59169b3bc8a3122be488d4438668af97d83ac9d3223",
     "evaluation/READER-START.md": "b3b3cf874254380287d2c6ed75d0c04ab8859ebb6967e5212c473916238e19df",
     "evaluation/READER-TASK.md": "86162573727dfd316f31fa8fe282a8bb6838794f2d4f00c900fe8c622fd5564c",
-    "evaluation/README.md": "c0507790ef59185c509274f8405da9921088e487efc476b70832babec2db0bc9",
+    "evaluation/README.md": "21640377cab10eb2b80bfc14fb924092f77b4f0e97a361c095799ada8904744b",
     "evaluation/RECOVERY.md": "31ccfeaef1b5671151c4487bb38141bbb8e9e6ac779b883cc87cff912ffb63f0",
     "evaluation/TIMESTAMP-RECIPE.md": "e52fc177bdee711a8f1d5c53fcc08eaca3f638ab5b22547140aab50654ba58ea",
     "evaluation/batch-manifest.py": "e4c75a8e80d76ec9c810e1a9733ca128a124b091cadc75ed1c07bf3ba87f2ed4",
@@ -38,6 +38,8 @@
     "test_summary.py": "f2ae998be8ec56a8dba342da612b19dfc6d52bd784768f40a7e15cca125ea7f9",
     "evaluation/automate-batch.py": "5db0ec119a823a095a927c30a373a5fc399e6c9cb6dabee6cf0624a420af6baf",
     "evaluation/sample-manifest.json": "10a4ffb966a4fa87a54f3d15fc802bb0676437c0911bf0a512e94508fba408a3",
-    "test_automate_batch.py": "af79a44f785be3e41620c1d811298cec80a2de516a8885e41daf47f95e01f696"
+    "test_automate_batch.py": "af79a44f785be3e41620c1d811298cec80a2de516a8885e41daf47f95e01f696",
+    "evaluation/column-tally.py": "2f1f4676d538da04a326f5c0eaafbae356fd6a83575f7b528b7f35a41fb5a5fc",
+    "test_column_tally.py": "397b65ac1fc52422212dc8a604608aa419a2c8a974177e8827e44732a2192d27"
   }
 }
