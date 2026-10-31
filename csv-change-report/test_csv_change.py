@@ -162,6 +162,13 @@ class ProcessTests(unittest.TestCase):
         self.assertEqual((before.read_bytes(), after.read_bytes()), snapshots)
         self.assertEqual(list(self.root.iterdir()), [])
 
+    def test_process_version(self):
+        result = self.run_cli('--version')
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, 'csv-change-report 0.1.1-preview\n')
+        self.assertEqual(result.stderr, '')
+        self.assertEqual(list(self.root.iterdir()), [])
+
     def test_process_help(self):
         result = self.run_cli('--help')
         self.assertEqual(result.returncode, 0)
