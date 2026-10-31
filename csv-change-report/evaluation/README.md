@@ -269,3 +269,26 @@ including ignored fields. This helper supports a single ignored column, while
 the underlying CLI supports repeated `--ignore-column` arguments. Choose an
 unused output directory; existing reports are preserved. Synthetic examples
 only, with no independent customer or revenue evidence.
+
+### Quote a column name containing spaces
+
+POSIX shells split unquoted spaces into separate arguments. Single-quote the
+entire exact name: `--ignore-column 'exported at'`. This invented example creates
+a fresh private working directory and two small CSV copies; run it from the
+extracted product directory. Choose an unused directory name before rerunning.
+
+```sh
+(umask 077; mkdir './quoted-column-demo') || exit 2
+printf 'id,exported at,status\n1,old,open\n' > './quoted-column-demo/before.csv'
+printf 'id,exported at,status\n1,new,open\n' > './quoted-column-demo/after.csv'
+status=0
+sh evaluation/batch-review.sh --ignore-column 'exported at' './quoted-column-demo/reports' \
+  './quoted-column-demo/before.csv' './quoted-column-demo/after.csv' id || status=$?
+printf 'Quoted batch status: %s\n' "$status"
+cat './quoted-column-demo/reports/status.tsv'
+```
+
+Expected batch status: 0 and pair-0001 status 0: only the deliberately excluded
+field changed. This means retained-field equality, not full-file equality.
+Changing `status` would still count. Names remain case-sensitive, including
+spaces; quoting preserves the name rather than changing matching rules.
