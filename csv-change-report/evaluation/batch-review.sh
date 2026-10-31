@@ -5,6 +5,7 @@ max_input_bytes=10485760
 ignore_column=
 seen_budget=0
 seen_ignore=0
+write_totals=0
 while :; do
     case "${1-}" in
         --max-input-bytes)
@@ -27,6 +28,12 @@ while :; do
             ignore_column=$2
             seen_ignore=1
             shift 2 ;;
+        --totals)
+            if [ "$write_totals" -eq 1 ]; then
+                echo 'Repeated totals option.' >&2; exit 2
+            fi
+            write_totals=1
+            shift ;;
         --) shift; break ;;
         *) break ;;
     esac
@@ -39,7 +46,7 @@ run_compare() {
     fi
 }
 if [ "$#" -lt 4 ] || [ $(( ($# - 1) % 3 )) -ne 0 ]; then
-    echo 'Usage: sh batch-review.sh [--max-input-bytes N] [--ignore-column COLUMN] [--] NEW_REPORT_DIR BEFORE AFTER KEY [BEFORE AFTER KEY ...]' >&2
+    echo 'Usage: sh batch-review.sh [--max-input-bytes N] [--ignore-column COLUMN] [--totals] [--] NEW_REPORT_DIR BEFORE AFTER KEY [BEFORE AFTER KEY ...]' >&2
     exit 2
 fi
 kit_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -75,4 +82,16 @@ while [ "$#" -gt 0 ]; do
     esac
     printf '%s\t%s\t%s\t%s\n' "$stem" "$status" "$report" "$stem.stderr" >> "$report_dir/status.tsv"
 done
+if [ "$write_totals" -eq 1 ]; then
+    totals_status=0
+    python3 "$kit_dir/batch-totals.py" "$report_dir/status.tsv" --expected-pairs "$pair" --row-counts \
+        > "$report_dir/totals.json.tmp" 2> "$report_dir/totals.stderr" || totals_status=$?
+    if [ -s "$report_dir/totals.json.tmp" ] && [ "$totals_status" -le 2 ]; then
+        mv "$report_dir/totals.json.tmp" "$report_dir/totals.json"
+    else
+        rm -f "$report_dir/totals.json.tmp"
+        totals_status=2
+    fi
+    if [ "$totals_status" -eq 2 ]; then batch_status=2; fi
+fi
 exit "$batch_status"
