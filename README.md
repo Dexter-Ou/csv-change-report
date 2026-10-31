@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/ad805d7ffbc0ffc15228d86e90c43ffa425906a1).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/63a9489400d5e68d1c209f747c5356c65ff3dd79).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-ad805d7ffbc0ffc15228d86e90c43ffa425906a1`.
+   named `csv-change-report-63a9489400d5e68d1c209f747c5356c65ff3dd79`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -314,3 +314,5 @@ and exit 2; malformed successful reports produce no totals. See the
 Compare merged and separate column counts with the copyable
 [two-schema batch example](csv-change-report/evaluation/TWO-SCHEMA-EXAMPLE.md).
 It keeps same-named invoice and stock fields separate by generated pair ID.
+
+For a batch with added/removed rows, an equal pair and a failed pair, follow the [mixed-batch recipe](csv-change-report/evaluation/MIXED-BATCH-RECIPE.md). It explains partial totals and exit statuses.
