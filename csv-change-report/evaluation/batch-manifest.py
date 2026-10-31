@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a data-only JSON manifest, then invoke the sequential batch runner."""
+"""Validate a data-only JSON manifest, optionally without running comparisons."""
 import argparse
 import json
 import os
@@ -14,7 +14,7 @@ MAX_JSON_DEPTH = 32
 
 # Fixed diagnostics only: never interpolate input values, paths or exceptions.
 REASONS = {
-    'E_ARGUMENTS': 'Check option names, values and the two required arguments.',
+    'E_ARGUMENTS': 'Check options; supply a manifest and, unless validating only, a report directory.',
     'E_BUDGET': 'Set --max-input-bytes to an integer from 1 to 10485760.',
     'E_READ': 'Check that the manifest exists and is readable.',
     'E_FILE': 'Use a regular file for the manifest.',
@@ -126,15 +126,23 @@ def main():
     parser.add_argument('--max-input-bytes', type=int, default=10485760)
     parser.add_argument('--ignore-column')
     parser.add_argument('--totals', action='store_true')
+    parser.add_argument('--validate-only', action='store_true',
+                        help='validate and resolve manifest only; do not read CSVs or create reports')
     parser.add_argument('manifest')
-    parser.add_argument('new_report_dir', help='relative to current working directory')
+    parser.add_argument('new_report_dir', nargs='?', help='required for execution; relative to current working directory')
     args = parser.parse_args()
+    if not args.validate_only and args.new_report_dir is None:
+        parser.error('report directory required')
     try:
         if not 1 <= args.max_input_bytes <= 10485760:
             raise ManifestError('E_BUDGET')
         if args.ignore_column is not None:
             text(args.ignore_column)
         triples = load_manifest(args.manifest)
+        if args.validate_only:
+            print('Manifest valid: ' + str(len(triples) // 3) +
+                  ' pair(s); CSV files not checked; no reports created.')
+            return 0
         command = ['sh', str(Path(__file__).with_name('batch-review.sh').absolute()),
                    '--max-input-bytes', str(args.max_input_bytes)]
         if args.ignore_column is not None:
