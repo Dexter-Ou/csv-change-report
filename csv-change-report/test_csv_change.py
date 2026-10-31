@@ -147,6 +147,70 @@ class ProcessTests(unittest.TestCase):
             cwd=self.root, capture_output=True, text=True, encoding='utf-8',
             timeout=15, check=False)
 
+    def test_process_check_content_semantics_and_reports(self):
+        before = self.root / 'before.csv'
+        after = self.root / 'after.csv'
+        before.write_text('id,x\na,1\nb,2\n', encoding='utf-8')
+        cases = [
+            ('id,x\na,1\nb,2\n', 0),
+            ('\ufeffx,id\r\n2,b\r\n1,a\r\n', 0),
+            ('id,x\na,9\nb,2\n', 1),
+            ('id,x\na,1\nb,2\nc,3\n', 1),
+            ('id,x\na,1\n', 1),
+            ('id,x\na,9\nc,3\n', 1),
+        ]
+        for index, (data, status) in enumerate(cases):
+            after.write_bytes(data.encode('utf-8'))
+            snapshots = (before.read_bytes(), after.read_bytes())
+            for fmt in ('json', 'text'):
+                args = (before, after, '--key', 'id', '--format', fmt)
+                baseline = self.run_cli(*args)
+                checked = self.run_cli(*args, '--check')
+                self.assertEqual((baseline.returncode, checked.returncode), (0, status))
+                self.assertEqual((checked.stdout, checked.stderr), (baseline.stdout, ''))
+                output = self.root / f'report-{index}-{fmt}'
+                saved = self.run_cli(*args, '--check', '--output', output)
+                self.assertEqual((saved.returncode, saved.stdout, saved.stderr), (status, '', ''))
+                self.assertEqual(output.read_bytes(), baseline.stdout.encode('utf-8'))
+                refused = self.run_cli(*args, '--check', '--output', output)
+                self.assertEqual((refused.returncode, refused.stdout, refused.stderr),
+                                 (2, '', '{"error": "output path already exists"}\n'))
+                self.assertEqual(output.read_bytes(), baseline.stdout.encode('utf-8'))
+            self.assertEqual((before.read_bytes(), after.read_bytes()), snapshots)
+
+    def test_process_check_empty_and_key_only(self):
+        before = self.root / 'before.csv'
+        after = self.root / 'after.csv'
+        for left, right, status in [('id\n', 'id\n', 0),
+                                    ('id\na\n', 'id\na\n', 0),
+                                    ('id\na\n', 'id\nb\n', 1)]:
+            before.write_text(left)
+            after.write_text(right)
+            result = self.run_cli(before, after, '--key', 'id', '--check')
+            self.assertEqual((result.returncode, result.stderr), (status, ''))
+            self.assertEqual(json.loads(result.stdout)['counts']['changed'], 0)
+
+    def test_process_check_errors_take_precedence(self):
+        before = self.root / 'before.csv'
+        after = self.root / 'after.csv'
+        before.write_text('id,x\na,1\n')
+        after.write_text('id,x\na,9\n')
+        for extra in [('--output', before), ('--output', self.root / 'absent' / 'report'),
+                      ('--format', 'PRIVATE_BAD'), ('--che',)]:
+            result = self.run_cli(before, after, '--key', 'id', '--check', *extra)
+            self.assertEqual((result.returncode, result.stdout), (2, ''))
+            self.assertNotIn('PRIVATE_BAD', result.stderr)
+        after.write_text('id,x\na,1\na,2\n')
+        output = self.root / 'never-created'
+        invalid = self.run_cli(before, after, '--key', 'id', '--check', '--output', output)
+        self.assertEqual((invalid.returncode, invalid.stdout, invalid.stderr),
+                         (2, '', '{"error": "record 2 repeats a key"}\n'))
+        self.assertFalse(output.exists())
+        after.unlink()
+        missing = self.run_cli(before, after, '--key', 'id', '--check')
+        self.assertEqual((missing.returncode, missing.stdout, missing.stderr),
+                         (2, '', '{"error": "input file could not be read"}\n'))
+
     def test_process_fixture_from_unrelated_directory(self):
         before = self.source / 'examples' / 'before.csv'
         after = self.source / 'examples' / 'after.csv'
@@ -165,7 +229,7 @@ class ProcessTests(unittest.TestCase):
     def test_process_version(self):
         result = self.run_cli('--version')
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, 'csv-change-report 0.1.4-preview\n')
+        self.assertEqual(result.stdout, 'csv-change-report 0.1.5-preview\n')
         self.assertEqual(result.stderr, '')
         self.assertEqual(list(self.root.iterdir()), [])
 
@@ -189,7 +253,7 @@ class ProcessTests(unittest.TestCase):
         for result in (default, explicit, text):
             self.assertEqual((result.returncode, result.stderr), (0, ''))
         self.assertEqual(default.stdout, explicit.stdout)
-        self.assertEqual(text.stdout, 'CSV Change Report 0.1.4-preview\n'
+        self.assertEqual(text.stdout, 'CSV Change Report 0.1.5-preview\n'
                          'Records: before 3, after 3\n'
                          'Changes: added 1, removed 1, changed 1, unchanged 1\n'
                          'Added after records: 2\nRemoved before records: 2\n'
@@ -222,7 +286,7 @@ class ProcessTests(unittest.TestCase):
         path.write_text('id\n')
         result = self.run_cli(path, path, '--key', 'id', '--format', 'text')
         self.assertEqual((result.returncode, result.stderr), (0, ''))
-        self.assertEqual(result.stdout, 'CSV Change Report 0.1.4-preview\n'
+        self.assertEqual(result.stdout, 'CSV Change Report 0.1.5-preview\n'
                          'Records: before 0, after 0\n'
                          'Changes: added 0, removed 0, changed 0, unchanged 0\n'
                          'Added after records: none\nRemoved before records: none\n'
