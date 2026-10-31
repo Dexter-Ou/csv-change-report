@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/ccd3afdc3da427210bffd92d94f116a133d32496).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/de0f3bf265a001c97dbac9c2a55fcb3b6fcfd4cf).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-ccd3afdc3da427210bffd92d94f116a133d32496`.
+   named `csv-change-report-de0f3bf265a001c97dbac9c2a55fcb3b6fcfd4cf`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -177,3 +177,5 @@ unverified. See the inner evaluation README for run and failure recovery steps.
 
 The offline kit includes a mixed-batch interpretation exercise: distinguish errors
 from changed pairs, then locate changes in a separate detailed report.
+
+Offline batch totals are available in `evaluation/batch-totals.py`; follow the evaluation guide and supply your original expected pair count to detect missing rows.
