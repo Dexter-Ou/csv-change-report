@@ -51,3 +51,11 @@ remains 0.1.10-preview; Windows/macOS and hostile concurrent edits are untested.
 Use `--validate-only` to validate and resolve a manifest without launching the
 batch runner or creating reports. CSV existence and contents are not checked;
 normal execution still requires a new report directory. See evaluation/README.md.
+
+
+## Manifest recovery walkthrough
+
+RECOVERY.md steps 4–5 show a schema-valid manifest with a missing CSV, partial
+execution totals and a separate corrected manifest/new report directory. Both
+attempts remain available for review. Commands use synthetic fixtures; Linux
+execution is checked. No CSV existence check was added to preflight.
