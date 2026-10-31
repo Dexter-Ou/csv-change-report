@@ -14,8 +14,7 @@ Comparing the before fixture with `evaluation/duplicate-key.csv`: error, raw CLI
 and wrapper exit 2. No completed report; stderr contains the fixed duplicate-key
 diagnostic and wrapper failure notice. Neither snapshot should change.
 
-These fixtures validate mechanics only. They do not establish that a real user
-can find relevant changes or would pay. Header/row reordering alone does not
+Header/row reordering alone does not
 count as a keyed content change; a changed key is a removal plus addition.
 
 
@@ -36,7 +35,7 @@ status changed from pending to active in the original synthetic snapshots.
 
 No command modifies input snapshots. A workflow that excludes `status` too would
 hide that meaningful change; choosing exclusions is the reviewer's decision.
-These are synthetic mechanical examples, not independent user feedback.
+These examples use synthetic records.
 
 ## Summary-versus-detail exercise
 
