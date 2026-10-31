@@ -13,3 +13,6 @@ column names, hashes, paths, personal/customer information and secrets private.
 
 Do not promise or send payment. Interest is not a purchase. Participation is
 optional; no telemetry or automatic submission is included.
+
+Optional: Did explicit exclusions make the review clearer? Could you tell that
+excluded fields still differed? Describe generally; do not paste private data.
