@@ -8,7 +8,7 @@ import json
 import sys
 from pathlib import Path
 
-VERSION = '0.1.2-preview'
+VERSION = '0.1.3-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -103,11 +103,37 @@ def compare(before, after, key):
     }
 
 
+def render_text(result):
+    """Render metadata only; quote headers to escape terminal control characters."""
+    counts = result['counts']
+    lines = ['CSV Change Report ' + result['tool_version'],
+             f"Records: before {counts['before']}, after {counts['after']}",
+             f"Changes: added {counts['added']}, removed {counts['removed']}, "
+             f"changed {counts['changed']}, unchanged {counts['unchanged']}"]
+    for label, records in [('Added after records', result['added_after_records']),
+                           ('Removed before records', result['removed_before_records'])]:
+        lines.append(label + ': ' + (', '.join(map(str, records)) or 'none'))
+    lines.append('Changed records:')
+    for record in result['changed_records']:
+        columns = ', '.join(json.dumps(name, ensure_ascii=True) for name in record['columns'])
+        lines.append(f"  before {record['before_record']} -> after {record['after_record']}: {columns}")
+    if not result['changed_records']:
+        lines.append('  none')
+    lines.append('Changed cells by column:')
+    for name, count in result['changed_cells_by_column'].items():
+        lines.append('  ' + json.dumps(name, ensure_ascii=True) + ': ' + str(count))
+    if not result['changed_cells_by_column']:
+        lines.append('  none')
+    return '\n'.join(lines)
+
+
 def main(argv=None):
     parser = SafeArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('before')
     parser.add_argument('after')
     parser.add_argument('--key', required=True, help='exact, case-sensitive unique column name')
+    parser.add_argument('--format', choices=('json', 'text'), default='json',
+                        help='output format (default: json); text omits input hashes')
     try:
         parser.add_argument('--version', action='version',
                             version=f'csv-change-report {VERSION}')
@@ -118,7 +144,8 @@ def main(argv=None):
         message = str(error) if isinstance(error, InputError) else 'input file could not be read'
         print(json.dumps({'error': message}), file=sys.stderr)
         return 2
-    print(json.dumps(result, indent=2, ensure_ascii=True))
+    print(render_text(result) if args.format == 'text' else
+          json.dumps(result, indent=2, ensure_ascii=True))
     return 0
 
 
