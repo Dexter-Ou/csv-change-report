@@ -8,6 +8,8 @@ import json
 import sys
 from pathlib import Path
 
+VERSION = '0.1.1-preview'
+
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
 MAX_COLUMNS = 256
@@ -107,6 +109,8 @@ def main(argv=None):
     parser.add_argument('after')
     parser.add_argument('--key', required=True, help='exact, case-sensitive unique column name')
     try:
+        parser.add_argument('--version', action='version',
+                            version=f'csv-change-report {VERSION}')
         args = parser.parse_args(argv)
         result = compare(args.before, args.after, args.key)
     except (InputError, OSError) as error:
