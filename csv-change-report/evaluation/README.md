@@ -367,3 +367,32 @@ pin CSV contents. Preserve the original CSV snapshots alongside your reports.
 It provides no concurrent-edit protection or provenance verification. Python
 3.10+ and a POSIX shell are required; Windows/macOS remain untested. This optional
 workflow has synthetic Linux tests.
+
+
+#### Manifest refusal diagnostics
+
+Validation failures return status 2 with a fixed code and an action, without
+printing the supplied path, JSON content or exception text. Validation finishes
+before the batch runner starts, so a malformed manifest creates no report directory.
+
+| Code | Action |
+| --- | --- |
+| `E_ARGUMENTS` | Check option names/values and the two required arguments. |
+| `E_BUDGET` | Use an input budget from 1 to 10485760 bytes. |
+| `E_READ` | Check manifest existence and read permission. |
+| `E_FILE` | Supply a regular file; regular-file symlinks are allowed. |
+| `E_SIZE` | Reduce the manifest to at most 65536 bytes. |
+| `E_ENCODING` | Save as UTF-8. |
+| `E_JSON` | Fix JSON syntax and remove NaN/Infinity constants. |
+| `E_DEPTH` | Reduce structural JSON nesting to at most 32 levels. |
+| `E_DUPLICATE` | Remove duplicate object fields. |
+| `E_SCHEMA` | Use exactly top-level version and pairs fields. |
+| `E_VERSION` | Use integer version 1. |
+| `E_PAIRS` | Supply 1–100 pairs in a list. |
+| `E_PAIR` | Use exactly before, after and key in each pair. |
+| `E_TEXT` | Use nonempty strings without controls or surrogates. |
+| `E_RUNNER` | Check shell availability; the runner could not be launched. |
+
+Codes describe the first detected problem; fix it and validate again. Once the
+runner starts, its own existing output and status rules apply. These diagnostics
+are not a privacy guarantee for subprocess output or a filesystem sandbox.
