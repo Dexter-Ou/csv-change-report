@@ -650,11 +650,16 @@ column counts. Same-named columns stay separate across pairs; zero counts remain
 Failed and unstarted pairs have no entry. Check the top-level error/incomplete
 counts and `partial` flag before treating the array as a complete batch.
 Add `--column-counts` for a merged tally too; both column outputs reuse one
-validated read of each successful report. `--row-counts` still reads reports
-separately. Exit codes remain 0 equal, 1 changed, 2 error/incomplete.
+validated read of each successful report, including `--row-counts` when combined. Exit codes remain 0 equal, 1 changed, 2 error/incomplete.
 Malformed successful reports produce no totals. No CSV cell values are copied;
 column names remain visible and counts are not authenticated. This option does
 not add symlink confinement or support hostile concurrent report changes.
 
 Copy and run the [two-schema example](TWO-SCHEMA-EXAMPLE.md) to compare merged
 and per-pair tallies for invoice amounts and stock quantities.
+
+When `--row-counts` is combined with either column-count option, each successful
+report is read and validated once; row and column totals use that parsed snapshot.
+This does not provide atomic filesystem snapshots or protection against concurrent
+writes. Use a trusted directory and completed, stable reports. Row-only behavior
+is unchanged.
