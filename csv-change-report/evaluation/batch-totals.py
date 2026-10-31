@@ -76,7 +76,7 @@ def column_counts(path, totals, table_rows, aggregate=True, per_pair=False, incl
         if include_rows:
             for name in rows:
                 rows[name] += report['counts'][name]
-        if status == '0' and result['changed_records']:
+        if status == '0' and any(report['counts'][name] for name in ('added', 'removed', 'changed')):
             raise ValueError('equal status contradicts report')
         if per_pair:
             pairs.append(dict(pair=stem, **result))
