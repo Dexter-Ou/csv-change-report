@@ -1,11 +1,12 @@
-# 0.1.8-preview
+# 0.1.9-preview candidate
 
-Adds optional --summary-only in JSON and text. Retains counts, per-column totals,
-exclusions, full-byte JSON hashes and check statuses; omits record positions and
-per-record column lists. Summary JSON uses format_version 2 and report_mode
-summary. Detailed mode remains the default with format_version 1.
+Adds --max-input-bytes N for a smaller per-input raw-byte budget, with the
+existing 10 MiB ceiling retained. Exact-limit inputs are accepted if valid;
+over-limit inputs fail with status 2 before report creation. Defaults and
+report formats remain unchanged apart from the tool version.
 
-Run python3 -m unittest -v and evaluation/review.sh. Synthetic tests include
-summary parity, omission, output preservation and a 10,000-record changed diff.
-No streaming, independent user validation, Windows/macOS, hostile-directory or
-crash-durability assurance. No dependencies, telemetry or hosted service added.
+Run python3 -m unittest -v and evaluation/review.sh. Synthetic boundary tests
+cover both inputs, UTF-8/BOM/CRLF bytes, output and input preservation, invalid
+arguments and bounded reads. This is not a total-memory or crash-durability
+guarantee. No new dependencies or services. Independent usefulness and
+willingness to pay remain unverified.
