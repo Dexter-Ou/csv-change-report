@@ -244,3 +244,28 @@ and retry reviewed inputs in a fresh directory; see RECOVERY.md.
 Start at [READER-START.md](READER-START.md). Record your answers to
 [READER-TASK.md](READER-TASK.md) before consulting [ANSWER-KEY.md](ANSWER-KEY.md).
 These tasks use bundled synthetic inputs; no independent reader results exist.
+
+### Optional batch ignored column
+
+Use one exact column name for every pair in a batch. Options precede the new
+report directory; the two options may appear in either order. Use `--` to end
+options if the directory name matches an option. Missing, empty or repeated
+option values fail with status 2 before creating a report directory.
+
+```sh
+status=0
+sh evaluation/batch-review.sh --ignore-column exported_at --max-input-bytes 4096 './timestamp batch' \
+  evaluation/volatile-before.csv evaluation/volatile-only.csv id \
+  evaluation/volatile-before.csv evaluation/retained-change.csv id || status=$?
+printf 'Batch status: %s\n' "$status"
+cat './timestamp batch/status.tsv'
+```
+
+Expected batch status: 1; pair-0001 status 0 (only timestamps changed),
+pair-0002 status 1 (a meaningful status change remains). Ignoring an unknown
+column or the key is a per-pair error (2); later pairs still run. Additions and
+removals still count. Byte limits still apply to the complete raw input,
+including ignored fields. This helper supports a single ignored column, while
+the underlying CLI supports repeated `--ignore-column` arguments. Choose an
+unused output directory; existing reports are preserved. Synthetic examples
+only, with no independent customer or revenue evidence.
