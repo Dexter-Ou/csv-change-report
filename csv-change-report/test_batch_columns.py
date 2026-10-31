@@ -91,6 +91,56 @@ class BatchColumnTests(unittest.TestCase):
     def test_equal_status_contradiction(self):
         self.report(1);r=self.invoke([0]);self.assertEqual(r.returncode,2);self.assertEqual(r.stdout,b'')
 
+    def test_row_only_strict_report_validation(self):
+        for summary in (True, False):
+            original = self.report(1, summary=summary).read_text()
+            data = json.loads(original)
+            malformed = [
+                original.replace('"counts":', '"counts": {}, "counts":', 1),
+                original.replace('"changed": 1', '"changed": 0, "changed": 1', 1),
+                original + ' ' * (16 * 1024 * 1024),
+            ]
+            for mutate in (
+                    lambda d: d.update(format_version=99),
+                    lambda d: d['counts'].update(before=99),
+                    lambda d: d['counts'].update(changed=True),
+                    lambda d: d.update(changed_cells_by_column={}),
+                    lambda d: d.update(format_version=float('nan'))):
+                changed = json.loads(original)
+                mutate(changed)
+                malformed.append(json.dumps(changed))
+            for index, raw in enumerate(malformed):
+                with self.subTest(summary=summary, malformed=index):
+                    (self.root/'pair-0001.json').write_text(raw)
+                    r = self.invoke([1], extra=['--row-counts'], aggregate=False)
+                    self.assertEqual(r.returncode, 2)
+                    self.assertEqual(r.stdout, b'')
+                    self.assertTrue(r.stderr.startswith(b'Cannot summarize:'))
+
+    def test_row_only_valid_formats_partial_and_status(self):
+        for summary in (True, False):
+            with self.subTest(summary=summary):
+                self.report(1, equal=True, summary=summary)
+                self.report(2, summary=summary)
+                (self.root/'pair-0003.json').write_text('PRIVATE_STALE')
+                r = self.invoke([0, 1, 2], expected=4, extra=['--row-counts'], aggregate=False)
+                self.assertEqual(r.returncode, 2)
+                data = json.loads(r.stdout)
+                self.assertEqual(data['rows'], dict(added=0, removed=0, changed=1, unchanged=1))
+                self.assertTrue(data['partial'])
+                self.assertNotIn('column_tally', data)
+                self.assertNotIn('pair_column_tallies', data)
+                r = self.invoke([0], extra=['--row-counts'], aggregate=False)
+                self.assertEqual(r.returncode, 0)
+                self.assertFalse(json.loads(r.stdout)['partial'])
+                r = self.invoke([0, 1], extra=['--row-counts'], aggregate=False)
+                self.assertEqual(r.returncode, 1)
+                self.assertFalse(json.loads(r.stdout)['partial'])
+                self.report(1, summary=summary)
+                r = self.invoke([0], extra=['--row-counts'], aggregate=False)
+                self.assertEqual(r.returncode, 2)
+                self.assertEqual(r.stdout, b'')
+
     def test_combined_row_counts(self):
         self.report(1);r=self.invoke([1],extra=['--row-counts']);d=json.loads(r.stdout)
         self.assertEqual(r.returncode,1);self.assertEqual(d['rows']['changed'],1)
