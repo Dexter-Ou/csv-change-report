@@ -44,3 +44,10 @@ The revised suite passed 69 unittest methods on synthetic Linux inputs, includin
 all refusal categories, no-output assertions, 32/33-level nesting boundaries and
 quoted brackets. The unavailable-shell case uses fault injection. CLI version
 remains 0.1.10-preview; Windows/macOS and hostile concurrent edits are untested.
+
+
+## Offline manifest preflight
+
+Use `--validate-only` to validate and resolve a manifest without launching the
+batch runner or creating reports. CSV existence and contents are not checked;
+normal execution still requires a new report directory. See evaluation/README.md.
