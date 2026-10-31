@@ -23,6 +23,43 @@ class ChangeTests(unittest.TestCase):
         path.write_text(text, encoding='utf-8')
         return path
 
+
+    def test_stdout_faults_override_check_status(self):
+        old = self.put('old.csv', 'id,x\na,1\n')
+        new = self.put('new.csv', 'id,x\na,2\n')
+        class Fault:
+            def __init__(self, mode, fault): self.mode, self.fault = mode, fault
+            def write(self, data):
+                if self.mode == 'write': raise self.fault('private synthetic exception')
+                return len(data)
+            def flush(self):
+                if self.mode == 'flush': raise self.fault('private synthetic exception')
+        for after in [old, new]:
+            for fmt in ['json', 'text']:
+                for mode in ['write', 'flush']:
+                    for fault in [BrokenPipeError, OSError, RuntimeError]:
+                        with self.subTest(after=after.name, fmt=fmt, mode=mode, fault=fault):
+                            err = io.StringIO()
+                            with contextlib.redirect_stdout(Fault(mode, fault)), contextlib.redirect_stderr(err):
+                                code = main([str(old), str(after), '--key', 'id', '--format', fmt, '--check'])
+                            self.assertEqual(code, 2)
+                            self.assertEqual(err.getvalue(), '{"error": "standard output could not be written"}\n')
+
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux pipe/descriptor regression')
+    def test_closed_stdout_pipe_process_status(self):
+        import os
+        old = self.put('old.csv', 'id,x\na,1\n')
+        new = self.put('new.csv', 'id,x\na,2\n')
+        tool = str(Path(__file__).with_name('csv_change.py'))
+        for after in [old, new]:
+            for fmt in ['json', 'text']:
+                read_fd, write_fd = os.pipe()
+                os.close(read_fd)
+                with os.fdopen(write_fd, 'wb') as sink:
+                    result = subprocess.run([sys.executable, tool, str(old), str(after), '--key', 'id', '--check', '--format', fmt], stdout=sink, stderr=subprocess.PIPE)
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(result.stderr, b'{"error": "standard output could not be written"}\n')
+
     def test_core_journey_and_no_cell_values(self):
         old = self.put('old.csv', 'id,name,status\na,Private-A,open\nb,Private-B,open\nc,Private-C,done\n')
         new = self.put('new.csv', 'status,id,name\nclosed,a,Private-A\nopen,d,Private-D\ndone,c,Private-C\n')
@@ -229,7 +266,7 @@ class ProcessTests(unittest.TestCase):
     def test_process_version(self):
         result = self.run_cli('--version')
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, 'csv-change-report 0.1.5-preview\n')
+        self.assertEqual(result.stdout, 'csv-change-report 0.1.6-preview\n')
         self.assertEqual(result.stderr, '')
         self.assertEqual(list(self.root.iterdir()), [])
 
@@ -253,7 +290,7 @@ class ProcessTests(unittest.TestCase):
         for result in (default, explicit, text):
             self.assertEqual((result.returncode, result.stderr), (0, ''))
         self.assertEqual(default.stdout, explicit.stdout)
-        self.assertEqual(text.stdout, 'CSV Change Report 0.1.5-preview\n'
+        self.assertEqual(text.stdout, 'CSV Change Report 0.1.6-preview\n'
                          'Records: before 3, after 3\n'
                          'Changes: added 1, removed 1, changed 1, unchanged 1\n'
                          'Added after records: 2\nRemoved before records: 2\n'
@@ -286,7 +323,7 @@ class ProcessTests(unittest.TestCase):
         path.write_text('id\n')
         result = self.run_cli(path, path, '--key', 'id', '--format', 'text')
         self.assertEqual((result.returncode, result.stderr), (0, ''))
-        self.assertEqual(result.stdout, 'CSV Change Report 0.1.5-preview\n'
+        self.assertEqual(result.stdout, 'CSV Change Report 0.1.6-preview\n'
                          'Records: before 0, after 0\n'
                          'Changes: added 0, removed 0, changed 0, unchanged 0\n'
                          'Added after records: none\nRemoved before records: none\n'
