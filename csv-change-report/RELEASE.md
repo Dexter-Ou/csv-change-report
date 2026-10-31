@@ -1,6 +1,6 @@
 # Draft release procedure
 
-Status: 0.1.0-draft tested preview. Sixteen synthetic test methods and the
+Status: 0.1.1-preview tested preview. Seventeen synthetic test methods and the
 fresh-start example/help passed on the isolated worker on 2026-10-31.
 No independent customer testing or demand evidence. All fixture data is synthetic.
 
@@ -20,15 +20,16 @@ a fresh directory on the approved isolated worker and run from its root:
 
 ```sh
 python3 --version
+python3 csv_change.py --version
 python3 -m unittest -v
 python3 csv_change.py examples/before.csv examples/after.csv --key id > actual-report.json
 python3 -c 'import json; from pathlib import Path; assert json.loads(Path("actual-report.json").read_text()) == json.loads(Path("examples/expected-report.json").read_text())'
 python3 csv_change.py --help
 ```
 
-Require Python 3.10+, all sixteen synthetic test methods passing, the fixture
-comparison passing and help exiting 0. Four subprocess methods cover the real entry point from an unrelated working
-directory, fixture output, deterministic bytes, unchanged inputs, help, missing
+Require Python 3.10+, all seventeen synthetic test methods passing, the fixture
+comparison passing and help exiting 0. Five subprocess methods cover the real entry point from an unrelated working
+directory, fixture output, deterministic bytes, unchanged inputs, version, help, missing
 files, invalid UTF-8, duplicate keys and argument errors. These passed on the approved worker. The suite covers missing input and
 argument errors; confirm their exit code 2 and fixed JSON diagnostics from the
 CLI as part of fresh-start verification. Record actual command results and the
