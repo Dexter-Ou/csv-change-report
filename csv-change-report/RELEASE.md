@@ -13,3 +13,7 @@ The cycle also retains a pre-version-bump exact default-output comparison and
 an independent seeded oracle; these are internal tests, not customer evidence.
 No Windows/macOS, hostile-directory or crash-durability assurance.
 No dependencies, network, telemetry, hosted service or paid obligation added.
+
+Evaluation-kit refresh: three synthetic timestamp/status fixtures and shell-safe
+raw CLI examples demonstrate statuses 1, 0, 1 with explicit column exclusions.
+Product code and version unchanged. Independent usefulness remains unverified.
