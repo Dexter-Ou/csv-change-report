@@ -1,7 +1,7 @@
 # Try an offline export review
 
 Audience hypothesis: someone who reviews recurring CSV exports by a stable unique
-record key. This is a free, speculative evaluation kit for 0.1.5-preview, not
+record key. This is a free, speculative evaluation kit for 0.1.7-preview, not
 customer evidence or a paid offer. All supplied names and records are synthetic.
 Python 3.10+ and a POSIX shell are required; no install, network or account needed
 to run. Windows shell behavior has not been tested.
@@ -39,6 +39,36 @@ keys need a domain decision; never silently discard records to make a test pass.
 The main README describes input limits, exact comparisons and exclusive
 `--output` behavior. For automation that needs 0=equal, 1=changed, 2=error, use
 `csv_change.py --check` directly; this demonstration wrapper consumes 1.
+
+## Try explicit volatile-column exclusions
+
+These original synthetic exports add an `exported_at` timestamp. Run the raw
+CLI from the extracted product directory. Each command prints a JSON report;
+`--check` uses 0=equal under this comparison, 1=changed, 2=error. These commands
+explicitly handle all three statuses and can also run in a `set -e` shell:
+
+```sh
+status=0
+python3 csv_change.py evaluation/volatile-before.csv evaluation/volatile-only.csv --key id --check || status=$?
+printf 'CLI status: %s\n' "$status"
+
+status=0
+python3 csv_change.py evaluation/volatile-before.csv evaluation/volatile-only.csv --key id --check --ignore-column exported_at || status=$?
+printf 'CLI status: %s\n' "$status"
+
+status=0
+python3 csv_change.py evaluation/volatile-before.csv evaluation/retained-change.csv --key id --check --ignore-column exported_at || status=$?
+printf 'CLI status: %s\n' "$status"
+```
+
+Expected statuses are 1, 0, 1. See `EXPECTED.md` for counts and positions.
+Only exclude a field when your workflow deliberately permits ignoring it.
+With exclusions, status 0 means equality of retained fields and keyed membership,
+not full export equality. Full input hashes still differ. Exclusions do not
+suppress schema/format errors or added/removed records. Names are exact and
+case-sensitive; key columns and absent columns cannot be excluded. Repeat
+`--ignore-column NAME` for multiple fields. `review.sh` intentionally accepts
+only BEFORE, AFTER and KEY: use the raw CLI for exclusions.
 
 ## Optional feedback
 
