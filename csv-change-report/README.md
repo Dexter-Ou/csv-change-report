@@ -160,3 +160,7 @@ total process memory: parsed objects, decoded text and reports also consume memo
 Row, column, data-cell and CSV parser field limits still apply. The batch helper accepts the same option in first position; see
 [evaluation instructions](evaluation/README.md#optional-batch-input-budget). Existing
 report paths and both original inputs remain protected by the usual refusal rules.
+
+
+Repeat offline batches with the optional [JSON manifest helper](evaluation/README.md#optional-repeat-review-manifest-prototype).
+Use `examples/batch.json` for a synthetic changed/equal batch.
