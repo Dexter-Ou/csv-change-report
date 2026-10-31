@@ -292,3 +292,36 @@ Expected batch status: 0 and pair-0001 status 0: only the deliberately excluded
 field changed. This means retained-field equality, not full-file equality.
 Changing `status` would still count. Names remain case-sensitive, including
 spaces; quoting preserves the name rather than changing matching rules.
+
+
+### Optional aggregate row counts
+
+Add `--totals` before the report directory to write `totals.json` beside
+`status.tsv`, without a separate helper command:
+
+```sh
+status=0
+sh evaluation/batch-review.sh --totals './aggregate reports' \
+  examples/before.csv examples/after.csv id || status=$?
+printf 'Batch status: %s\n' "$status"
+cat './aggregate reports/totals.json'
+```
+
+The JSON retains pair totals (`equal`, `changed`, `error`, `incomplete`,
+`expected`, `completed`) and adds `rows` with summed `added`, `removed`,
+`changed` and `unchanged` counts. These are sums across successful pairs,
+not deduplicated records across files. Failed pairs contribute no row counts;
+`partial: true` means the totals exclude failed or incomplete pairs. An all-error
+batch therefore has zero included rows, not evidence that its inputs were empty.
+Exit statuses remain 0 for all equal, 1 for differences, and 2 for any error.
+`totals.stderr` records aggregation diagnostics. An unreadable or malformed report
+produces no `totals.json` and status 2; keep the pair reports for inspection.
+Options can be combined with `--ignore-column` and `--max-input-bytes`.
+Without `--totals`, no aggregate files are created. Repeated `--totals` fails
+before creating the report directory. The underlying CSV CLI is unchanged.
+
+For a preserved batch, the equivalent manual command is
+`python3 evaluation/batch-totals.py REPORT_DIR/status.tsv --expected-pairs N --row-counts`.
+Only use row aggregation on a trusted batch directory you generated; do not let
+another process edit its reports while summarizing. Synthetic Linux tests do
+not establish independent usefulness or willingness to pay.
