@@ -590,3 +590,24 @@ output-parent failure currently returns `E_STATUS` because no complete status
 table exists. Disk faults, concurrent edits and crash recovery are untested.
 The suite uses only Python's
 standard library; the batch runner also requires the shell tools listed above.
+
+### Offline column tally
+
+After generating a JSON report, run:
+
+```sh
+python3 evaluation/column-tally.py /path/to/report.json
+python3 -m unittest -v test_column_tally
+```
+
+The helper accepts detailed format 1 and summary format 2 reports up to 16 MiB.
+It emits sorted column names, changed-cell counts per column, their sum, and the
+changed-record count. Added/removed records are excluded from these cell counts;
+ignored/key columns are absent. One changed record may affect several columns.
+Exit 0 means a tally was produced (including a changed report); exit 2 means an
+unreadable, oversized, malformed or inconsistent report. Errors use fixed text.
+Input bytes are preserved. It opens only the specified JSON, with no CSV or network
+access. Cell values are not copied, but column names remain visible and may be
+sensitive. JSON escaping keeps control characters escaped. Validation checks
+count types and arithmetic, not report authenticity or agreement with source CSVs.
+Untrusted reports can forge valid counts or put arbitrary text in column names.
