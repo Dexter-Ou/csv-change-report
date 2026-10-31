@@ -7,6 +7,7 @@
   "evaluation/EXPECTED.md",
   "evaluation/FEEDBACK.md",
   "evaluation/README.md",
+  "evaluation/RECOVERY.md",
   "evaluation/batch-review.sh",
   "evaluation/batch-totals.py",
   "evaluation/duplicate-key.csv",
