@@ -404,6 +404,25 @@ are not a privacy guarantee for subprocess output or a filesystem sandbox.
 python3 evaluation/batch-manifest.py --validate-only examples/batch.json
 ```
 
+For automation, add `--json` (requires `--validate-only`):
+
+```sh
+python3 evaluation/batch-manifest.py --validate-only --json examples/batch.json
+```
+
+Stdout is one JSON object with `version: 1`, `valid`, fixed `code`,
+`pair_count`, `csv_files_checked: false` and `reports_created: false`.
+Success returns 0 with code `OK` and the validated pair count. Refusal returns 2,
+with a fixed `E_*` code and `pair_count: null`; the fixed human diagnostic also
+appears on stderr. No supplied paths, keys or content appear in this metadata.
+A valid manifest can still reference missing or invalid CSVs. JSON mode does not
+create reports, even if a report-directory argument is supplied. `--json` without
+`--validate-only` refuses before execution. Use full option names; abbreviations
+are refused. `--help` retains ordinary help output. This stdout privacy contract
+does not cover operating-system/interpreter failures or the separate execution
+runner's output.
+
+
 Preflight checks the same full manifest schema, limits, encoding and literal
 path/key resolution as execution. Success prints only the number of pairs and
 returns 0; a refusal uses the fixed reason diagnostic and returns 2. No CSV is
