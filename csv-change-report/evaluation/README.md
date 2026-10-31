@@ -454,8 +454,12 @@ import subprocess
 import sys
 import tempfile
 
+def require(condition, message):
+    if not condition:
+        raise SystemExit(message)
+
 runner = Path('evaluation/batch-manifest.py').resolve()
-assert runner.is_file(), 'Run from the inner csv-change-report directory'
+require(runner.is_file(), 'Run from the inner csv-change-report directory')
 with tempfile.TemporaryDirectory(prefix='csv-json-walkthrough-') as temporary:
     work = Path(temporary)
     (work / 'before.csv').write_text('id,value\n1,old\n', encoding='utf-8')
@@ -486,9 +490,14 @@ with tempfile.TemporaryDirectory(prefix='csv-json-walkthrough-') as temporary:
                     'code': expected_code,
                     'pair_count': 1 if expected_preflight == 0 else None,
                     'csv_files_checked': False, 'reports_created': False}
-        assert preflight.returncode == expected_preflight
-        assert metadata == expected
-        assert not reports.exists()
+        require(preflight.returncode == expected_preflight,
+                'Unexpected preflight exit status')
+        require(type(metadata) is dict and metadata.keys() == expected.keys()
+                and all(type(metadata[key]) is type(value)
+                        and metadata[key] == value
+                        for key, value in expected.items()),
+                'Unexpected preflight metadata')
+        require(not reports.exists(), 'Preflight unexpectedly created reports')
         print(f'{name}: preflight={preflight.returncode} code={metadata["code"]}')
         if preflight.returncode != 0 or metadata['valid'] is not True:
             print('  execution skipped; no reports')
@@ -496,11 +505,11 @@ with tempfile.TemporaryDirectory(prefix='csv-json-walkthrough-') as temporary:
         # Preflight success permits comparison; it does not predict its result.
         run = subprocess.run([sys.executable, str(runner), str(source), str(reports)],
                              capture_output=True, text=True, check=False)
-        assert run.returncode == expected_run
-        assert (reports / 'status.tsv').is_file()
+        require(run.returncode == expected_run, 'Unexpected comparison exit status')
+        require((reports / 'status.tsv').is_file(), 'Missing comparison status.tsv')
         print(f'  execution={run.returncode}; status.tsv created')
-    assert all(hashlib.sha256(p.read_bytes()).hexdigest() == digest
-               for p, digest in originals.items())
+    require(all(hashlib.sha256(p.read_bytes()).hexdigest() == digest
+                for p, digest in originals.items()), 'Original fixture bytes changed')
     print('Original fixture bytes preserved; temporary reports removed on exit.')
 PYCODE
 ```
@@ -511,7 +520,9 @@ Expected: `changed` preflight 0/OK then execution 1 (differences);
 0/OK then execution 2 (input error). Execution 0 means no retained differences,
 1 means differences, and 2 means an error; inspect `status.tsv` before using
 partial reports. Preflight 0 never proves CSV existence or content validity.
-The assertions are checks for these fixtures, not a general production wrapper.
+The explicit checks remain active with optimized Python (`-O` or
+`PYTHONOPTIMIZE=1`). They check these fixtures; this is not a general production
+wrapper. Metadata fields must match the expected values and JSON value types.
 Unexpected or non-JSON preflight output stops this block before comparison.
 Execution output has its own privacy limits; this example captures it without
 printing supplied paths or CSV content. Files may change after preflight; no
