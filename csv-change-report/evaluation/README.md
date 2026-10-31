@@ -141,6 +141,45 @@ Reports retain hashes and column names, and summary reports omit positions.
 Use detailed CLI output separately to locate changes. Synthetic examples are
 not customer evidence; independent batch-review usefulness remains unverified.
 
+## Interpret a mixed batch and choose a detailed review
+
+Use the three-pair command above once in a fresh directory. Before consulting
+`EXPECTED.md`, answer: does batch status 2 mean all three comparisons failed?
+Which pair needs a data correction, and which successful pair needs change review?
+The numeric pair names map to the order of triples in your command, not filenames.
+
+Inspect the changed pair's summary and the invalid pair's diagnostic:
+
+```sh
+cat './batch reports/pair-0002.json'
+cat './batch reports/pair-0003.stderr'
+```
+
+Now locate changes in pair-0002 with a separate detailed report. Reuse its exact
+BEFORE, AFTER and KEY triple from your original command; do not infer paths from
+the table or run table contents as commands. Run this block once; it refuses an
+existing detailed output rather than overwriting it:
+
+```sh
+status=0
+python3 csv_change.py examples/before.csv examples/after.csv --key id --check \
+  --output './batch reports/pair-0002-detail.json' || status=$?
+printf 'Detailed pair-0002 status: %s\n' "$status"
+if [ "$status" -ne 1 ]; then
+  printf 'Expected a completed changed comparison; inspect the diagnostic.\n' >&2
+  exit 2
+fi
+cat './batch reports/pair-0002-detail.json'
+```
+
+Compare summary and detail counts and hashes, then find the changed column and
+record positions. Use original snapshots locally to judge the values. Pair-0001
+needs no content-change review under this keyed comparison; pair-0003 still needs
+a domain decision about repeated keys. Reviewing pair-0002 does not repair that
+error or approve the batch. Preserve the partial/error evidence; after correcting
+a copy of invalid input, use a different new report directory. See the answer key
+for exact expected results. This exercise tests mechanics, not human review speed.
+
 ## Optional feedback
 
 If you choose to share feedback, open an issue at
