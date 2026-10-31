@@ -1,7 +1,7 @@
 # Try an offline export review
 
 Audience hypothesis: someone who reviews recurring CSV exports by a stable unique
-record key. This is a free, speculative evaluation kit for 0.1.7-preview, not
+record key. This is a free, speculative evaluation kit for 0.1.8-preview, not
 customer evidence or a paid offer. All supplied names and records are synthetic.
 Python 3.10+ and a POSIX shell are required; no install, network or account needed
 to run. Windows shell behavior has not been tested.
