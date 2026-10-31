@@ -581,7 +581,12 @@ python3 -O -m unittest -v test_automate_batch
 These offline synthetic tests use temporary CSV fixtures and report directories.
 They check equal and mixed batches, error precedence and continuation, preservation
 of existing outputs, invalid manifests and arguments, and missing or file-valued
-output parents. An output-parent failure currently returns `E_STATUS` because no
-complete status table exists. No permission-denial, disk-fault, concurrent-edit or
-crash-recovery guarantee is tested by this suite. The suite uses only Python's
+output parents. Two POSIX permission tests first observe a real directory-creation
+denial; they skip explicitly on other platforms or when the runtime bypasses
+permissions (for example, root). They check denied-parent failure, preservation of
+read-only existing reports, and subsequent use of a fresh writable directory.
+Optimized suite runs also pass optimization to the wrapper subprocess. An
+output-parent failure currently returns `E_STATUS` because no complete status
+table exists. Disk faults, concurrent edits and crash recovery are untested.
+The suite uses only Python's
 standard library; the batch runner also requires the shell tools listed above.
