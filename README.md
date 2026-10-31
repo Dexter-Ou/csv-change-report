@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/f6c3fee8057160c22db1bace9b7b2eea53d1fde2).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/edcc8f8f72d550354164366075de9180e8c0d8a7).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-f6c3fee8057160c22db1bace9b7b2eea53d1fde2`.
+   named `csv-change-report-edcc8f8f72d550354164366075de9180e8c0d8a7`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -141,3 +141,11 @@ becomes 0, unchanged becomes 2, and added/removed remain 1 each. Full schemas
 must still match. Without exclusions, content is unchanged apart from version.
 The candidate also passed 256 seeded synthetic CLI checks against an independent
 list-based oracle; these tests do not establish user demand or revenue.
+
+The refreshed evaluation kit includes timestamp-only and retained-status changes.
+Its shell-safe raw CLI examples demonstrate --check statuses 1, 0, 1 when
+exported_at is explicitly excluded from the latter two comparisons. See the
+[evaluation task](csv-change-report/evaluation/README.md) and answer key.
+Fresh public extraction passed 36 synthetic test methods, six JSON/text exercise
+comparisons, the documented shell block, two invalid exclusions and three wrapper
+journeys on Linux Python 3.12.15. These are internal tests, not user feedback.
