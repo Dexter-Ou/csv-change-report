@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/de0f3bf265a001c97dbac9c2a55fcb3b6fcfd4cf).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/05c2085b6ca7423c5832ded649d65385cef5fc61).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-de0f3bf265a001c97dbac9c2a55fcb3b6fcfd4cf`.
+   named `csv-change-report-05c2085b6ca7423c5832ded649d65385cef5fc61`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -179,3 +179,7 @@ The offline kit includes a mixed-batch interpretation exercise: distinguish erro
 from changed pairs, then locate changes in a separate detailed report.
 
 Offline batch totals are available in `evaluation/batch-totals.py`; follow the evaluation guide and supply your original expected pair count to detect missing rows.
+
+Practice preserving a stopped batch and retrying into a new directory with the
+[offline recovery exercise](csv-change-report/evaluation/RECOVERY.md). Its stopped
+snapshot is simulated; process interruption and crash durability are untested.
