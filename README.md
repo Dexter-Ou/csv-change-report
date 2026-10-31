@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/d7e907b4c30ecbc499deb69a0548dc58a09b7141).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/2e61c48ef283906011070d6424194156bbe962e6).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-d7e907b4c30ecbc499deb69a0548dc58a09b7141`.
+   named `csv-change-report-2e61c48ef283906011070d6424194156bbe962e6`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -36,7 +36,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Twenty-eight synthetic test methods passed on the isolated Linux worker. These are
+Thirty synthetic test methods passed on the isolated Linux worker. These are
 software checks, not customer validation or an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -103,7 +103,7 @@ comparisons both exit 0 after a notice; invalid input exits 2. See the
 [task and recovery steps](csv-change-report/evaluation/README.md),
 [synthetic answer key](csv-change-report/evaluation/EXPECTED.md) and
 [voluntary feedback prompts](csv-change-report/evaluation/FEEDBACK.md).
-The tested public kit passed the 28-method suite and 11 scripted checks on Linux
+The tested public kit passed the 30-method suite and the changed-export journey on Linux
 Python 3.12.15. These are synthetic checks, not usability or customer evidence.
 Use the inner `csv-change-report/evaluation` directory; the separate top-level
 `product/evaluation` directory is a superseded misplaced draft, not runnable.
@@ -127,3 +127,6 @@ other sensitive material. Issues are public. No response, support turnaround or
 payment is promised. No telemetry is collected by the tool. Owner/internal tests
 will be recorded separately from independent volunteer feedback. No independent
 feedback, customer acceptance or revenue has yet been established.
+
+Version 0.1.6-preview fixes stdout write/flush failures and preserves exit 2 for
+closed pipes. It cannot confirm downstream receipt or storage of report bytes.
