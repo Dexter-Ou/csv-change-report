@@ -71,5 +71,4 @@ For your own authorized snapshots, quote paths, replace the key exactly and
 preserve originals. Avoid shell redirection onto inputs. See [the full rules](README.md)
 for limits, exclusive `--output`, optional exclusions and recovery, and
 [the evaluation kit](evaluation/README.md) for mixed batches and safe retries.
-Do not share private files or reports in public issues. Independent usefulness
-and willingness to pay remain unverified; these examples are not customer tests.
+Do not share private files or reports in public issues. These examples use synthetic data.
