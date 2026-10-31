@@ -11,15 +11,16 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/2b5cdb668c8b1e684de41183ab31bd436b4adf6b).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/5bb5f09814ab72c5938b923b1b2ebcd0ac23f592).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-2b5cdb668c8b1e684de41183ab31bd436b4adf6b`.
+   named `csv-change-report-5bb5f09814ab72c5938b923b1b2ebcd0ac23f592`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
 cd csv-change-report
 python3 --version
+python3 csv_change.py --version
 python3 csv_change.py examples/before.csv examples/after.csv --key id
 ```
 
@@ -35,7 +36,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Sixteen synthetic test methods passed on the isolated Linux worker. These are
+Seventeen synthetic test methods passed on the isolated Linux worker. These are
 software checks, not customer validation or an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -74,7 +75,7 @@ Then compare your answer with the expected JSON. Skip any question you prefer.
 
 You may voluntarily open an issue in this repository with only:
 
-- Your operating system and Python version; did download-to-example succeed?
+- Your operating system, Python version and tool `--version` output; did download-to-example succeed?
 - Where you got stuck and roughly how long the task took.
 - Whether you could interpret the changed/added/removed record positions.
 - A recurring export-review task this might help, or why it would not help.
