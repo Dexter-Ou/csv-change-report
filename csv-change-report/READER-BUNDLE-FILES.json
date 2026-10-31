@@ -1,6 +1,6 @@
 {
   "base_commit": "fc065837a0253e67442e82db0eb98a85b3746310",
-  "status": "unpublished optional reader bundle",
+  "status": "published optional reader bundle with synthetic timestamp recipe",
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
     "QUICKSTART.md": "a373bc2b551028280589c30c7ff7dc410147e3933c5c0d53f49a145abc7f688c",
@@ -11,10 +11,11 @@
     "evaluation/ANSWER-KEY.md": "385eef637c036277f1c2f445c266ffe475efd6dd52d0bd71e3d337c7b338ccdb",
     "evaluation/EXPECTED.md": "6cccb9d32e689dfaab70e5f7848cb26b6c7340b0eae543d47c09507892fdfb3f",
     "evaluation/FEEDBACK.md": "f431afddb7ef52f857b5a894ed3bea5478b09a798dff802f69105da0eea0188b",
-    "evaluation/READER-START.md": "865320c1a6bb3122048041730c03588faf8e4202e1eda15e0743020d6c53f8b8",
+    "evaluation/READER-START.md": "45478a15a5b40267f99f22b51aaef02b2c9870f355c16144fde2f48606660e7b",
     "evaluation/READER-TASK.md": "3b232f5dbcae0e9a4bd88d8afb6dc459c4757dd3ce279265f6b57df9109733eb",
     "evaluation/README.md": "99faaa9dbf6aba69a692317ff2072b391c24d450ab6cf5b2a7792cf8cf9098e2",
     "evaluation/RECOVERY.md": "ede9d0204b80016a2e74d1d73dace8bf37fb05b175547889ed822d4dae4d7fcb",
+    "evaluation/TIMESTAMP-RECIPE.md": "5ba8b799a39a0c02ed841f31f15ecb909e2c6f514db574124b90066c8387b939",
     "evaluation/batch-review.sh": "0e9eb2268fdf487457ad9c8c8e8abcbd5c5ba1767bbee909223b67abe0c594a1",
     "evaluation/batch-totals.py": "42de8097afb9a54fe62c5a747f01fff194618294eb8e755dc27ffe81d871a163",
     "evaluation/duplicate-key.csv": "33adb2b84dcd9323c8a543454cb67642bb45d5694102e0bfd177f77811f4945d",
