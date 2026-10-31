@@ -1,0 +1,34 @@
+# Optional offline reader exercise
+
+This complete candidate bundle includes the existing 0.1.10-preview product and
+an optional six-task worksheet. No installation, network or account is needed.
+Requires Python 3.10+ and a POSIX shell. Linux command checks only; human
+usefulness and willingness to pay are unverified. All examples are synthetic.
+
+Extract reader-evaluation.zip into a new trusted directory using your archive
+manager, then enter its csv-change-report folder. Read QUICKSTART.md and
+evaluation/READER-TASK.md. Record answers locally before opening
+evaluation/ANSWER-KEY.md. Read evaluation/README.md for batch commands and
+continuation behavior. Use only the bundled invented CSVs for this exercise.
+
+The following setup check prints the interpreter version and verifies that you
+are in the right folder. It does not run comparisons or send feedback:
+
+```sh
+python3 --version
+test -f csv_change.py
+test -f QUICKSTART.md
+test -f evaluation/READER-TASK.md
+test -f evaluation/ANSWER-KEY.md
+```
+
+Then use the literal examples in QUICKSTART.md. The batch example creates
+`guide batch`; choose a fresh extraction or unused directory before rerunning.
+Status 1 with --check means changes; status 2 means an error. Preserve outputs.
+The optional worksheet has no timing target or automatic score. An automated
+command check is not evidence that an independent person understood the guide.
+
+Feedback is voluntary through the public issue route described in
+evaluation/FEEDBACK.md. Send general observations or invented examples only;
+never private CSVs, reports, paths, hashes, identifiers or secrets. Nothing is
+sent automatically. This candidate bundle is not yet published.
