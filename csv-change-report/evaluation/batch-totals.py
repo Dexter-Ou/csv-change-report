@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize a batch status table without executing it or opening its reports."""
+"""Summarize a batch status table without executing it; optionally sum successful reports."""
 import argparse
 import json
 import re
@@ -38,15 +38,35 @@ def summarize(path, expected):
     return dict(expected=expected, completed=completed, **totals)
 
 
+def row_counts(path, totals):
+    """Only generated report names from an already validated table are opened."""
+    rows = dict(added=0, removed=0, changed=0, unchanged=0)
+    directory = Path(path).parent
+    for line in Path(path).read_text(encoding='utf-8').splitlines()[1:]:
+        stem, status, _, _ = line.split('\t')
+        if status not in ('0', '1'):
+            continue
+        counts = json.loads((directory / (stem + '.json')).read_text(encoding='utf-8'))['counts']
+        for name in rows:
+            value = counts[name]
+            if type(value) is not int or value < 0:
+                raise ValueError('invalid row count')
+            rows[name] += value
+    return dict(rows=rows, partial=bool(totals['error'] or totals['incomplete']))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('table')
     parser.add_argument('--expected-pairs', type=int, required=True)
+    parser.add_argument('--row-counts', action='store_true', help='sum row counts from successful pair reports; failed pairs excluded')
     args = parser.parse_args()
     try:
         totals = summarize(args.table, args.expected_pairs)
-    except (OSError, UnicodeError, ValueError):
-        print('Cannot summarize: unreadable, malformed or inconsistent table; preserve it and inspect the run.', file=sys.stderr)
+        if args.row_counts:
+            totals.update(row_counts(args.table, totals))
+    except (OSError, UnicodeError, ValueError, KeyError, TypeError):
+        print('Cannot summarize: unreadable, malformed or inconsistent table/report; preserve it and inspect the run.', file=sys.stderr)
         return 2
     print(json.dumps(totals, sort_keys=True))
     return 2 if totals['error'] or totals['incomplete'] else 1 if totals['changed'] else 0
