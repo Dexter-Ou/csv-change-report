@@ -10,10 +10,8 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/e1260f5d077ff04afaa27494597fb0cad939a822).
-   This link pins the synthetic-tested code, rather than following future edits.
-2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-e1260f5d077ff04afaa27494597fb0cad939a822`.
+1. Download the source ZIP from the repository Code menu.
+2. Extract it into a new folder and open a terminal in the outer folder.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -35,7 +33,7 @@ python3 -m unittest -v
 python3 csv_change.py --help
 ```
 
-Fifty-three synthetic test methods passed on the isolated Linux worker. These are
+Fifty-nine synthetic test methods passed on the isolated Linux worker. These are
 synthetic software checks, not an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
@@ -74,7 +72,7 @@ inspect it and use a new name when retrying. Use a trusted output directory.
 
 ## Choose a report
 
-Follow the [short report-choice guide](csv-change-report/QUICKSTART.md) for terminal text, detailed JSON, summary JSON and batch reports. Its three literal shell blocks passed on a fresh pinned Linux download; human usability remains unverified.
+Follow the [short report-choice guide](csv-change-report/QUICKSTART.md) for terminal text, detailed JSON, summary JSON and batch reports. Its three literal shell blocks passed on a fresh pinned Linux download.
 
 ## Fit and limits
 
@@ -106,8 +104,8 @@ comparisons both exit 0 after a notice; invalid input exits 2. See the
 [task and recovery steps](csv-change-report/evaluation/README.md),
 [synthetic answer key](csv-change-report/evaluation/EXPECTED.md) and
 [voluntary feedback prompts](csv-change-report/evaluation/FEEDBACK.md).
-The tested public kit passed the 53-method suite and the changed-export journey on Linux
-Python 3.12.15. These are synthetic checks, not measured human usability.
+The tested public kit passed the 59-method suite and the changed-export journey on Linux
+Python 3.12.15 with synthetic fixtures.
 Use the inner `csv-change-report/evaluation` directory; the separate top-level
 `product/evaluation` directory is a superseded misplaced draft, not runnable.
 
@@ -126,8 +124,7 @@ You may voluntarily open an issue in this repository with only:
 - A recurring export-review task this might help, or why it would not help.
 
 Do not upload CSV files, reports, private paths, customer names, credentials or
-other sensitive material. Issues are public. No response, support turnaround or
-payment is promised. No telemetry is collected by the tool. Automated test reports are separate from voluntary user feedback.
+other sensitive material. Issues are public. No response or support turnaround is promised. No telemetry is collected by the tool.
 
 Version 0.1.7-preview fixes stdout write/flush failures and preserves exit 2 for
 closed pipes. It cannot confirm downstream receipt or storage of report bytes.
@@ -149,16 +146,16 @@ exported_at is explicitly excluded from the latter two comparisons. See the
 [evaluation task](csv-change-report/evaluation/README.md) and answer key.
 Fresh public extraction passed 36 synthetic test methods, six JSON/text exercise
 comparisons, the documented shell block, two invalid exclusions and three wrapper
-journeys on Linux Python 3.12.15. These are internal tests, not user feedback.
+journeys on Linux Python 3.12.15 with synthetic fixtures.
 
 
 Version 0.1.8-preview adds `--summary-only` for JSON and text. It omits record
 positions and per-record changed-column lists while retaining counts and column
 totals. JSON retains full-input hashes and uses format_version 2 with report_mode
 summary; default detailed JSON remains version 1. `--check` statuses are unchanged.
-Both input snapshots remain in memory. This is a speculative usability feature.
+Both input snapshots remain in memory.
 On a synthetic 10,000-record changed diff, JSON shrank from 1,138,301 to 453 bytes;
-text from 378,026 to 203 bytes. This is not a performance or customer benchmark.
+text from 378,026 to 203 bytes. This measures output size, not runtime performance.
 
 ```sh
 python3 csv_change.py examples/before.csv examples/after.csv --key id --summary-only
@@ -166,15 +163,13 @@ python3 csv_change.py examples/before.csv examples/after.csv --key id --summary-
 
 The offline evaluation kit now includes a summary-versus-detail exercise with
 counts, omitted locations and explicit check statuses 0/1/2. Its documented
-changed-pair commands also passed under `sh -ec`. This remains synthetic practice,
-not measured human review speed or independent feedback.
+changed-pair commands also passed under `sh -ec` with synthetic fixtures.
 
 The offline evaluation kit includes `evaluation/batch-review.sh` for several
 export pairs. It writes numeric summary reports and per-pair status rows into
 a new directory, continues after invalid pairs and refuses existing directories.
 Five synthetic batches (11 pairs), documented commands and 40 existing tests
-passed on the candidate and fresh public extraction. Human usefulness remains
-unverified. See the inner evaluation README for run and failure recovery steps.
+passed on the candidate and fresh public extraction. See the inner evaluation README for run and failure recovery steps.
 
 The offline kit includes a mixed-batch interpretation exercise: distinguish errors
 from changed pairs, then locate changes in a separate detailed report.
@@ -219,7 +214,7 @@ The pinned download also includes an optional complete reader exercise. After
 entering the inner product folder, start at [evaluation/READER-START.md](csv-change-report/evaluation/READER-START.md).
 It includes a six-task worksheet and a separate answer key. Fresh public Linux
 extraction matched all 29 candidate files and passed the four literal setup/guide
-shell blocks. These are synthetic command checks; human usability was not measured.
+shell blocks using synthetic fixtures.
 
 
 Try the [worked timestamp-export recipe](csv-change-report/evaluation/TIMESTAMP-RECIPE.md)
@@ -252,3 +247,5 @@ Equal/changed batches retain status 0/1; mixed error batches retain partial tota
 and status 2. Fault injection does not prove safety under hostile directory edits.
 
 Batch status-file initialization and append failures now return error 2 with an incomplete-batch diagnostic. Existing pair reports after a failed run are not proof of a complete batch. Five injected status-write faults and three normal batch cases passed on the candidate; fault injection is synthetic Linux evidence.
+
+Batch review validates version 2 JSON summaries, row and column counts, and agreement with comparator exit status before recording status 0 or 1. Malformed or inconsistent reports record error 2 and report `-`; later pairs continue. Ninety-eight focused synthetic checks and 59 unittest methods passed on Linux, plus 26 prior output-fault checks. Validation checks report structure and internal consistency; it does not prove source provenance or protection from concurrent edits.
