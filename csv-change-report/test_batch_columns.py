@@ -91,6 +91,42 @@ class BatchColumnTests(unittest.TestCase):
     def test_equal_status_contradiction(self):
         self.report(1);r=self.invoke([0]);self.assertEqual(r.returncode,2);self.assertEqual(r.stdout,b'')
 
+    def test_added_removed_equal_status_all_options(self):
+        options = [[], ['--row-counts'], ['--column-counts'],
+                   ['--pair-column-counts'], ['--column-counts', '--pair-column-counts'],
+                   ['--row-counts', '--column-counts'],
+                   ['--row-counts', '--pair-column-counts'],
+                   ['--row-counts', '--column-counts', '--pair-column-counts']]
+        self.before.write_text('id,z,a\n1,PRIVATE_OLD,x\n')
+        for summary in (True, False):
+            for kind in ('added', 'removed'):
+                self.after.write_text('id,z,a\n1,PRIVATE_OLD,x\n2,PRIVATE_ADDED,y\n'
+                                      if kind == 'added' else 'id,z,a\n')
+                data = compare(self.before, self.after, 'id', summary_only=summary)
+                (self.root/'pair-0001.json').write_text(json.dumps(data))
+                for extra in options:
+                    with self.subTest(summary=summary, kind=kind, options=extra):
+                        # Status-only mode deliberately does not inspect reports.
+                        r = self.invoke([0], extra=extra, aggregate=False)
+                        inspect_report = bool(extra)
+                        self.assertEqual(r.returncode, 2 if inspect_report else 0)
+                        if inspect_report:
+                            self.assertEqual(r.stdout, b'')
+                            self.assertTrue(r.stderr.startswith(b'Cannot summarize:'))
+                        r = self.invoke([1], extra=extra, aggregate=False)
+                        self.assertEqual(r.returncode, 1, r.stderr)
+                        totals = json.loads(r.stdout)
+                        if inspect_report:
+                            self.assertFalse(totals['partial'])
+                        if '--row-counts' in extra:
+                            self.assertEqual(totals['rows'][kind], 1)
+                            self.assertEqual(totals['rows']['changed'], 0)
+                        if '--column-counts' in extra:
+                            self.assertEqual(totals['column_tally']['changed_records'], 0)
+                            self.assertEqual(totals['column_tally']['changed_cells'], 0)
+                        if '--pair-column-counts' in extra:
+                            self.assertEqual(totals['pair_column_tallies'][0]['changed_records'], 0)
+
     def test_row_only_strict_report_validation(self):
         for summary in (True, False):
             original = self.report(1, summary=summary).read_text()
