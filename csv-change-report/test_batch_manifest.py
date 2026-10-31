@@ -92,6 +92,49 @@ class ManifestTests(unittest.TestCase):
             cwd=self.root, capture_output=True, timeout=20)
         self.assert_refusal(missing_report, 'E_ARGUMENTS')
 
+    def test_leading_bom_refusal_and_separate_copy_recovery(self):
+        for newline in ('\n', '\r\n'):
+            with self.subTest(newline=newline):
+                raw = json.dumps(self.valid, indent=2).replace('\n', newline).encode()
+                original = b'\xef\xbb\xbf' + raw
+                self.manifest.write_bytes(original)
+                for options in ((), ('--validate-only',)):
+                    self.assert_refusal(self.run_manifest(options=options), 'E_BOM')
+                copy = self.manifest.with_name('batch-no-bom.json')
+                with copy.open('wb') as stream:
+                    stream.write(original[3:])
+                self.assertEqual(manifest_module.load_manifest(copy),
+                    [str(self.before), str(self.after), 'id'])
+                result = subprocess.run([sys.executable, str(SCRIPT), '--validate-only',
+                    str(copy)], cwd=self.root, capture_output=True, timeout=20)
+                self.assertEqual(result.returncode, 0)
+                self.assertEqual(result.stderr, b'')
+                self.assertFalse((self.root / 'reports').exists())
+                report = self.root / ('recovered-' + str(len(newline)))
+                result = subprocess.run([sys.executable, str(SCRIPT), str(copy), str(report)],
+                    cwd=self.root, capture_output=True, timeout=20)
+                self.assertEqual(result.returncode, 1)
+                self.assertTrue((report / 'status.tsv').is_file())
+                self.assertEqual(self.manifest.read_bytes(), original)
+
+    def test_bom_diagnostic_is_fixed_and_not_content_dependent(self):
+        cases = [b'\xef\xbb\xbf' + suffix for suffix in (
+            b'', b'PRIVATE_SENTINEL', b'\xef\xbb\xbf{}', b'[' * 40)]
+        for raw in cases:
+            self.manifest.write_bytes(raw)
+            for options in ((), ('--validate-only',)):
+                self.assert_refusal(self.run_manifest(options=options), 'E_BOM')
+        # Byte limits and UTF-8 decoding retain precedence over BOM detection.
+        self.manifest.write_bytes(b'\xef\xbb\xbf' + b' ' * 65536)
+        self.assert_refusal(self.run_manifest(), 'E_SIZE')
+        self.manifest.write_bytes(b'\xef\xbb\xbf\xff')
+        self.assert_refusal(self.run_manifest(), 'E_ENCODING')
+        self.manifest.write_bytes(b' \xef\xbb\xbf{}')
+        self.assert_refusal(self.run_manifest(), 'E_JSON')
+        self.valid['pairs'][0]['key'] = 'literal\ufeffkey'
+        self.write()
+        self.assertEqual(manifest_module.load_manifest(self.manifest)[-1], 'literal\ufeffkey')
+
     def test_fixed_actionable_refusal_codes(self):
         pair = self.valid['pairs'][0]
         cases = [
