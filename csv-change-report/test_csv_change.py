@@ -266,7 +266,7 @@ class ProcessTests(unittest.TestCase):
     def test_process_version(self):
         result = self.run_cli('--version')
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, 'csv-change-report 0.1.7-preview\n')
+        self.assertEqual(result.stdout, 'csv-change-report 0.1.8-preview\n')
         self.assertEqual(result.stderr, '')
         self.assertEqual(list(self.root.iterdir()), [])
 
@@ -290,7 +290,7 @@ class ProcessTests(unittest.TestCase):
         for result in (default, explicit, text):
             self.assertEqual((result.returncode, result.stderr), (0, ''))
         self.assertEqual(default.stdout, explicit.stdout)
-        self.assertEqual(text.stdout, 'CSV Change Report 0.1.7-preview\n'
+        self.assertEqual(text.stdout, 'CSV Change Report 0.1.8-preview\n'
                          'Records: before 3, after 3\n'
                          'Changes: added 1, removed 1, changed 1, unchanged 1\n'
                          'Added after records: 2\nRemoved before records: 2\n'
@@ -323,7 +323,7 @@ class ProcessTests(unittest.TestCase):
         path.write_text('id\n')
         result = self.run_cli(path, path, '--key', 'id', '--format', 'text')
         self.assertEqual((result.returncode, result.stderr), (0, ''))
-        self.assertEqual(result.stdout, 'CSV Change Report 0.1.7-preview\n'
+        self.assertEqual(result.stdout, 'CSV Change Report 0.1.8-preview\n'
                          'Records: before 0, after 0\n'
                          'Changes: added 0, removed 0, changed 0, unchanged 0\n'
                          'Added after records: none\nRemoved before records: none\n'
