@@ -6,13 +6,14 @@ records without uploading their data. This usefulness hypothesis is unverified.
 No customer testing, price, willingness to pay or earnings is established.
 
 **Synthetic runtime checks passed** on the isolated worker (Python 3.12.15,
-2026-10-31): sixteen test methods, fresh extraction, example oracle and help.
+2026-10-31): seventeen test methods, fresh extraction, example oracle and help.
 No independent user testing has occurred. This is a preview, not a hardened parser.
 Requires Python 3.10+; standard library only, no installation or service.
 
 From this directory on the isolated worker:
 
 ```sh
+python3 csv_change.py --version
 python3 -m unittest -v
 python3 csv_change.py examples/before.csv examples/after.csv --key id
 ```
@@ -41,7 +42,9 @@ before sharing. Hashes support reproducibility, not anonymization. Inputs are
 opened read-only. No network, telemetry, formula evaluation, automatic cleaning
 or spreadsheet export. Do not redirect output onto either input path: shell
 redirection can truncate it before this program starts. Invalid command arguments produce a fixed message without echoing supplied text;
-long option abbreviations are rejected. `--help` prints usage and exits 0.
+long option abbreviations are rejected. `--help` prints usage and exits 0. `--version` prints
+`csv-change-report 0.1.1-preview` and exits 0 without input files. Include this
+version when voluntarily reporting a problem; do not include private CSV data.
 Failures exit 2 with JSON
 on stderr; successful comparisons exit 0, including when changes exist.
 
