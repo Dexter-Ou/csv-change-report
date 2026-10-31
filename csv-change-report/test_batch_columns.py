@@ -110,6 +110,54 @@ class BatchColumnTests(unittest.TestCase):
                         for p in directory.iterdir() if p.is_file()})
             self.assertEqual(fixtures, {p: p.read_bytes() for p in fixtures})
 
+    def test_corrected_rerun_existing_directory_preserves_all_bytes(self):
+        # A failed-key batch stays readable after a refused corrected rerun.
+        script = str(ROOT/'evaluation/batch-review.sh')
+        def snapshot():
+            return {str(p.relative_to(self.root)): p.read_bytes()
+                    for p in self.root.rglob('*') if p.is_file()}
+        for totals in (False, True):
+            with self.subTest(totals=totals):
+                partial = self.root/('partial totals' if totals else 'partial plain')
+                occupied = self.root/('occupied totals' if totals else 'occupied plain')
+                prefix = ['sh', script] + (['--totals'] if totals else [])
+                pairs = [str(self.before), str(self.after), 'id',
+                         str(self.before), str(self.after), 'missing_key']
+                first = subprocess.run(prefix+[str(partial)]+pairs,
+                                       capture_output=True, timeout=15)
+                self.assertEqual(first.returncode, 2, first.stderr)
+                self.assertEqual([r.split('\t')[1] for r in
+                    (partial/'status.tsv').read_text().splitlines()[1:]], ['1', '2'])
+                occupied.mkdir()
+                (occupied/'status.tsv').write_bytes(b'original status\x00\xff')
+                (occupied/'pair-0001.json').write_bytes(b'original report\x00\xff')
+                nested = occupied/'nested'; nested.mkdir()
+                (nested/'keep.bin').write_bytes(bytes(range(256)))
+                baseline = snapshot()
+                corrected = pairs[:-1]+['id']
+                # Test both collision with the partial batch and a separate occupied target.
+                for target in (partial, occupied):
+                    refused = subprocess.run(prefix+[str(target)]+corrected,
+                                             capture_output=True, timeout=15)
+                    self.assertEqual(refused.returncode, 2, refused.stderr)
+                    self.assertIn(b'choose an unused path', refused.stderr)
+                    self.assertEqual(refused.stdout, b'')
+                    self.assertEqual(snapshot(), baseline)
+                    self.assertNotIn(b'PRIVATE_', refused.stdout+refused.stderr)
+                recovered = self.root/('recovered totals' if totals else 'recovered plain')
+                success = subprocess.run(prefix+[str(recovered)]+corrected,
+                                         capture_output=True, timeout=15)
+                self.assertEqual(success.returncode, 1, success.stderr)
+                self.assertEqual([r.split('\t')[1] for r in
+                    (recovered/'status.tsv').read_text().splitlines()[1:]], ['1', '1'])
+                if totals:
+                    data = json.loads((recovered/'totals.json').read_text())
+                    self.assertFalse(data['partial'])
+                    self.assertEqual(data['error'], 0)
+                current = snapshot()
+                self.assertEqual(baseline, {k:current[k] for k in baseline})
+                self.assertNotIn(b'PRIVATE_', success.stdout+success.stderr)
+
     def test_equal_and_changed_both_report_formats(self):
         for summary in (True,False):
             self.report(1,equal=True,summary=summary);self.report(2,summary=summary)
