@@ -44,6 +44,72 @@ class BatchColumnTests(unittest.TestCase):
         self.assertNotIn(b'PRIVATE_',r.stdout+r.stderr)
         return r
 
+    def test_batch_review_added_removed_end_to_end_all_options(self):
+        # Generate real summaries through the shell journey, not compare fixtures.
+        self.before.write_text('id,z,a\n1,PRIVATE_OLD,x\n')
+        self.after.write_text('id,z,a\n1,PRIVATE_OLD,x\n2,PRIVATE_ADDED,y\n')
+        empty = self.root/'empty.csv'
+        empty.write_text('id,z,a\n')
+        fixtures = {p: p.read_bytes() for p in (self.before, self.after, empty)}
+        options = [[], ['--row-counts'], ['--column-counts'],
+                   ['--pair-column-counts'], ['--column-counts', '--pair-column-counts'],
+                   ['--row-counts', '--column-counts'],
+                   ['--row-counts', '--pair-column-counts'],
+                   ['--row-counts', '--column-counts', '--pair-column-counts']]
+        for partial in (False, True):
+            directory = self.root/('partial batch' if partial else 'complete batch')
+            args = ['sh', str(ROOT/'evaluation/batch-review.sh'), '--totals', str(directory),
+                    str(self.before), str(self.after), 'id',
+                    str(self.before), str(empty), 'id',
+                    str(self.before), str(self.before), 'id']
+            if partial:
+                # Missing key is a real comparison error; successful pairs remain usable.
+                args += [str(self.before), str(self.after), 'missing_key']
+            run = subprocess.run(args, capture_output=True, timeout=30)
+            expected_status = 2 if partial else 1
+            self.assertEqual(run.returncode, expected_status, run.stderr)
+            self.assertNotIn(b'PRIVATE_', run.stdout+run.stderr)
+            baseline = {p.name: p.read_bytes() for p in directory.iterdir() if p.is_file()}
+            self.assertNotIn(b'PRIVATE_', b''.join(baseline.values()))
+            rows = (directory/'status.tsv').read_text().splitlines()[1:]
+            self.assertEqual([r.split('\t')[1] for r in rows],
+                             ['1', '1', '0'] + (['2'] if partial else []))
+            expected_rows = dict(added=1, removed=1, changed=0, unchanged=2)
+            stored = json.loads((directory/'totals.json').read_text())
+            self.assertEqual(stored['rows'], expected_rows)
+            self.assertEqual(stored['partial'], partial)
+            for extra in options:
+                with self.subTest(partial=partial, options=extra):
+                    result = subprocess.run(PYTHON + [str(ROOT/'evaluation/batch-totals.py'),
+                        str(directory/'status.tsv'), '--expected-pairs', str(4 if partial else 3)]
+                        + extra, capture_output=True, timeout=10)
+                    self.assertEqual(result.returncode, expected_status, result.stderr)
+                    self.assertNotIn(b'PRIVATE_', result.stdout+result.stderr)
+                    data = json.loads(result.stdout)
+                    self.assertEqual(data['changed'], 2)
+                    self.assertEqual(data['equal'], 1)
+                    self.assertEqual(data['error'], 1 if partial else 0)
+                    if extra:
+                        self.assertEqual(data['partial'], partial)
+                    if '--row-counts' in extra:
+                        self.assertEqual(data['rows'], expected_rows)
+                    self.assertEqual('rows' in data, '--row-counts' in extra)
+                    self.assertEqual('column_tally' in data, '--column-counts' in extra)
+                    self.assertEqual('pair_column_tallies' in data, '--pair-column-counts' in extra)
+                    if '--column-counts' in extra:
+                        self.assertEqual(data['column_tally'], dict(reports=3,
+                            changed_records=0, changed_cells=0,
+                            columns=[dict(column='a', changed_cells=0), dict(column='z', changed_cells=0)]))
+                    if '--pair-column-counts' in extra:
+                        self.assertEqual([x['pair'] for x in data['pair_column_tallies']],
+                                         ['pair-0001', 'pair-0002', 'pair-0003'])
+                        for tally in data['pair_column_tallies']:
+                            self.assertEqual(tally['changed_records'], 0)
+                            self.assertEqual(tally['changed_cells'], 0)
+                    self.assertEqual(baseline, {p.name: p.read_bytes()
+                        for p in directory.iterdir() if p.is_file()})
+            self.assertEqual(fixtures, {p: p.read_bytes() for p in fixtures})
+
     def test_equal_and_changed_both_report_formats(self):
         for summary in (True,False):
             self.report(1,equal=True,summary=summary);self.report(2,summary=summary)
