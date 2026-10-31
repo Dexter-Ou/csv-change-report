@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/873911c8024a4257c9cf661ff7b046e5ef0803e2).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/dc542ed2f9b7bee06bf848214aa341735c3f286a).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-873911c8024a4257c9cf661ff7b046e5ef0803e2`.
+   named `csv-change-report-dc542ed2f9b7bee06bf848214aa341735c3f286a`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -255,3 +255,5 @@ status 2 for output, rename or cleanup failures. Candidate and pinned public
 Linux tests covered nine synthetic cases and 53 existing unittest methods.
 Equal/changed batches retain status 0/1; mixed error batches retain partial totals
 and status 2. Fault injection does not prove safety under hostile directory edits.
+
+Batch status-file initialization and append failures now return error 2 with an incomplete-batch diagnostic. Existing pair reports after a failed run are not proof of a complete batch. Five injected status-write faults and three normal batch cases passed on the candidate; fault injection is synthetic Linux evidence.
