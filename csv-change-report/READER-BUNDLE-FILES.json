@@ -11,7 +11,7 @@
     "evaluation/ANSWER-KEY.md": "98f402ccdb5998dbe127542dc9099b5b941048c2b94ba6b79236615db4ada66f",
     "evaluation/EXPECTED.md": "4c3aa0add1b33efa9d11dc9224b467978945707c2cd30cd2f62c6233b5f61a50",
     "evaluation/FEEDBACK.md": "355fdd174ae223deb52fd59169b3bc8a3122be488d4438668af97d83ac9d3223",
-    "evaluation/READER-START.md": "b3b3cf874254380287d2c6ed75d0c04ab8859ebb6967e5212c473916238e19df",
+    "evaluation/READER-START.md": "a5e92aad1ddb03d0c69499098155620cea79ac793180ca8b68f72e20af5e7c6a",
     "evaluation/READER-TASK.md": "86162573727dfd316f31fa8fe282a8bb6838794f2d4f00c900fe8c622fd5564c",
     "evaluation/README.md": "0d840891fd354f34b6ffc9603a801c7014494631f20ba02590c994f445d11c48",
     "evaluation/RECOVERY.md": "31ccfeaef1b5671151c4487bb38141bbb8e9e6ac779b883cc87cff912ffb63f0",
@@ -42,6 +42,7 @@
     "evaluation/column-tally.py": "39c8f0f332e8a9c51cd139c22aabfd538e7feefbd5ba0ed1f1af49714c8c90b1",
     "test_column_tally.py": "397b65ac1fc52422212dc8a604608aa419a2c8a974177e8827e44732a2192d27",
     "test_batch_columns.py": "a11b8773a48d89a51c8d8a45b72872d74745784c51266787b191930b96d78cb4",
-    "evaluation/TWO-SCHEMA-EXAMPLE.md": "b096642a62333f9d3fa59889c9d4ec3fef16eab7d5d5b5a66459d8c0add9cb41"
+    "evaluation/TWO-SCHEMA-EXAMPLE.md": "b096642a62333f9d3fa59889c9d4ec3fef16eab7d5d5b5a66459d8c0add9cb41",
+    "evaluation/MIXED-BATCH-RECIPE.md": "efd14499b593e27de28cdd55634cd9b2f79f26d695b7ed70f1c3d6630b9eb105"
   }
 }
