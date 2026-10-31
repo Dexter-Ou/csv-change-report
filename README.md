@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/7bbd6dd684a51c245139fb190057c3879f19d807).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/9f902e2a35cc2df57037446c5a4273e40e24ece0).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-7bbd6dd684a51c245139fb190057c3879f19d807`.
+   named `csv-change-report-9f902e2a35cc2df57037446c5a4273e40e24ece0`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -285,3 +285,6 @@ Follow the [manifest recovery walkthrough](csv-change-report/evaluation/RECOVERY
 Leading UTF-8 BOM manifests receive fixed `E_BOM` guidance. Follow [recovery step 6](csv-change-report/evaluation/RECOVERY.md#6-recover-a-manifest-exported-with-a-leading-utf-8-bom) to preserve the original and create a separate same-directory copy. Candidate checks passed 73 synthetic Linux unittest methods and both new literal recovery blocks; Windows/macOS remain untested.
 
 For scripts, `--validate-only --json` emits versioned metadata with a fixed code and pair count, without reading CSV files or creating reports. Refusals use status 2 and a null pair count. See the [JSON preflight instructions](csv-change-report/evaluation/README.md#manifest-preflight-without-comparisons). The candidate and pinned public extraction each passed 78 synthetic Linux unittest methods, including metadata privacy and no-execution checks. Windows/macOS remain untested.
+
+For a runnable example that consumes JSON preflight metadata and handles comparison
+status separately, see [the automation walkthrough](csv-change-report/evaluation/README.md#automate-preflight-and-handle-execution-separately).
