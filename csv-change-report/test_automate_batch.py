@@ -1,6 +1,7 @@
 """Offline synthetic CLI regressions for the checked automation example."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -39,7 +40,9 @@ class AutomationTests(unittest.TestCase):
         # Check the whole machine-readable contract and preserve input bytes.
         originals = {p: hashlib.sha256(p.read_bytes()).hexdigest()
                      for p in self.data.iterdir() if p.is_file()}
-        result = subprocess.run([sys.executable, str(SCRIPT),
+        result = subprocess.run([sys.executable,
+            *(['-' + 'O' * sys.flags.optimize] if sys.flags.optimize else []),
+            str(SCRIPT),
             *(arguments if arguments is not None else
               [str(self.manifest), str(reports or self.reports)])],
             cwd=self.root, capture_output=True, timeout=20)
@@ -103,6 +106,50 @@ class AutomationTests(unittest.TestCase):
         parent.write_bytes(b'preserve this parent')
         self.run_wrapper('E_STATUS', 2, 1, reports=parent / 'reports')
         self.assertEqual(parent.read_bytes(), b'preserve this parent')
+
+    def require_denied_creation(self, directory):
+        # Observe a real denial; chmod bits alone do not establish enforcement.
+        if os.name != 'posix':
+            self.skipTest('POSIX directory permissions required')
+        original_mode = directory.stat().st_mode & 0o7777
+        self.addCleanup(directory.chmod, original_mode)
+        directory.chmod(0o555)
+        probe = directory / 'permission probe'
+        try:
+            probe.mkdir()
+        except PermissionError:
+            return
+        else:
+            probe.rmdir()
+            self.skipTest('runtime can bypass directory write permissions')
+
+    def test_denied_output_parent_and_fresh_output(self):
+        self.write_manifest(['changed'])
+        parent = self.root / 'denied parent'
+        parent.mkdir()
+        sentinel = parent / 'sentinel'
+        sentinel.write_bytes(b'preserve parent contents')
+        self.require_denied_creation(parent)
+        self.run_wrapper('E_STATUS', 2, 1, reports=parent / 'reports')
+        self.assertEqual({p.name: p.read_bytes() for p in parent.iterdir()},
+                         {'sentinel': b'preserve parent contents'})
+        self.run_wrapper('CHANGED', 1, 1)
+        self.check_table([1])
+
+    def test_read_only_existing_reports_are_preserved(self):
+        self.write_manifest(['changed'])
+        self.run_wrapper('CHANGED', 1, 1)
+        self.check_table([1])
+        originals = {p.name: p.read_bytes() for p in self.reports.iterdir()}
+        self.require_denied_creation(self.reports)
+        for path in self.reports.iterdir():
+            original_mode = path.stat().st_mode & 0o7777
+            self.addCleanup(path.chmod, original_mode)
+            path.chmod(0o444)
+        self.run_wrapper('E_OUTPUT', 2, 1)
+        self.assertEqual({p.name: p.read_bytes() for p in self.reports.iterdir()},
+                         originals)
+        self.run_wrapper('CHANGED', 1, 1, reports=self.root / 'fresh reports')
 
     def test_existing_reports_are_never_reused(self):
         self.write_manifest(['error', 'changed'])
