@@ -1,19 +1,11 @@
-# 0.1.7-preview
+# 0.1.8-preview
 
-Adds repeatable --ignore-column NAME for exact non-key column exclusions.
-Reports explicitly list active exclusions; --check evaluates only retained
-fields while additions/removals still count. Unknown/key columns fail closed;
-full schemas, input validation, limits and full-byte hashes remain enforced.
-No exclusions keeps the previous report structure, apart from tool_version.
+Adds optional --summary-only in JSON and text. Retains counts, per-column totals,
+exclusions, full-byte JSON hashes and check statuses; omits record positions and
+per-record column lists. Summary JSON uses format_version 2 and report_mode
+summary. Detailed mode remains the default with format_version 1.
 
-Thirty-six synthetic acceptance methods cover comparison, errors, bounded
-inputs, output handling, stdout faults and explicit column exclusions.
-Run python3 -m unittest -v and the included evaluation/review.sh example.
-The cycle also retains a pre-version-bump exact default-output comparison and
-an independent seeded oracle; these are internal tests, not customer evidence.
-No Windows/macOS, hostile-directory or crash-durability assurance.
-No dependencies, network, telemetry, hosted service or paid obligation added.
-
-Evaluation-kit refresh: three synthetic timestamp/status fixtures and shell-safe
-raw CLI examples demonstrate statuses 1, 0, 1 with explicit column exclusions.
-Product code and version unchanged. Independent usefulness remains unverified.
+Run python3 -m unittest -v and evaluation/review.sh. Synthetic tests include
+summary parity, omission, output preservation and a 10,000-record changed diff.
+No streaming, independent user validation, Windows/macOS, hostile-directory or
+crash-durability assurance. No dependencies, telemetry or hosted service added.
