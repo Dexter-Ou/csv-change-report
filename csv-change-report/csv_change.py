@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-VERSION = '0.1.6-preview'
+VERSION = '0.1.7-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -70,17 +70,22 @@ def load(path, key):
     return header, rows, hashlib.sha256(data).hexdigest()
 
 
-def compare(before, after, key):
+def compare(before, after, key, ignore_columns=()):
     old_header, old, old_hash = load(before, key)
     new_header, new, new_hash = load(after, key)
     # Header order may differ; column additions/removals require explicit review.
     if set(old_header) != set(new_header):
         raise InputError('column sets differ; reconcile schemas before comparison')
+    ignored = set(ignore_columns)
+    if key in ignored:
+        raise InputError('key column cannot be ignored')
+    if not ignored.issubset(old_header):
+        raise InputError('ignored column is missing')
     added = sorted(set(new) - set(old), key=lambda k: new[k][0])
     removed = sorted(set(old) - set(new), key=lambda k: old[k][0])
     changed = []
     unchanged = 0
-    by_column = {name: 0 for name in old_header if name != key}
+    by_column = {name: 0 for name in old_header if name != key and name not in ignored}
     for value in sorted(set(old) & set(new), key=lambda k: old[k][0]):
         columns = [name for name in by_column if old[value][1][name] != new[value][1][name]]
         if columns:
@@ -90,7 +95,7 @@ def compare(before, after, key):
                 by_column[name] += 1
         else:
             unchanged += 1
-    return {
+    result = {
         'format_version': 1,
         'tool_version': VERSION,
         'before_sha256': old_hash,
@@ -102,6 +107,9 @@ def compare(before, after, key):
         'changed_records': changed,
         'changed_cells_by_column': by_column,
     }
+    if ignored:
+        result['ignored_columns'] = [name for name in old_header if name in ignored]
+    return result
 
 
 def render_text(result):
@@ -111,6 +119,9 @@ def render_text(result):
              f"Records: before {counts['before']}, after {counts['after']}",
              f"Changes: added {counts['added']}, removed {counts['removed']}, "
              f"changed {counts['changed']}, unchanged {counts['unchanged']}"]
+    if result.get('ignored_columns'):
+        lines.append('Ignored columns: ' + ', '.join(
+            json.dumps(name, ensure_ascii=True) for name in result['ignored_columns']))
     for label, records in [('Added after records', result['added_after_records']),
                            ('Removed before records', result['removed_before_records'])]:
         lines.append(label + ': ' + (', '.join(map(str, records)) or 'none'))
@@ -137,12 +148,14 @@ def main(argv=None):
                         help='output format (default: json); text omits input hashes')
     parser.add_argument('--check', action='store_true',
                         help='exit 1 for added, removed or changed records; 0 when equal')
+    parser.add_argument('--ignore-column', action='append', default=[], metavar='NAME',
+                        help='ignore one exact non-key column; repeat for multiple columns')
     parser.add_argument('--output', help='create a new report file; existing paths are refused')
     try:
         parser.add_argument('--version', action='version',
                             version=f'csv-change-report {VERSION}')
         args = parser.parse_args(argv)
-        result = compare(args.before, args.after, args.key)
+        result = compare(args.before, args.after, args.key, args.ignore_column)
     except (InputError, OSError) as error:
         # Do not echo file paths or cell values in diagnostics.
         message = str(error) if isinstance(error, InputError) else 'input file could not be read'
