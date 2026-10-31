@@ -20,6 +20,7 @@ REASONS = {
     'E_FILE': 'Use a regular file for the manifest.',
     'E_SIZE': 'Reduce the manifest to at most 65536 bytes.',
     'E_ENCODING': 'Save the manifest as UTF-8.',
+    'E_BOM': 'Save a separate UTF-8 copy without the leading BOM in the same directory; see evaluation/RECOVERY.md.',
     'E_JSON': 'Use valid JSON without nonstandard constants.',
     'E_DEPTH': 'Reduce JSON nesting to at most 32 levels.',
     'E_DUPLICATE': 'Remove duplicate JSON object fields.',
@@ -100,6 +101,8 @@ def load_manifest(path):
     if len(raw) > MAX_MANIFEST_BYTES:
         raise ManifestError('E_SIZE')
     document = raw.decode('utf-8')
+    if document.startswith('\ufeff'):
+        raise ManifestError('E_BOM')
     check_depth(document)
     data = json.loads(document, object_pairs_hook=unique_fields,
                       parse_constant=lambda _: (_ for _ in ()).throw(ManifestError('E_JSON')))
