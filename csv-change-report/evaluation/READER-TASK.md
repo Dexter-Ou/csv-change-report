@@ -1,7 +1,7 @@
 # Offline report-choice exercise (synthetic)
 
 Read the published QUICKSTART.md first. Use only the bundled invented CSVs.
-This worksheet is an internal evaluation artifact, not evidence of a human test.
+Use this worksheet to practice choosing reports and interpreting batch results.
 Do not consult ANSWER-KEY.md until recording your answers. No timing target.
 
 1. You need only counts, without record positions. Which report do you choose?
@@ -20,5 +20,4 @@ Do not consult ANSWER-KEY.md until recording your answers. No timing target.
    batch without overwriting its saved evidence?
 
 The first two tasks concern mode choice; the remaining tasks concern reading
-actual outputs. A future independent reader may record answers and confusing
-wording voluntarily. Never submit private CSVs or reports in public feedback.
+actual outputs. Record answers and confusing wording locally. Never submit private CSVs or reports in public feedback.
