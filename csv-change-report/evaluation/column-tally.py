@@ -17,7 +17,7 @@ def unique_object(pairs):
     return result
 
 
-def tally(path):
+def validated_report(path):
     with Path(path).open('rb') as stream:
         raw = stream.read(MAX_BYTES + 1)
     if len(raw) > MAX_BYTES:
@@ -44,10 +44,21 @@ def tally(path):
         raise ValueError('invalid column count')
     if sum(columns.values()) < counts['changed']:
         raise ValueError('inconsistent column total')
+    return report
+
+
+def tally_report(report):
+    """Summarize a report returned by validated_report without opening it again."""
+    counts = report['counts']
+    columns = report['changed_cells_by_column']
     return {'format_version': 1, 'changed_records': counts['changed'],
             'changed_cells': sum(columns.values()),
             'columns': [{'column': name, 'changed_cells': columns[name]}
                         for name in sorted(columns)]}
+
+
+def tally(path):
+    return tally_report(validated_report(path))
 
 
 def main():
