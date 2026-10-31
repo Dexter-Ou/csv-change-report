@@ -170,3 +170,46 @@ equal=2, error=0, incomplete=0. Changed records still need review. Attempt-1 and
 original.json remain unchanged; the corrected manifest does not repair old reports.
 Choose a new unused report directory for each execution. This walkthrough tests
 synthetic files on Linux, not crash recovery or concurrent edits.
+
+
+## 6. Recover a manifest exported with a leading UTF-8 BOM
+
+`E_BOM` means the decoded manifest starts with U+FEFF. The runner refuses it
+before launching comparisons and creates no reports. LF and CRLF line endings
+are accepted. A U+FEFF inside a JSON string remains literal data. The size and
+UTF-8 checks run first; an oversized or invalid-UTF-8 file gets its own error.
+
+From the product directory, set `source` below to your manifest. This command
+removes exactly one leading UTF-8 BOM into a **new file in the same directory**.
+It preserves the original and remaining bytes, including line endings. Keeping
+the directory preserves relative CSV references. Exclusive creation refuses to
+overwrite an existing copy; choose a new destination name if necessary. It does
+not repair other JSON/schema errors or validate CSV files.
+
+```sh
+python3 - <<'PYCODE'
+from pathlib import Path
+source = Path('examples/batch-with-bom.json')
+target = source.with_name(source.stem + '-no-bom.json')
+with source.open('rb') as stream:
+    raw = stream.read(65537)
+if len(raw) > 65536:
+    raise SystemExit('Manifest exceeds 65536 bytes; no copy written.')
+if not raw.startswith(b'\xef\xbb\xbf'):
+    raise SystemExit('No leading UTF-8 BOM; no copy written.')
+with target.open('xb') as stream:
+    stream.write(raw[3:])
+PYCODE
+```
+
+Use the actual new copy path for preflight, then choose a fresh report directory:
+
+```sh
+python3 evaluation/batch-manifest.py --validate-only examples/batch-with-bom-no-bom.json
+python3 evaluation/batch-manifest.py examples/batch-with-bom-no-bom.json reports-without-bom
+```
+
+Preflight status 0 means manifest validation only. Execution statuses remain
+0 equal, 1 differences, 2 error. Two leading BOMs require investigation: removing
+one leaves another, which still refuses. These steps assume ordinary local files;
+they do not protect against hostile concurrent file changes.
