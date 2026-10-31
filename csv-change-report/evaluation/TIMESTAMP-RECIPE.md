@@ -47,4 +47,4 @@ records differ. Add `--check` in automation when you want exit 1 for differences
 exit 2 means an input/usage error. Ignore only fields you deliberately consider
 irrelevant: meaningful changes in an ignored field will also be suppressed.
 Timestamp parsing, normalization and automatic volatile-field detection are not
-performed. Linux synthetic command verification is not independent user feedback.
+performed.
