@@ -79,7 +79,7 @@ while [ "$#" -gt 0 ]; do
         status=2
         echo "Cannot initialize output streams for $stem." >&2
     else
-        (run_compare "$before" "$after" --key "$key" --check --summary-only --max-input-bytes "$max_input_bytes" \
+        (run_compare "$before" "$after" "--key=$key" --check --summary-only --max-input-bytes "$max_input_bytes" \
             --output "$report_dir/$stem.json" > "$report_dir/$stem.stdout" 2> "$report_dir/$stem.stderr") || status=$?
     fi
     report=-
