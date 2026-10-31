@@ -58,7 +58,10 @@ if ! (umask 077; mkdir "$report_dir"); then
     echo 'Cannot create a new report directory; choose an unused path.' >&2
     exit 2
 fi
-printf 'pair\tstatus\treport\tdiagnostic\n' > "$report_dir/status.tsv"
+if ! (printf 'pair\tstatus\treport\tdiagnostic\n' > "$report_dir/status.tsv"); then
+    echo 'Cannot initialize batch status file; batch is incomplete.' >&2
+    exit 2
+fi
 pair=0
 batch_status=0
 while [ "$#" -gt 0 ]; do
@@ -80,7 +83,10 @@ while [ "$#" -gt 0 ]; do
            if [ "$batch_status" -eq 0 ]; then batch_status=1; fi ;;
         *) batch_status=2 ;;
     esac
-    printf '%s\t%s\t%s\t%s\n' "$stem" "$status" "$report" "$stem.stderr" >> "$report_dir/status.tsv"
+    if ! (printf '%s\t%s\t%s\t%s\n' "$stem" "$status" "$report" "$stem.stderr" >> "$report_dir/status.tsv"); then
+        echo 'Cannot append batch status; batch is incomplete. Do not treat existing pair reports as a complete batch.' >&2
+        exit 2
+    fi
 done
 if [ "$write_totals" -eq 1 ]; then
     totals_status=0
