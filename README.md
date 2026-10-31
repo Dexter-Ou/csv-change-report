@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/f3e7f6c8defb91a7c38a75df4058cf9899627df7).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/fc065837a0253e67442e82db0eb98a85b3746310).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-f3e7f6c8defb91a7c38a75df4058cf9899627df7`.
+   named `csv-change-report-fc065837a0253e67442e82db0eb98a85b3746310`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -72,6 +72,10 @@ Save directly to a new file with `--output report.json`, or combine
 are refused; successful file output leaves stdout empty. On Linux new report
 permissions are owner-only. A write failure may leave a partial new report;
 inspect it and use a new name when retrying. Use a trusted output directory.
+
+## Choose a report
+
+Follow the [short report-choice guide](csv-change-report/QUICKSTART.md) for terminal text, detailed JSON, summary JSON and batch reports. Its three literal shell blocks passed on a fresh pinned Linux download; human usability remains unverified.
 
 ## Fit and limits
 
