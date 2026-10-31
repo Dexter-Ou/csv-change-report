@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-VERSION = '0.1.4-preview'
+VERSION = '0.1.5-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -135,6 +135,8 @@ def main(argv=None):
     parser.add_argument('--key', required=True, help='exact, case-sensitive unique column name')
     parser.add_argument('--format', choices=('json', 'text'), default='json',
                         help='output format (default: json); text omits input hashes')
+    parser.add_argument('--check', action='store_true',
+                        help='exit 1 for added, removed or changed records; 0 when equal')
     parser.add_argument('--output', help='create a new report file; existing paths are refused')
     try:
         parser.add_argument('--version', action='version',
@@ -146,11 +148,13 @@ def main(argv=None):
         message = str(error) if isinstance(error, InputError) else 'input file could not be read'
         print(json.dumps({'error': message}), file=sys.stderr)
         return 2
+    status = int(args.check and any(result['counts'][name]
+                                    for name in ('added', 'removed', 'changed')))
     report = (render_text(result) if args.format == 'text' else
               json.dumps(result, indent=2, ensure_ascii=True)) + '\n'
     if args.output is None:
         print(report, end='')
-        return 0
+        return status
     try:
         target = Path(args.output)
         if target.resolve() in (Path(args.before).resolve(), Path(args.after).resolve()):
@@ -165,7 +169,7 @@ def main(argv=None):
                    'output file could not be written')
         print(json.dumps({'error': message}), file=sys.stderr)
         return 2
-    return 0
+    return status
 
 
 if __name__ == '__main__':
