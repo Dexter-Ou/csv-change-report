@@ -64,7 +64,7 @@ opened read-only. No network, telemetry, formula evaluation, automatic cleaning
 or spreadsheet export. Do not redirect output onto either input path: shell
 redirection can truncate it before this program starts. Invalid command arguments produce a fixed message without echoing supplied text;
 long option abbreviations are rejected. `--help` prints usage and exits 0. `--version` prints
-`csv-change-report 0.1.8-preview` and exits 0 without input files. Include this
+`csv-change-report 0.1.9-preview` and exits 0 without input files. Include this
 version when voluntarily reporting a problem; do not include private CSV data.
 Failures exit 2 with JSON
 on stderr. By default successful comparisons exit 0, including when changes exist.
@@ -139,3 +139,23 @@ all text output, input hashes. Default detailed JSON remains format version 1.
 This is an output-size feature, not streaming: both input snapshots remain in
 memory. Column names, counts and hashes can still disclose sensitive metadata.
 Independent usefulness and willingness to pay remain unverified.
+
+
+### Smaller input byte budgets
+
+The default per-input ceiling remains 10 MiB (10485760 bytes). Use
+`--max-input-bytes N` to choose a smaller positive integer budget; values above
+the fixed ceiling are refused. For example:
+
+```sh
+python3 csv_change.py examples/before.csv examples/after.csv --key id --max-input-bytes 4096
+```
+
+The same limit applies separately to each input, including its header, UTF-8 BOM,
+line endings and all encoded bytes. An input exactly at the limit is accepted if
+otherwise valid; one byte over is refused with status 2 before any report is
+created. Only up to N+1 raw bytes are read per input. The limit is not a bound on
+total process memory: parsed objects, decoded text and reports also consume memory.
+Row, column, data-cell and CSV parser field limits still apply. The batch helper
+currently uses the default ceiling and does not expose this option. Existing
+report paths and both original inputs remain protected by the usual refusal rules.
