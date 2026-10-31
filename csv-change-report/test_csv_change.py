@@ -165,8 +165,18 @@ class ProcessTests(unittest.TestCase):
     def test_process_version(self):
         result = self.run_cli('--version')
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, 'csv-change-report 0.1.1-preview\n')
+        self.assertEqual(result.stdout, 'csv-change-report 0.1.2-preview\n')
         self.assertEqual(result.stderr, '')
+        self.assertEqual(list(self.root.iterdir()), [])
+
+    def test_process_report_version_matches_cli(self):
+        version = self.run_cli('--version')
+        report = self.run_cli(self.source / 'examples' / 'before.csv',
+                              self.source / 'examples' / 'after.csv', '--key', 'id')
+        self.assertEqual((version.returncode, report.returncode), (0, 0))
+        self.assertEqual((version.stderr, report.stderr), ('', ''))
+        self.assertEqual(version.stdout,
+                         'csv-change-report ' + json.loads(report.stdout)['tool_version'] + '\n')
         self.assertEqual(list(self.root.iterdir()), [])
 
     def test_process_help(self):
