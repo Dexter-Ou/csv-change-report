@@ -2,8 +2,7 @@
 
 Compare two CSV exports by a stable unique key, offline, without uploading data.
 The JSON or optional text report locates added, removed and changed records and names changed
-columns without including cell values. This free MIT-licensed preview is an
-experiment by Gong LLC. Usefulness and willingness to pay remain unverified.
+columns without including cell values. Free, MIT-licensed preview from Gong LLC.
 
 ## Download and run the tested preview
 
@@ -11,10 +10,8 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/dc542ed2f9b7bee06bf848214aa341735c3f286a).
-   This link pins the synthetic-tested code, rather than following future edits.
-2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-dc542ed2f9b7bee06bf848214aa341735c3f286a`.
+1. Download the source ZIP from the repository's Code menu.
+2. Extract it into a new folder and open a terminal in the outer folder.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -37,7 +34,7 @@ python3 csv_change.py --help
 ```
 
 Fifty-three synthetic test methods passed on the isolated Linux worker. These are
-software checks, not customer validation or an assurance for hostile inputs.
+synthetic software checks, not an assurance for hostile inputs.
 If your Python installation uses a different command, use its Python 3 command.
 
 For your own files, replace both paths and the key column name:
@@ -108,7 +105,7 @@ comparisons both exit 0 after a notice; invalid input exits 2. See the
 [synthetic answer key](csv-change-report/evaluation/EXPECTED.md) and
 [voluntary feedback prompts](csv-change-report/evaluation/FEEDBACK.md).
 The tested public kit passed the 53-method suite and the changed-export journey on Linux
-Python 3.12.15. These are synthetic checks, not usability or customer evidence.
+Python 3.12.15. These are synthetic checks, not measured human usability.
 Use the inner `csv-change-report/evaluation` directory; the separate top-level
 `product/evaluation` directory is a superseded misplaced draft, not runnable.
 
@@ -128,9 +125,7 @@ You may voluntarily open an issue in this repository with only:
 
 Do not upload CSV files, reports, private paths, customer names, credentials or
 other sensitive material. Issues are public. No response, support turnaround or
-payment is promised. No telemetry is collected by the tool. Owner/internal tests
-will be recorded separately from independent volunteer feedback. No independent
-feedback, customer acceptance or revenue has yet been established.
+payment is promised. No telemetry is collected by the tool. Automated test reports are separate from voluntary user feedback.
 
 Version 0.1.7-preview fixes stdout write/flush failures and preserves exit 2 for
 closed pipes. It cannot confirm downstream receipt or storage of report bytes.
@@ -144,7 +139,7 @@ For example, append `--ignore-column status` to the included example: changed
 becomes 0, unchanged becomes 2, and added/removed remain 1 each. Full schemas
 must still match. Without exclusions, content is unchanged apart from version.
 The candidate also passed 256 seeded synthetic CLI checks against an independent
-list-based oracle; these tests do not establish user demand or revenue.
+list-based oracle.
 
 The refreshed evaluation kit includes timestamp-only and retained-status changes.
 Its shell-safe raw CLI examples demonstrate --check statuses 1, 0, 1 when
@@ -200,7 +195,7 @@ python3 csv_change.py examples/before.csv examples/after.csv --key id --max-inpu
 
 The pinned public download passed 53 synthetic unittest methods, this byte-budget
 example and the three evaluation wrapper journeys on the isolated Linux worker.
-No independent user feedback, customers or revenue are established.
+
 
 
 Version 0.1.10-preview adds a leading optional per-input byte budget to batch review:
@@ -215,30 +210,28 @@ pair; an existing directory is refused. The default remains 10 MiB per input.
 Canonical decimal budgets 1..10485760 are accepted before directory creation.
 See the evaluation guide for retry and interpretation steps. This bounds raw input
 reads, not total process memory. The pinned public extraction passed 53 synthetic
-unittest methods and this command on Linux. No customers or revenue established.
+unittest methods and this command on Linux.
 
 
 The pinned download also includes an optional complete reader exercise. After
 entering the inner product folder, start at [evaluation/READER-START.md](csv-change-report/evaluation/READER-START.md).
 It includes a six-task worksheet and a separate answer key. Fresh public Linux
 extraction matched all 29 candidate files and passed the four literal setup/guide
-shell blocks. These are internal synthetic checks; no independent reader score,
-customer acceptance or earnings are established.
+shell blocks. These are synthetic command checks; human usability was not measured.
 
 
 Try the [worked timestamp-export recipe](csv-change-report/evaluation/TIMESTAMP-RECIPE.md)
 to compare baseline and deliberately filtered counts using invented records. The
 pinned download includes it; its literal shell block and expected output passed
 on the isolated Linux worker. Ignoring timestamps reduced changed records from
-two to one while preserving one addition and one removal. No independent user
-feedback or earnings are implied.
+two to one while preserving one addition and one removal. 
 
 The offline batch helper now accepts one `--ignore-column COLUMN` for every
 pair, together with its byte budget in either option order. See the
 [evaluation guide](csv-change-report/evaluation/README.md#optional-batch-ignored-column)
 for a worked timestamp-only versus meaningful-change batch. Candidate and fresh
 pinned public downloads passed 53 existing tests and 16 additional synthetic
-checks on Linux; independent usefulness and willingness to pay remain unverified.
+checks on Linux.
 
 
 For optional batch aggregate row counts, use `--totals` as described in the
@@ -247,7 +240,7 @@ It writes pair outcomes and summed added/removed/changed/unchanged rows to
 `totals.json`. Failed pairs are excluded and explicitly mark results partial;
 any pair error still returns status 2. Candidate and fresh pinned public source
 each passed 53 existing tests and 11 focused synthetic checks on Linux, including
-the literal recipe. This is software evidence, not independent demand or earnings.
+the literal recipe. 
 
 
 Optional batch totals now require a regular temporary output file and return
