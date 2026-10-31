@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/9ffd66ec69b208b16e515ee6d0a887597f0d5aaa).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/00dc468ece30b132078ad259246a4e120c424036).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-9ffd66ec69b208b16e515ee6d0a887597f0d5aaa`.
+   named `csv-change-report-00dc468ece30b132078ad259246a4e120c424036`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -224,3 +224,11 @@ It includes a six-task worksheet and a separate answer key. Fresh public Linux
 extraction matched all 29 candidate files and passed the four literal setup/guide
 shell blocks. These are internal synthetic checks; no independent reader score,
 customer acceptance or earnings are established.
+
+
+Try the [worked timestamp-export recipe](csv-change-report/evaluation/TIMESTAMP-RECIPE.md)
+to compare baseline and deliberately filtered counts using invented records. The
+pinned download includes it; its literal shell block and expected output passed
+on the isolated Linux worker. Ignoring timestamps reduced changed records from
+two to one while preserving one addition and one removal. No independent user
+feedback or earnings are implied.
