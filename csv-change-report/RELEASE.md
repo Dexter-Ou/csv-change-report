@@ -1,12 +1,9 @@
-# 0.1.10-preview candidate
+# 0.1.10-preview documentation refresh candidate
 
-Adds --max-input-bytes N for a smaller per-input raw-byte budget, with the
-existing 10 MiB ceiling retained. Exact-limit inputs are accepted if valid;
-over-limit inputs fail with status 2 before report creation. Defaults and
-report formats remain unchanged apart from the tool version.
+No executable source changes. Adds QUICKSTART.md with report-mode choices and
+synthetic expected outcomes; corrects the main README's stale claim that batch
+input budgets are unavailable. Batch support was already published in 0.1.10.
 
-Run python3 -m unittest -v and evaluation/review.sh. Synthetic boundary tests
-cover both inputs, UTF-8/BOM/CRLF bytes, output and input preservation, invalid
-arguments and bounded reads. This is not a total-memory or crash-durability
-guarantee. No new dependencies or services. Independent usefulness and
-willingness to pay remain unverified.
+Worker command checks are recorded separately from human usability evidence.
+No new dependency, service or price. Independent usefulness and willingness to
+pay remain unverified. See evaluation/README.md for full batch/recovery rules.
