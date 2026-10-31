@@ -14,6 +14,5 @@ Comparing the before fixture with `evaluation/duplicate-key.csv`: error, raw CLI
 and wrapper exit 2. No completed report; stderr contains the fixed duplicate-key
 diagnostic and wrapper failure notice. Neither snapshot should change.
 
-These fixtures validate mechanics only. They do not establish that a real user
-can find relevant changes or would pay. Header/row reordering alone does not
+Header/row reordering alone does not
 count as a keyed content change; a changed key is a removal plus addition.
