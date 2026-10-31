@@ -27,7 +27,7 @@ class BatchColumnTests(unittest.TestCase):
         path.write_text(json.dumps(data))
         return path
 
-    def invoke(self, statuses, expected=None, extra=(), table_text=None):
+    def invoke(self, statuses, expected=None, extra=(), table_text=None, aggregate=True):
         lines = ['pair\tstatus\treport\tdiagnostic']
         for i, status in enumerate(statuses, 1):
             stem = f'pair-{i:04d}'
@@ -35,7 +35,7 @@ class BatchColumnTests(unittest.TestCase):
         self.table.write_text(table_text if table_text is not None else '\n'.join(lines)+'\n')
         before = {p.name:p.read_bytes() for p in self.root.iterdir() if p.is_file()}
         r = subprocess.run(PYTHON + [str(ROOT/'evaluation/batch-totals.py'),str(self.table),
-            '--expected-pairs',str(expected or len(statuses)), '--column-counts'] + list(extra),capture_output=True)
+            '--expected-pairs',str(expected or len(statuses))] + (['--column-counts'] if aggregate else []) + list(extra),capture_output=True)
         self.assertEqual(before,{p.name:p.read_bytes() for p in self.root.iterdir() if p.is_file()})
         self.assertNotIn(b'PRIVATE_',r.stdout+r.stderr)
         return r
@@ -179,5 +179,61 @@ class BatchColumnTests(unittest.TestCase):
                          sorted(names))
         self.assertEqual(r.stdout.count(b'\n'), 1)
         self.assertNotIn(b'\t', r.stdout)
+
+    def test_per_pair_separates_unrelated_schemas_both_formats(self):
+        for summary in (True, False):
+            self.before.write_text('id,z,a\n1,PRIVATE_OLD,x\n')
+            self.after.write_text('id,z,a\n1,PRIVATE_NEW,y\n')
+            self.report(1, summary=summary)
+            self.before.write_text('id,a,other\n1,old,same\n')
+            self.after.write_text('id,a,other\n1,new,same\n')
+            self.report(2, summary=summary)
+            r = self.invoke([1, 1], extra=['--pair-column-counts'], aggregate=False)
+            self.assertEqual(r.returncode, 1, r.stderr)
+            d = json.loads(r.stdout)
+            self.assertNotIn('column_tally', d)
+            self.assertFalse(d['partial'])
+            pairs = d['pair_column_tallies']
+            self.assertEqual([p['pair'] for p in pairs], ['pair-0001', 'pair-0002'])
+            self.assertEqual([p['changed_cells'] for p in pairs], [2, 1])
+            self.assertEqual(pairs[0]['columns'], [dict(column='a', changed_cells=1), dict(column='z', changed_cells=1)])
+            self.assertEqual(pairs[1]['columns'], [dict(column='a', changed_cells=1), dict(column='other', changed_cells=0)])
+
+    def test_per_pair_combined_options(self):
+        self.report(1, equal=True); self.report(2)
+        r = self.invoke([0, 1], extra=['--pair-column-counts', '--row-counts'])
+        self.assertEqual(r.returncode, 1, r.stderr)
+        d = json.loads(r.stdout)
+        self.assertEqual(d['rows']['changed'], 1)
+        self.assertEqual(d['column_tally']['changed_cells'], 2)
+        self.assertEqual([p['changed_records'] for p in d['pair_column_tallies']], [0, 1])
+
+    def test_per_pair_partial_omits_failed_stale_report(self):
+        self.report(1)
+        (self.root/'pair-0002.json').write_text('PRIVATE_STALE')
+        r = self.invoke([1, 2], expected=3, extra=['--pair-column-counts'], aggregate=False)
+        self.assertEqual(r.returncode, 2, r.stderr)
+        d = json.loads(r.stdout)
+        self.assertTrue(d['partial'])
+        self.assertEqual(d['error'], 1); self.assertEqual(d['incomplete'], 1)
+        self.assertEqual([p['pair'] for p in d['pair_column_tallies']], ['pair-0001'])
+
+    def test_per_pair_empty_and_unstarted(self):
+        for statuses in ([2, 9], []):
+            r = self.invoke(statuses, expected=2, extra=['--pair-column-counts'], aggregate=False)
+            self.assertEqual(r.returncode, 2, r.stderr)
+            d = json.loads(r.stdout)
+            self.assertTrue(d['partial']); self.assertEqual(d['pair_column_tallies'], [])
+
+    def test_per_pair_malformed_or_contradictory_report_no_output(self):
+        for status, raw in ((1, '{"PRIVATE_SENTINEL":'), (1, None), (0, None)):
+            if raw is None:
+                self.report(1)
+            else:
+                (self.root/'pair-0001.json').write_text(raw)
+            if status == 1 and raw is None:
+                (self.root/'pair-0001.json').unlink()
+            r = self.invoke([status], extra=['--pair-column-counts'], aggregate=False)
+            self.assertEqual(r.returncode, 2); self.assertEqual(r.stdout, b'')
 
 if __name__ == '__main__':unittest.main()
