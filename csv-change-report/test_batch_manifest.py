@@ -50,6 +50,48 @@ class ManifestTests(unittest.TestCase):
                              manifest_module.REASONS[code] + '\n').encode())
         self.assertFalse((self.root / report).exists())
 
+    def test_validate_only_never_launches_runner_or_reads_csvs(self):
+        # Nonexistent inputs and shell-looking strings are valid manifest data.
+        self.valid['pairs'][0]['before'] = 'missing $(touch NEVER).csv'
+        self.write()
+        triples = manifest_module.load_manifest(self.manifest)
+        self.assertEqual(triples[0], str(self.data / 'missing $(touch NEVER).csv'))
+        self.assertEqual(triples[1], str(self.after))
+        self.assertEqual(triples[2], 'id')
+        for report in ([], [str(self.root / 'reports')], [str(self.before)]):
+            with self.subTest(report=report):
+                output = io.StringIO()
+                with mock.patch.object(sys, 'argv', ['batch-manifest.py', '--validate-only',
+                        '--totals', '--ignore-column=time', str(self.manifest), *report]), \
+                     mock.patch.object(manifest_module.subprocess, 'run') as runner, \
+                     contextlib.redirect_stdout(output):
+                    self.assertEqual(manifest_module.main(), 0)
+                runner.assert_not_called()
+                self.assertEqual(output.getvalue(),
+                    'Manifest valid: 1 pair(s); CSV files not checked; no reports created.\n')
+        self.assertFalse((self.root / 'reports').exists())
+        self.assertFalse((self.root / 'NEVER').exists())
+        self.assertEqual(self.before.read_text(), 'id,value,time\n1,a,x\n')
+
+    def test_validate_only_cli_and_invalid_cases(self):
+        self.write()
+        result = subprocess.run([sys.executable, str(SCRIPT), '--validate-only',
+            str(self.manifest)], cwd=self.root, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stderr, b'')
+        self.assertEqual(result.stdout,
+            b'Manifest valid: 1 pair(s); CSV files not checked; no reports created.\n')
+        for raw, code in [(b'{', 'E_JSON'), (b'{}', 'E_SCHEMA'),
+                          (b'{"version":1,"pairs":[]}', 'E_PAIRS')]:
+            self.manifest.write_bytes(raw)
+            self.assert_refusal(self.run_manifest(options=('--validate-only',)), code)
+        self.write()
+        self.assert_refusal(self.run_manifest(options=('--validate-only',
+                            '--max-input-bytes=0')), 'E_BUDGET')
+        missing_report = subprocess.run([sys.executable, str(SCRIPT), str(self.manifest)],
+            cwd=self.root, capture_output=True, timeout=20)
+        self.assert_refusal(missing_report, 'E_ARGUMENTS')
+
     def test_fixed_actionable_refusal_codes(self):
         pair = self.valid['pairs'][0]
         cases = [
@@ -68,7 +110,8 @@ class ManifestTests(unittest.TestCase):
         for raw, code in cases:
             with self.subTest(code=code):
                 self.manifest.write_bytes(raw)
-                self.assert_refusal(self.run_manifest(), code)
+                for options in ((), ('--validate-only',)):
+                    self.assert_refusal(self.run_manifest(options=options), code)
         self.manifest.unlink()
         self.assert_refusal(self.run_manifest(), 'E_READ')
         self.manifest.mkdir()
