@@ -11,10 +11,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/fc065837a0253e67442e82db0eb98a85b3746310).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/9ffd66ec69b208b16e515ee6d0a887597f0d5aaa).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-fc065837a0253e67442e82db0eb98a85b3746310`.
+   named `csv-change-report-9ffd66ec69b208b16e515ee6d0a887597f0d5aaa`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
@@ -216,3 +216,11 @@ Canonical decimal budgets 1..10485760 are accepted before directory creation.
 See the evaluation guide for retry and interpretation steps. This bounds raw input
 reads, not total process memory. The pinned public extraction passed 53 synthetic
 unittest methods and this command on Linux. No customers or revenue established.
+
+
+The pinned download also includes an optional complete reader exercise. After
+entering the inner product folder, start at [evaluation/READER-START.md](csv-change-report/evaluation/READER-START.md).
+It includes a six-task worksheet and a separate answer key. Fresh public Linux
+extraction matched all 29 candidate files and passed the four literal setup/guide
+shell blocks. These are internal synthetic checks; no independent reader score,
+customer acceptance or earnings are established.
