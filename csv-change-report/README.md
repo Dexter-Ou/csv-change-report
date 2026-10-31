@@ -6,7 +6,7 @@ records without uploading their data. This usefulness hypothesis is unverified.
 No customer testing, price, willingness to pay or earnings is established.
 
 **Synthetic runtime checks passed** on the isolated worker (Python 3.12.15,
-2026-10-31): thirty-six test methods, fresh extraction, example oracle and help.
+2026-10-31): the included test suite, fresh extraction, example oracle and help.
 No independent user testing has occurred. This is a preview, not a hardened parser.
 Requires Python 3.10+; standard library only, no installation or service.
 
@@ -64,7 +64,7 @@ opened read-only. No network, telemetry, formula evaluation, automatic cleaning
 or spreadsheet export. Do not redirect output onto either input path: shell
 redirection can truncate it before this program starts. Invalid command arguments produce a fixed message without echoing supplied text;
 long option abbreviations are rejected. `--help` prints usage and exits 0. `--version` prints
-`csv-change-report 0.1.7-preview` and exits 0 without input files. Include this
+`csv-change-report 0.1.8-preview` and exits 0 without input files. Include this
 version when voluntarily reporting a problem; do not include private CSV data.
 Failures exit 2 with JSON
 on stderr. By default successful comparisons exit 0, including when changes exist.
@@ -123,3 +123,19 @@ complete export equality. Without exclusions, report structure/content remains
 unchanged except the tool version. Reports do not expose ignored cell contents.
 For an included example, add `--ignore-column status` to the example command:
 the changed count becomes 0, unchanged becomes 2, and added/removed stay 1 each.
+
+
+For large diffs, add `--summary-only` with either JSON or text:
+
+```sh
+python3 csv_change.py examples/before.csv examples/after.csv --key id --summary-only
+```
+
+Counts, per-column totals, exclusions and `--check` statuses match detailed mode.
+Summary JSON uses `format_version: 2` and `report_mode: "summary"`, omitting
+`added_after_records`, `removed_before_records` and `changed_records` entirely.
+It retains full-input SHA-256 hashes. Summary text omits record details and, like
+all text output, input hashes. Default detailed JSON remains format version 1.
+This is an output-size feature, not streaming: both input snapshots remain in
+memory. Column names, counts and hashes can still disclose sensitive metadata.
+Independent usefulness and willingness to pay remain unverified.
