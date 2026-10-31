@@ -629,3 +629,14 @@ are excluded from column counts, so an added-only batch can have zero changed
 cells. No CSV is opened or cell values copied. Column names remain visible.
 Counts and status tables are not authenticated; reports from different schemas
 combine identical column names. Concurrent report mutation is not supported.
+
+Column grouping is by the exact case-sensitive name only, with no schema or
+pair identifier. Compared columns with no changes remain present with a zero
+count. For example, `amount` changed once in each of two different
+schemas is emitted once with `changed_cells: 2`; this does not establish that
+the two fields have the same meaning or units. Run separate batch summaries
+for unrelated schemas when that distinction matters. No schema-aware grouping
+option is provided. Names are JSON data (control characters are escaped), not
+paths to open. Status-table report and diagnostic fields must match the exact
+generated pair filenames; absolute, parent-relative and alternate names are
+rejected with exit 2 and no totals, including with `--column-counts`.
