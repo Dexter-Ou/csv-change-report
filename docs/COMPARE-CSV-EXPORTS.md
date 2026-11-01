@@ -43,6 +43,60 @@ python3 csv_change.py examples/before.csv examples/after.csv --key id --format t
 This also returns 1. These expected nonzero results can stop scripts using
 `set -e`; handle comparison statuses deliberately.
 
+## Reproduce row-order and changed-key behavior
+
+From the same inner folder, save the following as `try_export_keys.py` in a
+fresh trusted location and run `python3 try_export_keys.py`. It creates three
+temporary synthetic CSVs and removes them when finished. It needs no download
+beyond the existing product. Existing inputs are never used or modified.
+
+```python
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+
+# Run from the inner csv-change-report folder; all CSVs below are synthetic.
+with tempfile.TemporaryDirectory(prefix="csv-order-example-") as directory:
+    folder = Path(directory)
+    fixtures = {
+        "before": "id,status\na,open\nb,closed\nc,open\n",
+        "reordered": "id,status\nc,open\nb,closed\na,open\n",
+        "changed-key": "id,status\nz,open\nb,closed\nc,open\n",
+    }
+    for name, content in fixtures.items():
+        (folder / (name + ".csv")).write_text(content, encoding="utf-8")
+    cases = [
+        ("reordered", 0, {"added": 0, "removed": 0, "changed": 0, "unchanged": 3}),
+        ("changed-key", 1, {"added": 1, "removed": 1, "changed": 0, "unchanged": 2}),
+    ]
+    for name, status, expected in cases:
+        result = subprocess.run(
+            [sys.executable, "csv_change.py", str(folder / "before.csv"),
+             str(folder / (name + ".csv")), "--key", "id", "--check"],
+            capture_output=True, text=True, check=False, timeout=30,
+        )
+        if result.returncode != status or result.stderr:
+            raise RuntimeError(f"{name}: unexpected status or diagnostic: {result.stderr}")
+        counts = json.loads(result.stdout)["counts"]
+        if any(counts.get(key) != value for key, value in expected.items()):
+            raise RuntimeError(f"{name}: unexpected counts: {counts}")
+        print(name, "status", result.returncode, json.dumps(expected, sort_keys=True))
+```
+
+Expected output:
+
+```text
+reordered status 0 {"added": 0, "changed": 0, "removed": 0, "unchanged": 3}
+changed-key status 1 {"added": 1, "changed": 0, "removed": 1, "unchanged": 2}
+```
+
+The wrapper exits 0 only when both checks pass. The child comparison's changed
+status 1 is expected and explicitly checked. The key `a` becoming `z` produces
+an addition and removal even though its other cell is identical. This does not
+establish identity across changed keys; choose a stable key for real exports.
+
 ## Apply it to your snapshots
 
 Choose a key that is present, unique, nonblank and stable in both exports.
