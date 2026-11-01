@@ -74,6 +74,26 @@ class AutomationTests(unittest.TestCase):
                 self.assertFalse((self.reports / (stem + '.json')).exists())
                 self.assertTrue(diagnostic.read_bytes())
 
+    def test_unicode_and_space_filenames_from_other_directory(self):
+        self.before = self.data / 'before café 数据.csv'
+        self.after = self.data / 'after café 数据.csv'
+        self.before.write_bytes(b'id,value\n1,a\n')
+        self.after.write_bytes(b'id,value\n1,b\n')
+        self.manifest = self.data / 'manifest café 数据.json'
+        scenarios = [(['equal'], 'EQUAL', 0, [0]),
+                     (['equal', 'changed'], 'CHANGED', 1, [0, 1]),
+                     (['error', 'equal', 'changed'], 'E_COMPARISON', 2, [2, 0, 1])]
+        for index, (kinds, code, status, statuses) in enumerate(scenarios):
+            with self.subTest(code=code):
+                self.reports = self.root / f'reports café 数据 {index}'
+                self.write_manifest(kinds)
+                self.run_wrapper(code, status, len(kinds))
+                self.check_table(statuses)
+                snapshot = {p.name: p.read_bytes() for p in self.reports.iterdir()}
+                self.run_wrapper('E_OUTPUT', 2, len(kinds))
+                self.assertEqual({p.name: p.read_bytes() for p in self.reports.iterdir()},
+                                 snapshot)
+
     def test_all_equal(self):
         self.write_manifest(['equal', 'equal'])
         self.run_wrapper('EQUAL', 0, 2)
