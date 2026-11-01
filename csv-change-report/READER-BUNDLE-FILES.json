@@ -16,7 +16,7 @@
     "evaluation/READER-START.md": "a5e92aad1ddb03d0c69499098155620cea79ac793180ca8b68f72e20af5e7c6a",
     "evaluation/READER-TASK.md": "86162573727dfd316f31fa8fe282a8bb6838794f2d4f00c900fe8c622fd5564c",
     "evaluation/README.md": "2a62a3c36446626e88c3299e9569bcdad07ca87f7f4c18c130a0c770a4586334",
-    "evaluation/RECOVERY.md": "bcb7303438ae53c26bb35a3413f2ac229206017d6a21d675aed0259c19a7a723",
+    "evaluation/RECOVERY.md": "e95ab7147b729c236c0014b0385c6f9056a853dcd5e0bf504100b52145a91e3e",
     "evaluation/TIMESTAMP-RECIPE.md": "e52fc177bdee711a8f1d5c53fcc08eaca3f638ab5b22547140aab50654ba58ea",
     "evaluation/TWO-SCHEMA-EXAMPLE.md": "b096642a62333f9d3fa59889c9d4ec3fef16eab7d5d5b5a66459d8c0add9cb41",
     "evaluation/automate-batch.py": "5db0ec119a823a095a927c30a373a5fc399e6c9cb6dabee6cf0624a420af6baf",
@@ -46,6 +46,7 @@
     "test_ignore_columns.py": "2350310b08888512ebe4017b53cb1ce87b0fb2e881d56d739d6768844cef8f7b",
     "test_input_budget.py": "31b421e6e00f57fc691c0537f7fb059408b1f375a82d7bb1452682d2dda2ea4f",
     "test_summary.py": "f2ae998be8ec56a8dba342da612b19dfc6d52bd784768f40a7e15cca125ea7f9",
-    "evaluation/AUTOMATION-TOTALS.md": "a2b6848c3c70cb0afa2248e4b19dfcf7ec71d8168b3847c43fc6c536e23b75b3"
+    "evaluation/AUTOMATION-TOTALS.md": "a2b6848c3c70cb0afa2248e4b19dfcf7ec71d8168b3847c43fc6c536e23b75b3",
+    "evaluation/DAMAGED-REPORT-RECOVERY.md": "869b6392e842416ff816baa477b1085de484252dc57f6f6e59220f06edd2f72a"
   }
 }
