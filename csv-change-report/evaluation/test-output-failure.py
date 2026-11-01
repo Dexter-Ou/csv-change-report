@@ -58,7 +58,8 @@ check('mixed totals',r.returncode==2 and totals==dict(expected=2,completed=2,equ
 check('valid report remains readable',json.loads((out/'pair-0002.json').read_text())['counts']==dict(before=1,after=1,added=0,removed=0,changed=0,unchanged=1))
 check('write fault diagnostic',json.loads((out/'pair-0001.stderr').read_text())=={'error':oracle['write']})
 failed=out/'pair-0001.json';partial=failed.stat().st_size if failed.exists() else None
-check('partial output recorded',partial==2048)
+check('failed destination absent',partial is None)
+check('temporary siblings absent',not list(out.glob('.csv-change-*')))
 status=(out/'status.tsv').read_text()
 check('failed report excluded from status',status.splitlines()[1].split('\t')[1:3]==['2','-'])
 r=run('index',[p/'evaluation/batch-index.py',out,'--expected-pairs','2'])
