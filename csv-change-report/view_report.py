@@ -75,7 +75,7 @@ def validate(report):
     return report
 
 
-def render(report):
+def render(report, counts_only=False):
     validate(report)
     def table(headers, rows):
         return '<table><thead><tr>' + ''.join('<th scope="col">' + escape(str(v)) + '</th>' for v in headers) + '</tr></thead><tbody>' + ''.join('<tr>' + ''.join('<td>' + escape(str(v)) + '</td>' for v in row) + '</tr>' for row in rows) + '</tbody></table>'
@@ -89,7 +89,9 @@ def render(report):
              '<h2>Changed cells by column</h2>', table(['Column', 'Changed cells'], report['changed_cells_by_column'].items())]
     if report.get('ignored_columns'):
         parts += ['<h2>Ignored columns</h2><ul>' + ''.join('<li>' + escape(n) + '</li>' for n in report['ignored_columns']) + '</ul>']
-    if report['format_version'] == 2:
+    if counts_only and report['format_version'] == 1:
+        parts += ['<h2>Record positions</h2><p>Counts-only view: record positions are intentionally hidden in this HTML, but remain in the saved detailed JSON. Zero details must not be inferred.</p>']
+    elif report['format_version'] == 2:
         parts += ['<h2>Record positions</h2><p>Summary only: record positions were omitted from this saved report. Zero details must not be inferred.</p>']
     else:
         parts += ['<h2>Record positions</h2><p>Positions are 1-based data records, excluding the header; they are not physical line numbers when fields contain newlines.</p>']
@@ -104,6 +106,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('report', help='saved single-pair JSON report (not a batch manifest)')
     parser.add_argument('--output', required=True, help='new HTML file in a trusted directory; existing paths refused')
+    parser.add_argument('--counts-only', action='store_true', help='omit record-position tables from HTML; keep counts and saved JSON unchanged')
     args = parser.parse_args()
     try:
         with Path(args.report).open('rb') as stream:
@@ -111,7 +114,7 @@ def main():
         if len(raw) > MAX_BYTES:
             raise ValueError('oversize report')
         report = json.loads(raw.decode('utf-8'), object_pairs_hook=unique_object)
-        html = render(report)
+        html = render(report, counts_only=args.counts_only)
     except (OSError, UnicodeError, ValueError, TypeError, KeyError, RecursionError):
         print('E_REPORT: unreadable, unsupported or inconsistent report (8 MiB maximum); no HTML created.', file=sys.stderr)
         return 2
