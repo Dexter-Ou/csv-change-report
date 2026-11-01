@@ -136,3 +136,6 @@ Do not share private files or reports in public issues. These examples use synth
 
 Report-file output requires filesystem hard links. Status 2 can retain a complete
 report after temporary cleanup failure; see [output recovery](evaluation/OUTPUT-FAILURE.md).
+
+HTML viewer output also requires hard links. Cleanup failure may leave complete
+HTML with status 2; see [viewer output recovery](VIEWER.md#html-output-failures-and-recovery).
