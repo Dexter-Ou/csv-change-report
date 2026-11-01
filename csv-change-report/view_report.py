@@ -5,6 +5,8 @@ import hashlib
 from collections import Counter
 from html import escape
 import json
+import os
+import stat
 from pathlib import Path
 import re
 import sys
@@ -81,9 +83,19 @@ def compare_sources(report, before, after):
     mismatches = []
     for name, path in [('before', before), ('after', after)]:
         digest = hashlib.sha256()
-        with Path(path).open('rb') as stream:
-            for block in iter(lambda: stream.read(1024 * 1024), b''):
-                digest.update(block)
+        # Reject known special files before opening; recheck the opened descriptor.
+        # Nonblocking open also prevents a regular-to-FIFO swap from waiting on POSIX.
+        if not stat.S_ISREG(Path(path).stat().st_mode):
+            raise ValueError('retained input must be a regular file')
+        fd = os.open(path, os.O_RDONLY | getattr(os, 'O_NONBLOCK', 0) | getattr(os, 'O_BINARY', 0))
+        try:
+            if not stat.S_ISREG(os.fstat(fd).st_mode):
+                raise ValueError('retained input must be a regular file')
+            with os.fdopen(fd, 'rb', closefd=False) as stream:
+                for block in iter(lambda: stream.read(1024 * 1024), b''):
+                    digest.update(block)
+        finally:
+            os.close(fd)
         if digest.hexdigest() != report[name + '_sha256']:
             mismatches.append(name)
     return mismatches
