@@ -762,3 +762,8 @@ after a missing-input error. Run `python3 -m unittest -v test_automate_batch`.
 Synthetic quoted-record regression: `python3 -m unittest -v test_automate_batch.AutomationTests.test_quoted_multiline_logical_records` checks comma/quote/newline keys and values, logical positions after reordering, additions/removals, continuation after a missing input, input hashes and refusal to reuse reports with LF, CRLF and CR record endings. Concurrency safety is not covered by this regression.
 
 Synthetic malformed-quote regression: `python3 -m unittest -v test_automate_batch.AutomationTests.test_malformed_quoted_csv_continues_batch` checks unterminated fields, junk after closing quotes and malformed quoted headers on either input, with LF/CRLF/CR record endings. It checks error diagnostics, later equal/changed comparisons and preservation of inputs and existing reports. This is sequential coverage, without concurrency or crash-fault testing.
+
+## Optional size benchmark
+
+See [BENCHMARK.md](BENCHMARK.md) for a reproducible Linux-only synthetic
+50,000-record benchmark, observed measurements and their limits.
