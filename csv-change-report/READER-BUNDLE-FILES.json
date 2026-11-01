@@ -52,8 +52,8 @@
     "view_report.py": "6124f3c48da131c45f804c2992e88bcec5b2a58ce2d18e90c87eaa7c810e0d54",
     "test_view_report.py": "60a5f7b07b35d9f814c7988fab4f40c78624769b95df0e897efc843bb2737b54",
     "VIEWER.md": "0d0f836765aa03a8c907d815b04f523bb7301c5a3268f8e4214a3729ba07a9d4",
-    "evaluation/batch-index.py": "48aa0e564f1b0bbf1fe1c6fd319e8386bf630189502f3e5b8762ddd507df27f1",
-    "evaluation/BATCH-INDEX.md": "ff5a1bbcc40b1569f284091fc8803ec566406c423383ce4d56edd8d4bfdcf0f2",
-    "test_batch_index.py": "224c58ba2ed34f19325245b5d80e1ad19db396528bfa30a396e5d8e6a28e0967"
+    "evaluation/batch-index.py": "f85b8a06091b42a032bcee0b5cbf749d9e63ebc702b3a57771482b2ccdf0d4a5",
+    "evaluation/BATCH-INDEX.md": "284c8e40dbc04f4c562f98b59a6f1598ee5d895a8407b0bf2791736a6ed306f4",
+    "test_batch_index.py": "f69dce03e7320c7691fa871a21220d3df42e906d02cb176cf0bb3a7c59fbec19"
   }
 }
