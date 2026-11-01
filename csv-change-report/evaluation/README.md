@@ -746,3 +746,7 @@ report is read and validated once; row and column totals use that parsed snapsho
 This does not provide atomic filesystem snapshots or protection against concurrent
 writes. Use a trusted directory and completed, stable reports. Row-only behavior
 is unchanged.
+
+The synthetic automation regressions also cover quoted commas, escaped quotes,
+embedded LF field newlines, and LF/CRLF record endings. They check logical
+record counts, statuses 0/1/2, and preservation of inputs and existing reports.
