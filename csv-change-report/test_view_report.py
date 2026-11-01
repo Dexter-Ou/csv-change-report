@@ -138,6 +138,47 @@ class ViewerTests(unittest.TestCase):
         html = view_report.render(summary, counts_only=True)
         self.assertIn('Summary only:', html); self.assertNotIn('Counts-only view:', html)
 
+    def test_source_comparison_modes_and_collisions(self):
+        for mode in ('detailed', 'counts', 'summary'):
+            r = copy.deepcopy(self.report)
+            if mode == 'summary':
+                for field in ('added_after_records', 'removed_before_records', 'changed_records'): del r[field]
+                r.update(format_version=2, report_mode='summary')
+            args = ['--before-csv', str(ROOT / 'examples/before.csv'), '--after-csv', str(ROOT / 'examples/after.csv')]
+            if mode == 'counts': args += ['--counts-only']
+            result, out = self.run_view(json.dumps(r), mode + '-checked.html', args)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            html = out.read_text()
+            self.assertIn('Both explicitly supplied CSV files match', html)
+            self.assertIn('does not establish source authenticity', html)
+            self.assertNotIn(str(ROOT), html)
+            old = out.read_bytes()
+            result, _ = self.run_view(json.dumps(r), out.name, args)
+            self.assertEqual(result.returncode, 2); self.assertEqual(out.read_bytes(), old)
+        self.assertNotIn('Both explicitly supplied CSV files match', view_report.render(self.report))
+
+    def test_source_mismatch_missing_and_one_sided_arguments(self):
+        before = self.work / 'before.csv'; after = self.work / 'after.csv'
+        original_before = (ROOT / 'examples/before.csv').read_bytes()
+        original_after = (ROOT / 'examples/after.csv').read_bytes()
+        for label in ('before', 'after', 'both', 'newline', 'missing'):
+            before.write_bytes(original_before); after.write_bytes(original_after)
+            if label in ('before', 'both'): before.write_bytes(b'changed')
+            if label in ('after', 'both'): after.write_bytes(b'changed')
+            if label == 'newline': before.write_bytes(original_before + bytes([10]))
+            if label == 'missing': after.unlink()
+            snapshots = {p: p.read_bytes() for p in (before, after) if p.exists()}
+            result, out = self.run_view(json.dumps(self.report), label + '-refused.html',
+                ['--before-csv', str(before), '--after-csv', str(after), '--counts-only'])
+            self.assertEqual(result.returncode, 2, label)
+            self.assertIn('E_SOURCE:', result.stderr); self.assertFalse(out.exists())
+            if label == 'both': self.assertIn('before, after', result.stderr)
+            for p, raw in snapshots.items(): self.assertEqual(p.read_bytes(), raw)
+            self.assertEqual(json.loads((self.work / 'saved.json').read_text()), self.report)
+        for flag in ('--before-csv', '--after-csv'):
+            result, out = self.run_view(json.dumps(self.report), flag[2:] + '.html', [flag, str(before)])
+            self.assertEqual(result.returncode, 2); self.assertFalse(out.exists())
+
     def test_size_limit_and_missing_input(self):
         result, out = self.run_view(' ' * (view_report.MAX_BYTES + 1))
         self.assertEqual(result.returncode, 2); self.assertFalse(out.exists())
