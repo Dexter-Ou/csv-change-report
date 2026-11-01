@@ -1,0 +1,36 @@
+{
+  "counts": {
+    "before": 4,
+    "after": 4,
+    "added": 1,
+    "removed": 1,
+    "changed": 2,
+    "unchanged": 1
+  },
+  "added_after_records": [
+    3
+  ],
+  "removed_before_records": [
+    4
+  ],
+  "changed_records": [
+    {
+      "before_record": 1,
+      "after_record": 4,
+      "columns": [
+        "備考"
+      ]
+    },
+    {
+      "before_record": 2,
+      "after_record": 2,
+      "columns": [
+        "名称"
+      ]
+    }
+  ],
+  "changed_cells_by_column": {
+    "名称": 1,
+    "備考": 1
+  }
+}
