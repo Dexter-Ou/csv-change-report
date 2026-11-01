@@ -1,17 +1,52 @@
 # Output failures and recovery
 
-Run the synthetic regression from any working directory using Python 3 on Linux as a normal non-root user:
+Run these synthetic regressions with Python 3 on Linux as a normal non-root user,
+from any working directory. No dependencies, network or real input data are needed:
 
 ```sh
 python3 /path/to/csv-change-report/evaluation/test-output-failure.py
+python3 /path/to/csv-change-report/evaluation/test-cleanup-state.py
 ```
 
-No dependencies, sudo, network or real input data are needed. Do not use Python `-O`; assertions are required. Other operating systems are untested. The script retains a temporary directory, prints its path, and writes results.json plus samples.zip there. Remove only that test directory when finished. Permission-denied fixtures are mode 0555, so restore their write permission before cleanup if necessary.
+Run without `-O`. Each script prints a retained temporary directory with results
+and sample artifacts. Remove only that test directory after review; the permission
+fixture uses mode 0555 and may need its write permission restored for cleanup.
+The first regression uses a real 2,048-byte per-child file-size limit. The second
+injects unlink denial, unsupported hard links and a destination collision; these
+are synthetic Linux behavior, not evidence of Windows/macOS compatibility.
 
-The regression checks full and summary reports against unwritable parents, existing files/directories and input/output collisions. Existing bytes must survive. It then confirms a valid wide-schema comparison exceeds the 2,048-byte fault limit before applying a per-child Linux file-size limit to a two-pair batch. The first pair must return the exact write diagnostic, leave a 2,048-byte partial file, and have no report link in status.tsv. The second equal pair must still complete with a readable report. Batch, totals and index must report error exit 2.
+## Output protocol
 
-## Recovering a failed report
+Reports are written to a private mode-0600 `.csv-change-` temporary sibling,
+closed, then hard-linked to the requested destination without replacing it.
+A pre-link write failure returns 2 and normally leaves no destination or temporary
+sibling. Existing files, directories and dangling symlinks are refused.
+Hard links must be supported by the destination filesystem; unsupported links
+fail closed. Standard-output reporting is unchanged.
 
-An output error returns exit 2 with a diagnostic such as `output file could not be written`. A report file can remain partially written: output creation is not atomic. Do not parse, share or treat that file as a completed comparison, even when it contains readable JSON. Batch status marks the pair as ERROR and excludes the failed report from its links; a later pair may still succeed. Check status.tsv and each pair's stderr rather than assuming every file in the report directory is valid.
+If linking succeeds but temporary unlink fails, the destination contains a complete
+report, but status remains 2. A JSON stderr line reports `output_committed: true`
+and `cleanup_required: true`. If unlink also fails after a write/link error,
+`output_committed: false` precedes a second JSON line preserving the primary error.
+Consumers must handle multiple diagnostic lines. No diagnostic contains input
+values, supplied paths or OS exception text.
 
-Preserve your original CSVs and the error/status files. Check the destination's permissions and available storage or file-size limits. Choose a fresh writable output path or a fresh batch report directory, then rerun the original comparison after resolving the cause. Existing destinations are rejected; move aside the failed artifact for diagnosis or remove only the known failed report after reviewing it. Never remove an input file or unrelated existing directory to make a retry work. Confirm the rerun's exit status and report counts before using its results. This test does not establish crash durability, race safety or cross-platform behavior.
+## Manual recovery, including batches
+
+Preserve original CSVs, stderr and status files. Inspect permissions, storage and
+file-size limits. For cleanup-required errors, verify the requested report and
+inspect its directory for temporary siblings. Remove only files confirmed to
+belong to that run; never glob-delete temporary files shared with other runs.
+Do not delete the report blindly or retry the same output path: existing paths
+are refused. If rerunning after repair, use a fresh output path or batch directory.
+
+A batch treats every comparator status 2 as ERROR, excludes its report link and
+omits it from successful totals, even if cleanup failed after a complete report
+was created. Later pairs still run. Read each pair's stderr and status.tsv;
+a readable JSON file alone does not establish a successful batch comparison.
+Keep failed-run evidence separate from any verified rerun.
+
+"Committed" means the link operation returned, not durable storage. There is no
+fsync/power-loss guarantee. Crashes can leave temporary siblings. Adversarial
+parent-directory replacement, concurrent mutation and other platforms are untested.
+Use trusted input and output directories.
