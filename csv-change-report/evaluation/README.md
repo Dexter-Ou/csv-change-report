@@ -433,6 +433,12 @@ returns 0; a refusal uses the fixed reason diagnostic and returns 2. No CSV is
 opened or checked, no batch runner is launched, and no report directory is
 created. Missing CSVs therefore do not fail preflight. This does not establish
 that a comparison will succeed or that inputs will remain unchanged.
+Preflight does not hash, snapshot or pin CSV contents. A later execution reads
+the files available then: a formerly changed pair can become equal, an equal
+pair can become changed, or a previously valid CSV can fail (for example, after
+a duplicate key is introduced). Repeating preflight cannot detect these CSV
+changes. Keep stable copies of exports for a repeatable comparison; this tool
+does not provide an atomic input snapshot.
 An optional report-directory argument is ignored in this mode, including an
 existing directory; it is still required for normal execution. Budget and
 ignore-column options are validated; totals has no effect until execution.
