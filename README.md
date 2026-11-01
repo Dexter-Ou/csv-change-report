@@ -10,9 +10,9 @@ Requires Python 3.10+; standard library only. No installation, account, API key
 or network connection is needed to run. Tested on Linux with Python 3.12.15;
 Windows and macOS have not been tested.
 
-1. [Download the tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/308b6960e3a6027c3c704a9c0e988c8b8bdbe4e0).
+1. [Download the tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/6a17c7810699001f95f4a7a61a3c2deb8dd17bcd).
 2. Extract into a new folder and open a terminal in the outer
-   `csv-change-report-308b6960e3a6027c3c704a9c0e988c8b8bdbe4e0` folder.
+   `csv-change-report-6a17c7810699001f95f4a7a61a3c2deb8dd17bcd` folder.
 3. Run the included synthetic example:
 
 ```sh
