@@ -77,6 +77,11 @@ Never interpret an error as equality or export approval.
 
 ## Bound raw reads for a batch
 
+For a ready-to-run example with equal, changed and invalid pairs, follow
+[the synthetic mixed-batch example](examples/mixed-batch/README.md). It includes
+expected index labels and row counts; both commands intentionally return 2
+because one comparison fails.
+
 This block requires a POSIX shell. Run once with an unused output directory;
 keep previous results and choose a new name on retry. The parent must exist.
 
