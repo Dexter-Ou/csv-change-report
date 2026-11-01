@@ -758,3 +758,5 @@ Inputs and existing output bytes are checked for preservation.
 The offline automation regression also checks UTF-8 CSV headers with a BOM on
 either, both or neither input, non-ASCII keys and values, and later comparisons
 after a missing-input error. Run `python3 -m unittest -v test_automate_batch`.
+
+Synthetic quoted-record regression: `python3 -m unittest -v test_automate_batch.AutomationTests.test_quoted_multiline_logical_records` checks comma/quote/newline keys and values, logical positions after reordering, additions/removals, continuation after a missing input, input hashes and refusal to reuse reports with LF, CRLF and CR record endings. Concurrency safety is not covered by this regression.
