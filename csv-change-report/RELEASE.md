@@ -1,3 +1,12 @@
+# Failure-safe HTML viewer output
+
+HTML writes now use a private temporary sibling and no-clobber hard link.
+Pre-link write failures normally leave no requested HTML. Cleanup failure keeps
+status 2 and explicit committed/cleanup-required diagnostics. Hard-link support
+is required. See VIEWER.md for recovery and permanent regression commands.
+CLI version remains 0.1.10-preview. Crash durability and other platforms are
+untested; no browser appearance or accessibility claim is added.
+
 # Failure-safe report output
 
 Report-file writes use a private temporary sibling
