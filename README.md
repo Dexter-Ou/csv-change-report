@@ -48,6 +48,7 @@ that looks complete is not proof of success. Errors use JSON on stderr.
 
 ## More workflows
 
+- [Compare CSV exports by ID instead of line number](docs/COMPARE-CSV-EXPORTS.md).
 - [Choose text, detailed JSON, summary or batch reports](csv-change-report/QUICKSTART.md).
 - [Full options, comparison rules and scripting examples](csv-change-report/README.md).
 - [Batch manifests, validation, ignored columns and aggregate totals](csv-change-report/evaluation/README.md).
