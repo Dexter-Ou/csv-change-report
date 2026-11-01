@@ -78,6 +78,20 @@ def validate(report):
     return report
 
 
+def read_report_bytes(path):
+    """Read bounded regular-file JSON bytes, accepting regular-file symlinks."""
+    if not stat.S_ISREG(Path(path).stat().st_mode):
+        raise ValueError('saved report must be a regular file')
+    fd = os.open(path, os.O_RDONLY | getattr(os, 'O_NONBLOCK', 0) | getattr(os, 'O_BINARY', 0))
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError('saved report must be a regular file')
+        with os.fdopen(fd, 'rb', closefd=False) as stream:
+            return stream.read(MAX_BYTES + 1)
+    finally:
+        os.close(fd)
+
+
 def compare_sources(report, before, after):
     """Compare explicitly supplied bytes; never follow paths from report metadata."""
     mismatches = []
@@ -141,8 +155,7 @@ def main():
     if bool(args.before_csv) != bool(args.after_csv):
         parser.error('--before-csv and --after-csv must be supplied together')
     try:
-        with Path(args.report).open('rb') as stream:
-            raw = stream.read(MAX_BYTES + 1)
+        raw = read_report_bytes(args.report)
         if len(raw) > MAX_BYTES:
             raise ValueError('oversize report')
         report = json.loads(raw.decode('utf-8'), object_pairs_hook=unique_object)
