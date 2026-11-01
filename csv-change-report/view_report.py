@@ -118,8 +118,17 @@ def compare_sources(report, before, after):
 
 def render(report, counts_only=False, sources_checked=False):
     validate(report)
+    def text(value):
+        # Break opportunities add no text characters and need no CSS or script.
+        # Escape each chunk independently so markup-like labels remain inert.
+        # Leave Unicode words intact to avoid splitting grapheme sequences.
+        return ''.join('<wbr>'.join(escape(word[i:i + 24])
+                                   for i in range(0, len(word), 24))
+                       if word.isascii() and not word.isspace() else escape(word)
+                       for word in re.split(r'(\s+)', str(value)))
+
     def table(headers, rows):
-        return '<table><thead><tr>' + ''.join('<th scope="col">' + escape(str(v)) + '</th>' for v in headers) + '</tr></thead><tbody>' + ''.join('<tr>' + ''.join('<td>' + escape(str(v)) + '</td>' for v in row) + '</tr>' for row in rows) + '</tbody></table>'
+        return '<table><thead><tr>' + ''.join('<th scope="col">' + text(v) + '</th>' for v in headers) + '</tr></thead><tbody>' + ''.join('<tr>' + ''.join('<td>' + text(v) + '</td>' for v in row) + '</tr>' for row in rows) + '</tbody></table>'
     c = report['counts']
     parts = ['<!doctype html><html lang="en"><meta charset="utf-8">',
              '<meta name="viewport" content="width=device-width, initial-scale=1">',
@@ -131,7 +140,7 @@ def render(report, counts_only=False, sources_checked=False):
     if sources_checked:
         parts += ['<h2>Retained input comparison</h2><p>Both explicitly supplied CSV files match the SHA-256 hashes saved in this JSON. This checks bytes only; it does not establish source authenticity, provenance or correctness of the reported differences. Files may change after comparison.</p>']
     if report.get('ignored_columns'):
-        parts += ['<h2>Ignored columns</h2><ul>' + ''.join('<li>' + escape(n) + '</li>' for n in report['ignored_columns']) + '</ul>']
+        parts += ['<h2>Ignored columns</h2><ul>' + ''.join('<li>' + text(n) + '</li>' for n in report['ignored_columns']) + '</ul>']
     if counts_only and report['format_version'] == 1:
         parts += ['<h2>Record positions</h2><p>Counts-only view: record positions are intentionally hidden in this HTML, but remain in the saved detailed JSON. Zero details must not be inferred.</p>']
     elif report['format_version'] == 2:
