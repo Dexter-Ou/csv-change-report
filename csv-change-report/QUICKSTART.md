@@ -57,9 +57,10 @@ to see what changed. Check `before_sha256` and `after_sha256` against the snapsh
 when you need to confirm which input bytes the report describes.
 
 An existing destination is refused with status 2 and left intact. Keep that report
-and choose a new filename for another run. A write failure can leave a partial
-new file; treat any report from a failed command as incomplete. Avoid shell
-redirection onto inputs. See [output and recovery rules](README.md) for details.
+and choose a new filename for another run. Report-file writes require hard links;
+a pre-link write failure normally leaves no destination. Cleanup failure can
+leave a complete report with error status 2. Preserve failed-run evidence and
+follow [output recovery](evaluation/OUTPUT-FAILURE.md). Avoid shell redirection onto inputs.
 
 ## Check statuses before automating
 
@@ -132,3 +133,6 @@ preserve originals. Avoid shell redirection onto inputs. See [the full rules](RE
 for limits, exclusive `--output`, optional exclusions and recovery, and
 [the evaluation kit](evaluation/README.md) for mixed batches and safe retries.
 Do not share private files or reports in public issues. These examples use synthetic data.
+
+Report-file output requires filesystem hard links. Status 2 can retain a complete
+report after temporary cleanup failure; see [output recovery](evaluation/OUTPUT-FAILURE.md).
