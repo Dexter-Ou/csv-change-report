@@ -45,6 +45,9 @@ This also returns 1. These expected nonzero results can stop scripts using
 
 ## Save a report and open it as HTML
 
+To inspect the output first, [download a saved synthetic HTML example](examples/README.md).
+The example note explains how to open it locally and what its metadata means.
+
 Use the [pinned preview download](https://github.com/Dexter-Ou/csv-change-report/archive/708201fee61caeac4f29dc99d982460e95e5390d.zip)
 for this walkthrough. After extracting it, enter the inner `csv-change-report`
 folder. Choose a trusted writable directory with hard-link support and fresh
