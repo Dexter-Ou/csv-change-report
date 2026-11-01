@@ -20,12 +20,13 @@ class Tags(HTMLParser):
         super().__init__(); self.tags = []; self.text = []; self.cells = []; self.in_cell = False
     def handle_starttag(self, tag, attrs):
         self.tags.append((tag, dict(attrs)))
-        if tag == 'td': self.in_cell = True
+        if tag == 'td': self.in_cell = True; self.current_cell = []
     def handle_endtag(self, tag):
-        if tag == 'td': self.in_cell = False
+        if tag == 'td':
+            self.cells.append(''.join(self.current_cell)); self.in_cell = False
     def handle_data(self, data):
         self.text.append(data)
-        if self.in_cell: self.cells.append(data)
+        if self.in_cell: self.current_cell.append(data)
 
 
 class ViewerTests(unittest.TestCase):
@@ -143,7 +144,7 @@ class ViewerTests(unittest.TestCase):
         self.assertNotIn('script', [t for t, _ in parsed.tags])
         self.assertNotIn('img', [t for t, _ in parsed.tags])
         self.assertFalse(any(k in ('src', 'href', 'onclick') for _, attrs in parsed.tags for k in attrs))
-        self.assertIn(hostile, parsed.text)
+        self.assertIn(hostile, ''.join(parsed.text))
         self.assertIn('Content-Security-Policy', html)
 
     def test_inconsistent_and_unsupported_refused_before_output(self):
