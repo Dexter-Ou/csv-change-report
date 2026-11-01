@@ -2,6 +2,7 @@
 import contextlib
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -23,6 +24,44 @@ class ChangeTests(unittest.TestCase):
         path.write_text(text, encoding='utf-8')
         return path
 
+
+    @unittest.skipUnless(hasattr(os, 'mkfifo'), 'POSIX FIFO required')
+    def test_special_inputs_and_regular_symlink(self):
+        regular = self.put('regular.csv', 'id,x\na,1\n')
+        fifo = self.root / 'pipe.csv'
+        os.mkfifo(fifo)
+        directory = self.root / 'directory.csv'
+        directory.mkdir()
+        for special in [fifo, directory, Path('/dev/null')]:
+            with self.subTest(path=special), self.assertRaises(InputError):
+                load(special, 'id')
+        link = self.root / 'linked.csv'
+        link.symlink_to(regular)
+        self.assertEqual(load(link, 'id'), load(regular, 'id'))
+
+    @unittest.skipUnless(hasattr(os, 'mkfifo'), 'POSIX FIFO required')
+    def test_swapped_fifo_descriptor_is_rejected_and_closed(self):
+        regular = self.put('regular.csv', 'id,x\na,1\n')
+        fifo = self.root / 'pipe.csv'
+        os.mkfifo(fifo)
+        fd = os.open(fifo, os.O_RDONLY | os.O_NONBLOCK)
+        with patch('csv_change.os.open', return_value=fd), self.assertRaises(InputError):
+            load(regular, 'id')
+        with self.assertRaises(OSError):
+            os.fstat(fd)
+
+    def test_descriptor_closed_on_success_and_fdopen_failure(self):
+        regular = self.put('regular.csv', 'id,x\na,1\n')
+        for fail in [False, True]:
+            fd = os.open(regular, os.O_RDONLY)
+            with patch('csv_change.os.open', return_value=fd):
+                if fail:
+                    with patch('csv_change.os.fdopen', side_effect=OSError('synthetic')), self.assertRaises(OSError):
+                        load(regular, 'id')
+                else:
+                    load(regular, 'id')
+            with self.assertRaises(OSError):
+                os.fstat(fd)
 
     def test_stdout_faults_override_check_status(self):
         old = self.put('old.csv', 'id,x\na,1\n')
