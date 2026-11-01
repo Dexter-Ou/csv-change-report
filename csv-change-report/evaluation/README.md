@@ -754,3 +754,7 @@ record counts, statuses 0/1/2, and preservation of inputs and existing reports.
 Synthetic batch regression coverage includes header-only equality, addition/removal
 against header-only CSVs, and zero-byte input errors with later pairs completing.
 Inputs and existing output bytes are checked for preservation.
+
+The offline automation regression also checks UTF-8 CSV headers with a BOM on
+either, both or neither input, non-ASCII keys and values, and later comparisons
+after a missing-input error. Run `python3 -m unittest -v test_automate_batch`.
