@@ -10,9 +10,9 @@ Requires Python 3.10+; standard library only. No installation, account, API key
 or network connection is needed to run. Tested on Linux with Python 3.12.15;
 Windows and macOS have not been tested.
 
-1. [Download the tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/0a8d2b35505d7a1a76fec3c25c6972c0623b1905).
+1. [Download the tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/f34412f27f2140fd8fa6407f732efd11e852c2ac).
 2. Extract into a new folder and open a terminal in the outer
-   `csv-change-report-0a8d2b35505d7a1a76fec3c25c6972c0623b1905` folder.
+   `csv-change-report-f34412f27f2140fd8fa6407f732efd11e852c2ac` folder.
 3. Run the included synthetic example:
 
 ```sh
@@ -37,8 +37,10 @@ For your own authorized snapshots, replace both paths and `id` with your key
 column. Keep originals. JSON is the default; add `--output report.json` to save
 to a new file. Existing paths and input collisions are refused. Never redirect
 shell output onto either input: the shell can truncate it before the tool runs.
-Use a trusted output directory. A failed write may leave a partial new file;
-check the exit status and preserve the failed output before retrying with a new name.
+Use a trusted output directory with hard-link support. Pre-link write faults normally
+leave no destination; temporary cleanup failure can leave a complete report with
+error status 2. Preserve failed-run evidence and follow
+[output recovery](csv-change-report/evaluation/OUTPUT-FAILURE.md) before retrying.
 New report files have owner-only permissions on tested Linux.
 
 Comparisons exit 0 by default even when changes exist. Add `--check` in scripts:
