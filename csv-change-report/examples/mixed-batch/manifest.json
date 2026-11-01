@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "pairs": [
+    {
+      "before": "before.csv",
+      "after": "before.csv",
+      "key": "id"
+    },
+    {
+      "before": "before.csv",
+      "after": "after.csv",
+      "key": "id"
+    },
+    {
+      "before": "before.csv",
+      "after": "duplicate-key.csv",
+      "key": "id"
+    }
+  ]
+}
