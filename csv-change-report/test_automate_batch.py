@@ -94,6 +94,37 @@ class AutomationTests(unittest.TestCase):
                 self.assertEqual({p.name: p.read_bytes() for p in self.reports.iterdir()},
                                  snapshot)
 
+    def test_quoted_multiline_and_crlf_records(self):
+        # Physical lines inside quoted fields must not become extra records.
+        for index, ending in enumerate((b'\n', b'\r\n')):
+            with self.subTest(record_ending=repr(ending)):
+                before = ending.join((b'id,value', b'1,"alpha,beta"',
+                                      b'2,"first\nsecond"',
+                                      b'3,"say ""hello"""')) + ending
+                after = before.replace(b'first\nsecond', b'first\nrevised')
+                self.before.write_bytes(before)
+                self.after.write_bytes(after)
+                for offset, (kinds, code, status, statuses) in enumerate((
+                        (['equal'], 'EQUAL', 0, [0]),
+                        (['equal', 'changed'], 'CHANGED', 1, [0, 1]),
+                        (['error', 'equal', 'changed'], 'E_COMPARISON', 2, [2, 0, 1]))):
+                    self.reports = self.root / f'quoted reports {index}-{offset}'
+                    self.write_manifest(kinds)
+                    self.run_wrapper(code, status, len(kinds))
+                    self.check_table(statuses)
+                    for pair, pair_status in enumerate(statuses, 1):
+                        if pair_status in (0, 1):
+                            payload = json.loads((self.reports /
+                                f'pair-{pair:04d}.json').read_bytes())
+                            self.assertEqual(payload['counts']['unchanged'],
+                                             3 - pair_status)
+                            self.assertEqual(payload['counts']['added'], 0)
+                            self.assertEqual(payload['counts']['removed'], 0)
+                    snapshot = {x.name: x.read_bytes() for x in self.reports.iterdir()}
+                    self.run_wrapper('E_OUTPUT', 2, len(kinds))
+                    self.assertEqual({x.name: x.read_bytes() for x in self.reports.iterdir()},
+                                     snapshot)
+
     def test_all_equal(self):
         self.write_manifest(['equal', 'equal'])
         self.run_wrapper('EQUAL', 0, 2)
