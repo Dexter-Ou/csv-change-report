@@ -767,3 +767,6 @@ Synthetic malformed-quote regression: `python3 -m unittest -v test_automate_batc
 
 See [BENCHMARK.md](BENCHMARK.md) for a reproducible Linux-only synthetic
 50,000-record benchmark, observed measurements and their limits.
+
+Report-file output requires hard links. Status 2 can retain a complete report after
+temporary cleanup failure; see [output recovery](OUTPUT-FAILURE.md).
