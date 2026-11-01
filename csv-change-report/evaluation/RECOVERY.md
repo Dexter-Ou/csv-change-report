@@ -275,3 +275,6 @@ name. Requires Python 3.10+; tested on Linux only.
 
 For a runnable automation caller that reads partial row and column totals after
 `E_COMPARISON`, see [AUTOMATION-TOTALS.md](AUTOMATION-TOTALS.md).
+
+For status-only counts versus validated totals and regeneration from retained
+inputs, see [DAMAGED-REPORT-RECOVERY.md](DAMAGED-REPORT-RECOVERY.md).
