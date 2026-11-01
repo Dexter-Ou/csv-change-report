@@ -213,3 +213,62 @@ Preflight status 0 means manifest validation only. Execution statuses remain
 0 equal, 1 differences, 2 error. Two leading BOMs require investigation: removing
 one leaves another, which still refuses. These steps assume ordinary local files;
 they do not protect against hostile concurrent file changes.
+
+## 7. Recover when the chosen manifest output path is occupied
+
+After sections 4 and 5, copy this whole block from the product directory. It
+tries the corrected manifest against both preserved report directories, expects
+status 2, and compares file hashes before and after each refusal. It then runs
+into the unused `attempt-3` directory, expects status 1 (differences), and checks
+that the earlier files are still unchanged. The block refuses a repeat run.
+
+```sh
+python3 - <<'PYCODE'
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+base = Path('manifest recovery')
+fresh = base / 'attempt-3'
+if fresh.exists():
+    raise SystemExit('attempt-3 already exists; preserve it and choose a fresh path.')
+roots = [base, Path('examples')]
+def snapshot():
+    return {
+        str(path): hashlib.sha256(path.read_bytes()).hexdigest()
+        for root in roots for path in root.rglob('*')
+        if path.is_file() and not path.is_relative_to(fresh)
+    }
+if not all((base / name).exists() for name in
+           ('original.json', 'corrected.json', 'attempt-1', 'attempt-2')):
+    raise SystemExit('Run sections 4 and 5 first.')
+saved = snapshot()
+for name in ('attempt-1', 'attempt-2'):
+    result = subprocess.run([
+        sys.executable, 'evaluation/batch-manifest.py', '--totals',
+        str(base / 'corrected.json'), str(base / name),
+    ], capture_output=True, text=True)
+    if result.returncode != 2 or result.stdout or snapshot() != saved:
+        raise SystemExit('Unexpected collision result; preserve files and investigate.')
+    print('Occupied ' + name + ': status 2; inputs and reports unchanged.')
+result = subprocess.run([
+    sys.executable, 'evaluation/batch-manifest.py', '--totals',
+    str(base / 'corrected.json'), str(fresh),
+], capture_output=True, text=True)
+if result.returncode != 1 or snapshot() != saved:
+    raise SystemExit('Unexpected fresh-run result; preserve files and investigate.')
+totals = json.loads((fresh / 'totals.json').read_text(encoding='utf-8'))
+if totals['partial']:
+    raise SystemExit('Unexpected partial totals; inspect the new run.')
+print('Fresh attempt-3: status 1; complete totals; earlier files unchanged.')
+PYCODE
+```
+
+Expected output is the three printed lines in the block. The reports contain
+one changed pair and two equal pairs, as in section 5. Status 1 requires review
+of differences. Hash comparisons cover ordinary synthetic files at observation
+time; they do not establish atomicity, protect against hostile concurrent edits,
+or test symlink confinement or crash recovery. No report is deleted to reuse a
+name. Requires Python 3.10+; tested on Linux only.
