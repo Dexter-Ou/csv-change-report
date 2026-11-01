@@ -168,3 +168,7 @@ report paths and both original inputs remain protected by the usual refusal rule
 
 Repeat offline batches with the optional [JSON manifest helper](evaluation/README.md#optional-repeat-review-manifest-prototype).
 Use `examples/batch.json` for a synthetic changed/equal batch.
+
+## Saved report viewer
+
+Create a local static HTML view of a saved single-pair JSON report with `python3 view_report.py saved-review.json --output saved-review.html`. See [the viewer guide](VIEWER.md) for fresh-start commands, supported formats and limits.
