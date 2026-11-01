@@ -50,8 +50,9 @@ or repair a process. Keep original inputs, outputs and diagnostics together.
 Use comma-separated UTF-8, matching column sets and one nonblank unique key per
 record. Keep inputs and reports private: column names, counts, hashes and record
 positions can be sensitive. Work in trusted local directories with writers
-stopped. Existing output destinations are refused; failed writes may leave
-partial new files. Preserve them and choose fresh paths for retries.
+stopped. Existing output destinations are refused. Report-file output requires
+hard links; cleanup failure can leave a complete report with error status 2.
+Preserve failed-run evidence and follow [output recovery](evaluation/OUTPUT-FAILURE.md).
 
 Read [full comparison limits](README.md), [index limits](evaluation/BATCH-INDEX.md)
 and [recovery guidance](evaluation/RECOVERY.md). Index limits include 1–100 expected
