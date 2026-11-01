@@ -151,3 +151,5 @@ exports and create a source-checked HTML report.
 Follow the [local shell recipe](examples/automation/README.md) to branch on
 `--check` statuses 0 (unchanged), 1 (changed), and 2 (invalid input), including
 a caller using `set -eu`. The recipe runs locally and creates no reports.
+
+Inventory workflow: [review stock changes and resolve an invalid ID](examples/inventory-reconciliation/README.md). Uses fictional exports.
