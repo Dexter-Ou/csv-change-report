@@ -3,7 +3,7 @@
   "status": "Reader bundle with JSON manifest preflight",
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
-    "QUICKSTART.md": "f46097e855beb08e8315a24b47004331049ee8a907380039248c63572a9752ab",
+    "QUICKSTART.md": "017ea7aa76d37b00da5d46684204d43c727e35aa606811cc5b0d5edc9efc1877",
     "README.md": "09946b914a507cb5e770ee575d0228f228800e8520c4baa90dd675d9e7cf1c5c",
     "RELEASE-FILES.json": "9a9d5074226e9a77b8a070b25a72bcffa067c7e4ac1f1727c8cedd6a99992ea7",
     "RELEASE.md": "a20bc9bdc83428915630b8aabfa13e1553e7eda09c214f109a60c1ca5e105bae",
@@ -13,7 +13,7 @@
     "evaluation/EXPECTED.md": "4c3aa0add1b33efa9d11dc9224b467978945707c2cd30cd2f62c6233b5f61a50",
     "evaluation/FEEDBACK.md": "355fdd174ae223deb52fd59169b3bc8a3122be488d4438668af97d83ac9d3223",
     "evaluation/MIXED-BATCH-RECIPE.md": "4f9083105071fef4130593c07d57d475c54adf28522eaee021347c93ad93ecf3",
-    "evaluation/READER-START.md": "5f3b785570fc4f3917c37fe168d2f2a19b54387507a99fe3f7c5fb96a4af5961",
+    "evaluation/READER-START.md": "45ac05c4579193f6f4b1da3c64fc7eedf2a4973545eede4d49c5ca360e372d27",
     "evaluation/READER-TASK.md": "86162573727dfd316f31fa8fe282a8bb6838794f2d4f00c900fe8c622fd5564c",
     "evaluation/README.md": "2a62a3c36446626e88c3299e9569bcdad07ca87f7f4c18c130a0c770a4586334",
     "evaluation/RECOVERY.md": "b54dea75607819cfea49f0fd8ca0ba81475577c98180a7ff0cd84dd37bb2bd00",
