@@ -28,7 +28,7 @@ This preview has synthetic Linux command and HTML parser tests. Interactive brow
 Run the focused synthetic checks with:
 
 ```sh
-python3 -m unittest -v test_view_report
+python3 -m unittest -v test_view_report test_view_wrapping
 ```
 
 Optionally compare retained CSV bytes with the hashes saved in the JSON:
@@ -109,3 +109,7 @@ The tests include real per-child Linux file-size ceilings and injected link and
 cleanup exceptions. File-size ceilings are not actual disk exhaustion. Crashes,
 fsync/power loss, adversarial directory races, interactive browser appearance,
 accessibility and Windows/macOS behavior are untested. Crashes can leave siblings.
+
+Long ASCII words in column labels and hashes include optional line breaks.
+Unicode words remain intact. Parser tests preserve reconstructed text; browser
+layout and clipboard behavior remain untested.
