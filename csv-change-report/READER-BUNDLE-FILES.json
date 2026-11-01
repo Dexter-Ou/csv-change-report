@@ -4,7 +4,7 @@
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
     "QUICKSTART.md": "0e735d7e7440f3050cbd49c4926fe80edb00130a829c0f0548173149420d0d98",
-    "README.md": "93cde157ac0d68329a28261fb20421424baea546aa868a92d949139ff1c30fc1",
+    "README.md": "a324915448200c49783fa1aaf83d117dcfdf0ba975ec65ec3e03577d0465a835",
     "RELEASE-FILES.json": "9a9d5074226e9a77b8a070b25a72bcffa067c7e4ac1f1727c8cedd6a99992ea7",
     "RELEASE.md": "a20bc9bdc83428915630b8aabfa13e1553e7eda09c214f109a60c1ca5e105bae",
     "csv_change.py": "5ba68a9ca727ebded5c3e7daa9a6d7c4230904bc24d3918c8dd93a6cb6b25389",
@@ -73,6 +73,9 @@
     "evaluation/multiline-unicode/after-CRLF.csv": "b986e3bbf0a39a1d2c5556d637b064612e9dd905cdb1e737862796afb5025e04",
     "evaluation/test-malformed-input.py": "a497df25248cba7cfd5ab1d60c45b6ccb489ace5aa86b1d8ed4137d10e80bef8",
     "evaluation/MALFORMED-INPUT.md": "ffa2d6570a5dd6723b2bc46a81b88957218dd5b8301937a43155d9cd31375f8d",
-    "evaluation/malformed-input/oracle.json": "9941ce350199167538ead19f0b95366010d96de8cd6123297c813001ab4e65f4"
+    "evaluation/malformed-input/oracle.json": "9941ce350199167538ead19f0b95366010d96de8cd6123297c813001ab4e65f4",
+    "evaluation/OUTPUT-FAILURE.md": "75ffb725bbdf7f9c7bea374ef3bcb96a9af9ab58632e5334e34b737a3b64ae36",
+    "evaluation/test-output-failure.py": "bc42b268876970c170407933f9910da97b2b783103c6f9ff78d378871df871e9",
+    "evaluation/output-failure/oracle.json": "be0f324f03ba93b58e5a2e691f579fbf3ca39dc1f85bf8ce0db2ca7d3a99608e"
   }
 }
