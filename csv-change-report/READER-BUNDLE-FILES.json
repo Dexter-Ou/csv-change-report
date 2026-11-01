@@ -59,6 +59,9 @@
     "examples/mixed-batch/after.csv": "5eb51e7192b756984726dcb61e4df2f45106f1b961f2449822f1fa7dbbb76ae3",
     "examples/mixed-batch/duplicate-key.csv": "f0d585267b1fbd5f92c597dfa24562e29489682c972dc20ba982b4fca29bb925",
     "examples/mixed-batch/manifest.json": "1b461efd55d9a715b65bcc4db9e66de99cedca16be7d218c96e65afaf0cec29a",
-    "examples/mixed-batch/README.md": "706f2512785595a4c771048fb100a9d020ee8f2ee4692098de0c7a138cf6b596"
+    "examples/mixed-batch/README.md": "706f2512785595a4c771048fb100a9d020ee8f2ee4692098de0c7a138cf6b596",
+    "examples/interrupted-batch/demo.py": "1a880eae28da01ae3ac0b372e243b3dc7293d80ca29f2429995071fb3119204e",
+    "examples/interrupted-batch/manifest.json": "cf336dc1502b2e53a057544a7eacaf3e2bb7ffefa70e6fca918629ff4496e8cd",
+    "examples/interrupted-batch/README.md": "992826610b15e5b9db156a673bd3614b0b6bdf4408e32c47be251c69460e48d6"
   }
 }
