@@ -167,6 +167,56 @@ class ManifestTests(unittest.TestCase):
             self.assertEqual(before, {p: p.read_bytes() for p in self.data.iterdir()})
             self.assertFalse((self.root / 'NEVER').exists())
 
+    def test_preflight_does_not_pin_later_csv_contents(self):
+        # Sequential mutations, not a concurrency or filesystem atomicity test.
+        self.write()
+        manifest_bytes = self.manifest.read_bytes()
+        before_bytes = self.before.read_bytes()
+        cases = [
+            ('changed-to-equal', b'id,value,time\n1,b,y\n', before_bytes, 0),
+            ('equal-to-changed', before_bytes, b'id,value,time\n1,c,x\n', 1),
+            ('valid-to-duplicate', before_bytes,
+             b'id,value,time\n1,c,x\n1,d,x\n', 2),
+        ]
+        for name, initial, later, expected in cases:
+            with self.subTest(case=name):
+                self.after.write_bytes(initial)
+                target = self.root / name
+                preflight = self.run_manifest(str(target), ('--validate-only', '--json'))
+                self.assert_json_result(preflight, 'OK', 1)
+                self.assertFalse(target.exists())
+                self.assertEqual(self.after.read_bytes(), initial)
+                self.after.write_bytes(later)
+                # The same preflight response accepts the changed input, too.
+                repeated = self.run_manifest(str(target), ('--validate-only', '--json'))
+                self.assert_json_result(repeated, 'OK', 1)
+                self.assertEqual(repeated.stdout, preflight.stdout)
+                result = self.run_manifest(str(target), ('--totals',))
+                self.assertEqual(result.returncode, expected)
+                table = (target / 'status.tsv').read_text().splitlines()
+                self.assertEqual(len(table), 2)
+                fields = table[1].split('\t')
+                self.assertEqual(fields[1], str(expected))
+                totals = json.loads((target / 'totals.json').read_text())
+                self.assertEqual(totals['completed'], 1)
+                self.assertEqual(totals['equal'], int(expected == 0))
+                self.assertEqual(totals['changed'], int(expected == 1))
+                self.assertEqual(totals['error'], int(expected == 2))
+                self.assertEqual(totals['partial'], expected == 2)
+                if expected == 2:
+                    self.assertEqual(fields[2], '-')
+                    self.assertFalse((target / 'pair-0001.json').exists())
+                    self.assertTrue((target / fields[3]).read_bytes())
+                else:
+                    report = json.loads((target / fields[2]).read_text())
+                    self.assertEqual(report['counts']['changed'], expected)
+                    self.assertEqual(report['counts']['unchanged'], 1 - expected)
+                    self.assertEqual((target / fields[3]).read_bytes(), b'')
+                self.assertEqual(self.manifest.read_bytes(), manifest_bytes)
+                self.assertEqual(self.before.read_bytes(), before_bytes)
+                self.assertEqual(self.after.read_bytes(), later)
+                self.assertFalse((self.root / 'NEVER').exists())
+
     def test_json_preflight_fixed_failure_codes(self):
         pair = self.valid['pairs'][0]
         cases = [
