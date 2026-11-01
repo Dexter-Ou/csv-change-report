@@ -54,6 +54,7 @@ HTML with status 2; see [viewer output recovery](csv-change-report/VIEWER.md#htm
 
 ## More workflows
 
+- [Fix blank or duplicate CSV keys with a worked example](csv-change-report/examples/stable-key/README.md).
 - [Compare CSV exports by ID instead of line number](docs/COMPARE-CSV-EXPORTS.md).
 - [Choose text, detailed JSON, summary or batch reports](csv-change-report/QUICKSTART.md).
 - [Full options, comparison rules and scripting examples](csv-change-report/README.md).
