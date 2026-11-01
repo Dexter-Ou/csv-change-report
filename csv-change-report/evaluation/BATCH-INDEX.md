@@ -8,7 +8,10 @@ python3 evaluation/batch-index.py '/path/to/reports' --expected-pairs 3
 
 Use the original manifest pair count, never the number of saved status rows.
 Open `/path/to/reports/index.html` locally. It links validated JSON summaries
-and available diagnostics. It does not generate per-pair HTML comparison views.
+and available diagnostics. Each pair shows added, removed, changed and unchanged
+row counts from its validated summary. Counts are Unavailable for failed or
+incomplete comparisons and missing/invalid summaries; this does not mean zero.
+Changed rows count matched keys with changed compared values, not changed cells. It does not generate per-pair HTML comparison views.
 Status 0 means equal, 1 changed, and 2 review required or creation refused. A
 created page labels failed comparisons, missing/invalid summaries, missing
 or unsafe diagnostics, and incomplete pairs. Malformed/truncated tables refuse
