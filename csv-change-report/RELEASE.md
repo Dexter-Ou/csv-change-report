@@ -1,3 +1,9 @@
+# Stable-key troubleshooting example
+
+Adds four fictional CSV fixtures and runnable steps for blank and repeated key
+errors, source correction, JSON comparison and source-checked HTML review.
+Runtime behavior and CLI version remain unchanged.
+
 # Optional breaks in long HTML text
 
 The HTML viewer inserts inert optional break elements in long ASCII words,
