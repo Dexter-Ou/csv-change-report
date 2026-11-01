@@ -34,6 +34,28 @@ the addition at after record 2 and removal at before record 2. Summary omits
 those positions. Record numbers count parsed data records, excluding the header.
 Compare `examples/expected-report.json` for the detailed answer key.
 
+## Save a detailed report for later review
+
+From the same directory, choose a new filename in a trusted local directory:
+
+```sh
+python3 csv_change.py examples/before.csv examples/after.csv --key id --output saved-review.json
+```
+
+A successful save returns 0 and prints nothing. Open `saved-review.json` in a
+local text editor: `changed_records` points to before/after record 1 and names
+`status`; `added_after_records` and `removed_before_records` each contain 2.
+Use each position with its corresponding original snapshot. Positions are parsed
+data records, not physical line numbers: a quoted cell can span multiple lines.
+The report omits key and cell values, so inspect those records in your originals
+to see what changed. Check `before_sha256` and `after_sha256` against the snapshots
+when you need to confirm which input bytes the report describes.
+
+An existing destination is refused with status 2 and left intact. Keep that report
+and choose a new filename for another run. A write failure can leave a partial
+new file; treat any report from a failed command as incomplete. Avoid shell
+redirection onto inputs. See [output and recovery rules](README.md) for details.
+
 ## Check statuses before automating
 
 `--check` changes successful exit status to 0=equal, 1=changed; errors are 2.
