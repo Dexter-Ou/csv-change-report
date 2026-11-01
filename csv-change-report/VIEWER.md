@@ -40,3 +40,10 @@ python3 view_report.py saved-review.json --before-csv examples/before.csv --afte
 Supply both paths explicitly; no file paths are taken from the report. This also works with `--counts-only` and summary reports. A mismatch or unreadable CSV exits 2 with `E_SOURCE` and creates no HTML. Supplying only one path is a usage error. Matching files add a clearly labeled byte-comparison result to the HTML. The files are read in chunks, without parsing CSV values; even a newline or BOM change counts as different bytes. A matching hash does not prove provenance, authenticity, or correctness of the reported differences: an edited JSON can record edited hashes. Files may change after the comparison. No source paths or values are added to the HTML. Existing outputs remain protected.
 
 Retained CSV inputs must resolve to regular files. Directories, pipes/FIFOs, sockets and devices are refused with `E_SOURCE` before HTML creation. Symbolic links to regular files remain supported. On POSIX, the opened descriptor is checked after a nonblocking open to reject a path swapped to a FIFO. This is not a general hostile-filesystem guarantee: use trusted directories, and do not mutate inputs during comparison. Regular files may still be large or stored on slow filesystems; no runtime deadline is imposed.
+
+Saved JSON input must also be a regular file; symlinks to regular files are
+accepted. FIFOs, directories and devices are refused with `E_REPORT` before
+reading. On POSIX the open is nonblocking and its descriptor is checked again,
+so a path replaced by a FIFO between the checks is refused. The 8 MiB JSON
+limit still applies. This is not a general runtime deadline: slow filesystems,
+large regular inputs and concurrent file changes remain possible.
