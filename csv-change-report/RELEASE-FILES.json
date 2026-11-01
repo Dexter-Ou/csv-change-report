@@ -76,5 +76,6 @@
   "test_summary.py",
   "test_view_output.py",
   "test_view_report.py",
+  "test_view_wrapping.py",
   "view_report.py"
 ]
