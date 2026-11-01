@@ -272,3 +272,6 @@ of differences. Hash comparisons cover ordinary synthetic files at observation
 time; they do not establish atomicity, protect against hostile concurrent edits,
 or test symlink confinement or crash recovery. No report is deleted to reuse a
 name. Requires Python 3.10+; tested on Linux only.
+
+For a runnable automation caller that reads partial row and column totals after
+`E_COMPARISON`, see [AUTOMATION-TOTALS.md](AUTOMATION-TOTALS.md).
