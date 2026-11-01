@@ -96,6 +96,44 @@ class InputBudgetTests(unittest.TestCase):
         self.assertEqual(refused.returncode, 2)
         self.assertEqual(json.loads(accepted.stdout)['before_sha256'], hashlib.sha256(data).hexdigest())
 
+    def test_parser_field_boundary_and_preservation(self):
+        # Query a fresh interpreter: the CLI also starts with its runtime default.
+        limit = int(subprocess.check_output(
+            [sys.executable, '-c', 'import csv; print(csv.field_size_limit())']))
+        self.assertGreater(limit, 0)
+        self.assertLessEqual(limit, 1024 * 1024)  # Keep this synthetic probe bounded.
+        for character in ('x', '\u00e9'):
+            for size in (limit, limit + 1):
+                for side in ('before', 'after'):
+                    with self.subTest(character=character, size=size, side=side):
+                        small = b'id,x\na,small\n'
+                        large = ('id,x\na,"' + character * size + '"\n').encode('utf-8')
+                        self.before.write_bytes(large if side == 'before' else small)
+                        self.after.write_bytes(large if side == 'after' else small)
+                        self.originals = [p.read_bytes() for p in (self.before, self.after)]
+                        self.assertLess(max(map(len, self.originals)), MAX_BYTES)
+                        target = self.root / 'boundary-report.json'
+                        result = self.cli('--check', '--output', str(target))
+                        if size == limit:
+                            self.assertEqual(result.returncode, 1)
+                            self.assertEqual(result.stderr, b'')
+                            report = json.loads(target.read_bytes())
+                            self.assertEqual(report['counts']['changed'], 1)
+                            for name, data in zip(('before', 'after'), self.originals):
+                                self.assertEqual(report[name + '_sha256'], hashlib.sha256(data).hexdigest())
+                            target.unlink()
+                        else:
+                            self.assertEqual(result.returncode, 2)
+                            self.assertEqual(result.stdout, b'')
+                            self.assertEqual(json.loads(result.stderr),
+                                             {'error': 'malformed CSV or field exceeds parser limit'})
+                            self.assertFalse(target.exists())
+                            target.write_bytes(b'preserve existing report')
+                            refused = self.cli('--check', '--output', str(target))
+                            self.assertEqual(refused.returncode, 2)
+                            self.assertEqual(target.read_bytes(), b'preserve existing report')
+                            target.unlink()
+
     def test_row_and_parser_checks_still_apply(self):
         with patch('csv_change.MAX_ROWS', 0), self.assertRaises(InputError):
             compare(self.before, self.after, 'id', max_input_bytes=9)
