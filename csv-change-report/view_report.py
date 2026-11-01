@@ -7,6 +7,7 @@ from html import escape
 import json
 import os
 import stat
+import tempfile
 from pathlib import Path
 import re
 import sys
@@ -174,10 +175,35 @@ def main():
             return 2
     html = render(report, counts_only=args.counts_only, sources_checked=bool(args.before_csv))
     try:
-        with Path(args.output).open('x', encoding='utf-8') as stream:
-            stream.write(html)
-    except (OSError, ValueError):
-        print('E_OUTPUT: cannot create new HTML; choose a fresh path in a trusted directory. A failed write may leave a partial file.', file=sys.stderr)
+        target = Path(args.output)
+        if os.path.lexists(target):
+            raise FileExistsError()
+        fd, temporary = tempfile.mkstemp(prefix='.csv-view-', dir=target.parent)
+        committed = False
+        cleanup_failed = False
+        try:
+            with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as stream:
+                stream.write(html)
+            os.link(temporary, target)
+            committed = True
+        finally:
+            try:
+                os.unlink(temporary)
+            except OSError:
+                cleanup_failed = True
+                print('E_OUTPUT: ' + json.dumps({
+                    'error': ('complete HTML created but temporary cleanup failed'
+                              if committed else 'temporary cleanup failed before HTML creation'),
+                    'output_committed': committed,
+                    'cleanup_required': True,
+                    'recovery': ('Inspect the trusted output directory for .csv-view- siblings. '
+                                 'Remove only files confirmed to belong to this run. '
+                                 'Preserve any complete HTML; do not retry the same output path blindly.')
+                }), file=sys.stderr)
+        if cleanup_failed:
+            return 2
+    except (OSError, ValueError, RuntimeError):
+        print('E_OUTPUT: cannot create new HTML; choose a fresh path in a trusted directory. Existing paths are refused; hard-link support is required.', file=sys.stderr)
         return 2
     print('Created local HTML review. Open it in your browser; it contains saved report metadata.')
     return 0
