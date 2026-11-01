@@ -84,4 +84,23 @@ class IndexTests(unittest.TestCase):
     def test_truncated_table(self):
         self.batch(['equal']);p=self.out/'status.tsv';p.write_bytes(p.read_bytes()[:-1]);self.index(1,2);self.assertFalse((self.out/'index.html').exists())
 
+    def test_refusal_guidance_and_recovery(self):
+        self.batch(['equal'])
+        result=self.index(0,2)
+        self.assertIn(b'original manifest pair count',result.stderr)
+        self.assertFalse((self.out/'index.html').exists())
+        self.index(1,0)
+        result=self.index(1,2)
+        self.assertIn(b'index.html already exists',result.stderr)
+        saved=self.out/'preserved-index.html'
+        (self.out/'index.html').rename(saved)
+        self.index(1,0)
+        self.assertEqual(saved.read_bytes(),(self.out/'index.html').read_bytes())
+        (self.out/'index.html').unlink()
+        table=self.out/'status.tsv';table.write_bytes(table.read_bytes()[:-1])
+        result=self.index(1,2)
+        self.assertIn(b'evaluation/RECOVERY.md',result.stderr)
+        self.assertIn(b'do not edit saved status rows',result.stderr)
+        self.assertFalse((self.out/'index.html').exists())
+
 if __name__ == '__main__': unittest.main()
