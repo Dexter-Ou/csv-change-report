@@ -26,6 +26,7 @@ def render(directory, expected):
     for index in range(1, expected + 1):
         stem = f'pair-{index:04d}'
         links = []
+        row_counts = None
         label = 'INCOMPLETE — no completed status row'
         if index <= len(rows):
             _, status, report, diagnostic = rows[index - 1]
@@ -34,7 +35,8 @@ def render(directory, expected):
                 try:
                     if not available(directory, report) or (directory / report).stat().st_size > 1048576:
                         raise ValueError('report unavailable')
-                    schema['validate_summary'](directory / report, status)
+                    summary = schema['validate_summary'](directory / report, status)
+                    row_counts = summary['counts']
                     links.append(f'<a href="{report}">JSON summary</a>')
                 except (OSError, UnicodeError, ValueError, TypeError, KeyError, RecursionError):
                     label = 'ERROR — missing or invalid summary'
@@ -44,7 +46,9 @@ def render(directory, expected):
             else:
                 label += '; diagnostic missing or unsafe'
                 problems = True
-        body.append(f'<tr><th scope="row">{stem}</th><td>{html.escape(label)}</td><td>{" · ".join(links) or "—"}</td></tr>')
+        cells = ''.join(f'<td>{row_counts[name] if row_counts is not None else "Unavailable"}</td>'
+                        for name in ('added', 'removed', 'changed', 'unchanged'))
+        body.append(f'<tr><th scope="row">{stem}</th><td>{html.escape(label)}</td>{cells}<td>{" · ".join(links) or "—"}</td></tr>')
     counts = ', '.join(f'{name}={totals[name]}' for name in ('expected', 'completed', 'equal', 'changed', 'error', 'incomplete'))
     page = '<!doctype html><html lang="en"><meta charset="utf-8">' + \
         '<meta name="viewport" content="width=device-width, initial-scale=1">' + \
@@ -52,7 +56,7 @@ def render(directory, expected):
         '<title>CSV batch results</title><h1>CSV batch results</h1>' + \
         '<p>Offline snapshot. Expected pair count supplied by the operator. No CSV provenance or concurrent-write verification. Keep reports and diagnostics private.</p>' + \
         '<p>' + counts + '</p><p>' + ('Review required: errors, incomplete pairs or unavailable files.' if problems else 'All expected pairs have valid summaries and diagnostics.') + \
-        '</p><table><caption>Pair results and local files</caption><thead><tr><th scope="col">Pair</th><th scope="col">Result</th><th scope="col">Files</th></tr></thead><tbody>' + ''.join(body) + '</tbody></table></html>\n'
+        '</p><table><caption>Pair results and local files</caption><thead><tr><th scope="col">Pair</th><th scope="col">Result</th><th scope="col">Added rows</th><th scope="col">Removed rows</th><th scope="col">Changed rows</th><th scope="col">Unchanged rows</th><th scope="col">Files</th></tr></thead><tbody>' + ''.join(body) + '</tbody></table></html>\n'
     return page, 2 if problems else 1 if totals['changed'] else 0
 
 
