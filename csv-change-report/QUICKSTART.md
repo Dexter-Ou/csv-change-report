@@ -20,6 +20,8 @@ LF or CRLF record endings are supported. BOM and record-ending differences alone
 do not count as data changes, but the raw input hashes can differ. Other formats
 need a different tool.
 
+For a repository-readable tour, see [the report and batch preview](PREVIEW.md).
+
 ## Try three views of the same synthetic change
 
 These commands print reports and return 0 on successful comparisons, even when
