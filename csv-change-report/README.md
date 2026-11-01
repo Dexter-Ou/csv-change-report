@@ -205,3 +205,9 @@ HTML with status 2; see [viewer output recovery](VIEWER.md#html-output-failures-
 Follow the [stable-key example](examples/stable-key/README.md) to reproduce
 blank-key and duplicate-key errors, then compare source-corrected fictional
 exports and create a source-checked HTML report.
+
+## Local shell automation
+
+Follow the [local shell recipe](examples/automation/README.md) to branch on
+`--check` statuses 0 (unchanged), 1 (changed), and 2 (invalid input), including
+a caller using `set -eu`. The recipe runs locally and creates no reports.
