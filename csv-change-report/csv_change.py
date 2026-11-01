@@ -6,6 +6,7 @@ import hashlib
 import io
 import json
 import os
+import stat
 import sys
 from pathlib import Path
 
@@ -37,8 +38,17 @@ def input_byte_limit(value):
 def load(path, key, max_input_bytes=None):
     """Read one bounded snapshot; reject ambiguity instead of guessing."""
     limit = MAX_BYTES if max_input_bytes is None else input_byte_limit(max_input_bytes)
-    with Path(path).open('rb') as stream:
-        data = stream.read(limit + 1)
+    if not stat.S_ISREG(Path(path).stat().st_mode):
+        raise InputError('input must be a regular file')
+    # O_NONBLOCK prevents a swapped-in FIFO from waiting for a writer on POSIX.
+    fd = os.open(path, os.O_RDONLY | getattr(os, 'O_NONBLOCK', 0) | getattr(os, 'O_BINARY', 0))
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise InputError('input must be a regular file')
+        with os.fdopen(fd, 'rb', closefd=False) as stream:
+            data = stream.read(limit + 1)
+    finally:
+        os.close(fd)
     if len(data) > limit:
         raise InputError('input exceeds max input bytes limit')
     try:
