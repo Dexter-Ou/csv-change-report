@@ -189,3 +189,5 @@ has stopped. It labels comparison errors and incomplete work explicitly. See the
 Run `python3 evaluation/test-multiline-unicode.py` for the synthetic LF/CRLF oracle and batch/index checks. See [fixtures, expected counts and output cleanup](evaluation/MULTILINE-UNICODE.md).
 
 Malformed-input regression: [instructions](evaluation/MALFORMED-INPUT.md).
+
+For Linux output-failure checks and partial-report recovery, see [evaluation/OUTPUT-FAILURE.md](evaluation/OUTPUT-FAILURE.md).
