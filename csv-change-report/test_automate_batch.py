@@ -125,6 +125,50 @@ class AutomationTests(unittest.TestCase):
                     self.assertEqual({x.name: x.read_bytes() for x in self.reports.iterdir()},
                                      snapshot)
 
+    def test_empty_and_header_only_batch_records(self):
+        cases = [
+            (b'id,value\n', b'id,value\n', 0, (0, 0, 0, 0)),
+            (b'id,value\r\n', b'id,value\r\n1,a\r\n', 1, (1, 0, 0, 0)),
+            (b'id,value\n1,a\n', b'id,value\n', 1, (0, 1, 0, 0)),
+            (b'', b'', 2, None),
+            (b'', b'id,value\n', 2, None),
+            (b'id,value\n', b'', 2, None),
+        ]
+        valid = self.data / 'header-only.csv'
+        valid.write_bytes(b'id,value\n')
+        for index, (before, after, status, counts) in enumerate(cases):
+            with self.subTest(case=index):
+                self.before.write_bytes(before)
+                self.after.write_bytes(after)
+                self.reports = self.root / f'empty reports {index}'
+                self.manifest.write_text(json.dumps({'version': 1, 'pairs': [
+                    {'before': self.before.name, 'after': self.after.name, 'key': 'id'},
+                    {'before': valid.name, 'after': valid.name, 'key': 'id'}]}),
+                    encoding='utf-8')
+                code = {0: 'EQUAL', 1: 'CHANGED', 2: 'E_COMPARISON'}[status]
+                self.run_wrapper(code, status, 2)
+                lines = (self.reports / 'status.tsv').read_text().splitlines()
+                self.assertEqual(len(lines), 3)
+                for pair, expected_status in ((1, status), (2, 0)):
+                    stem = f'pair-{pair:04d}'
+                    report = stem + '.json' if expected_status < 2 else '-'
+                    self.assertEqual(lines[pair].split('\t'),
+                        [stem, str(expected_status), report, stem + '.stderr'])
+                    diagnostic = (self.reports / (stem + '.stderr')).read_bytes()
+                    if expected_status == 2:
+                        self.assertTrue(diagnostic)
+                        self.assertFalse((self.reports / (stem + '.json')).exists())
+                    else:
+                        self.assertEqual(diagnostic, b'')
+                        payload = json.loads((self.reports / report).read_bytes())
+                        expected = counts if pair == 1 else (0, 0, 0, 0)
+                        self.assertEqual(tuple(payload['counts'][name] for name in
+                            ('added', 'removed', 'changed', 'unchanged')), expected)
+                snapshot = {x.name: x.read_bytes() for x in self.reports.iterdir()}
+                self.run_wrapper('E_OUTPUT', 2, 2)
+                self.assertEqual({x.name: x.read_bytes() for x in self.reports.iterdir()},
+                                 snapshot)
+
     def test_all_equal(self):
         self.write_manifest(['equal', 'equal'])
         self.run_wrapper('EQUAL', 0, 2)
