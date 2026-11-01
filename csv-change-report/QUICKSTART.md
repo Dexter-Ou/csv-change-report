@@ -92,6 +92,32 @@ Place the optional byte budget first; omit it for the default 10 MiB per input.
 An over-budget input returns 2 with no JSON report. This is a raw-read limit,
 not a total-memory guarantee. Batch errors take precedence over changed status.
 
+## Open a local index of the saved batch
+
+After the batch command has returned and all writers have stopped, run:
+
+```sh
+status=0
+python3 evaluation/batch-index.py './quickstart reports' --expected-pairs 1 || status=$?
+printf 'Index status: %s\n' "$status"
+```
+
+Expected index status: 1 for this changed pair. Open
+`quickstart reports/index.html` locally to follow its JSON summary and diagnostic
+links. An empty diagnostic is normal for a successful pair. This page does not
+show old/new cell values or generate per-pair HTML comparison views.
+
+Supply the original expected pair count, including failed or unfinished pairs;
+counting saved rows can hide missing work. Status 2 means review required or
+creation refused: inspect the message and saved files. An existing index is
+preserved. Keep the whole stopped report directory together when copying or
+archiving it so the relative links still reach their files. Use trusted local
+directories; the index does not verify CSV provenance or concurrent writes.
+The count must be 1–100, the table at most 64 KiB, and each linked summary at
+most 1 MiB. See [the index guide](evaluation/BATCH-INDEX.md) for limits and
+[recovery instructions](evaluation/RECOVERY.md) before a fresh-directory retry.
+Browser interaction and accessibility remain untested.
+
 For your own authorized snapshots, quote paths, replace the key exactly and
 preserve originals. Avoid shell redirection onto inputs. See [the full rules](README.md)
 for limits, exclusive `--output`, optional exclusions and recovery, and
