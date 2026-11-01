@@ -22,7 +22,7 @@ test -f evaluation/ANSWER-KEY.md
 ```
 
 Then use the literal examples in QUICKSTART.md. The batch example creates
-`guide batch`; choose a fresh extraction or unused directory before rerunning.
+`quickstart reports`; choose a fresh extraction or unused directory before rerunning.
 Status 1 with --check means changes; status 2 means an error. Preserve outputs.
 The optional worksheet has no timing target or automatic score. 
 
