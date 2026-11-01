@@ -177,3 +177,9 @@ CSV inputs must be regular files; symlinks to regular files are accepted.
 Directories, devices and FIFOs are rejected. On POSIX, a nonblocking open and
 file-descriptor check also reject a FIFO substituted after the path check.
 This is not a general runtime deadline or a guarantee against all filesystem races.
+
+## Batch results index
+
+Create an offline table linking saved pair summaries and diagnostics after a batch
+has stopped. It labels comparison errors and incomplete work explicitly. See the
+[batch index guide](evaluation/BATCH-INDEX.md) for commands and snapshot limits.
