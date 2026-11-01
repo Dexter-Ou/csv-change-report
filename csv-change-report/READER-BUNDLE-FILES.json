@@ -4,7 +4,7 @@
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
     "QUICKSTART.md": "e661dfcdc49209a47d212e223a4e8614f28aeaaf83786f236abfb640229462b6",
-    "README.md": "2674cfa50243ef01a3b9927c9d195b67b2ab535b9a49e725d7df6e97b5af5170",
+    "README.md": "0c562c0e20c8d5b20e8acc65cb56d7a6757a3a85d7182e160838be49f0081a42",
     "RELEASE-FILES.json": "9a9d5074226e9a77b8a070b25a72bcffa067c7e4ac1f1727c8cedd6a99992ea7",
     "RELEASE.md": "a20bc9bdc83428915630b8aabfa13e1553e7eda09c214f109a60c1ca5e105bae",
     "csv_change.py": "46bcbc54238384748ba649fc92ad7136b8670b15b5727073807dc4cb85be4016",
@@ -34,7 +34,7 @@
     "test_batch_reports.py": "9fe167cd7ac891fc429f18a3daa38fb2deb3f7c6d33309d0f37150a0c2d60cf6",
     "test_csv_change.py": "1979381681a438aaf2f052f2d4cc212e6d2e962b71facbb9b030f91fb3ccfa0f",
     "test_ignore_columns.py": "2350310b08888512ebe4017b53cb1ce87b0fb2e881d56d739d6768844cef8f7b",
-    "test_input_budget.py": "9cbaff25b7764b32e403ce2160a60a45cacbd068dbf5702fec709851bf4edc3c",
+    "test_input_budget.py": "31b421e6e00f57fc691c0537f7fb059408b1f375a82d7bb1452682d2dda2ea4f",
     "test_summary.py": "f2ae998be8ec56a8dba342da612b19dfc6d52bd784768f40a7e15cca125ea7f9",
     "evaluation/automate-batch.py": "5db0ec119a823a095a927c30a373a5fc399e6c9cb6dabee6cf0624a420af6baf",
     "evaluation/sample-manifest.json": "10a4ffb966a4fa87a54f3d15fc802bb0676437c0911bf0a512e94508fba408a3",
