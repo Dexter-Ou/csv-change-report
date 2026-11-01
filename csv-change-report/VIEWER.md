@@ -21,7 +21,7 @@ This keeps every record count, changed-cell count by column, ignored-column name
 
 The viewer checks structure and internal totals. By default it does not reopen the CSVs. It does not verify source authenticity or establish that the report came from the named tool. Batch manifests, text reports, unknown formats and reports over 8 MiB are refused. Very wide/large valid reports may exceed the viewer limit; retain the JSON and use another local inspection method.
 
-Treat report headers and generated HTML as potentially sensitive metadata. The HTML escapes report text, contains no scripts or external resources, and requests a restrictive content security policy. It still contains column names, positions and source hashes; share only after review. Work in a trusted directory. Existing output paths are refused, including the input path. An I/O failure during a new write may leave a partial HTML file: retain your JSON and retry with a new output filename.
+Treat report headers and generated HTML as potentially sensitive metadata. The HTML escapes report text, contains no scripts or external resources, and requests a restrictive content security policy. It still contains column names, positions and source hashes; share only after review. Work in a trusted directory. Existing output paths are refused, including the input path. HTML is written to a private temporary sibling, closed, then hard-linked without replacing the requested path. Hard-link support is required. A pre-link write failure normally leaves no requested HTML. Cleanup failure can leave a complete HTML file with status 2; preserve failed-run evidence and follow the recovery steps below.
 
 This preview has synthetic Linux command and HTML parser tests. Interactive browser appearance, accessibility and Windows/macOS behavior have not been tested.
 
@@ -79,3 +79,33 @@ object-allocation patterns. The 44 KiB difference in the byte-heavy comparison
 is too small to interpret from one sample. These observations are not an upper
 bound or a cross-platform result. Keep the input limits and available memory
 in mind even when choosing smaller output.
+
+## HTML output failures and recovery
+
+The temporary sibling uses the `.csv-view-` prefix and mode 0600 on the tested
+Linux environment, subject to process umask. This is not a universal privacy
+guarantee. Output errors return 2 without the success message.
+
+When cleanup fails, an `E_OUTPUT: ` line contains JSON with `output_committed`
+and `cleanup_required`. Committed means the hard-link call returned; it does not
+mean durable storage. If another write/link failure also occurred, a second
+fixed-text E_OUTPUT line follows. Parse only the JSON-bearing line as JSON.
+These diagnostics omit supplied paths and OS exception messages.
+
+Keep the saved JSON, command status and all diagnostic lines. Inspect the trusted
+output directory for `.csv-view-` siblings. Remove only files confirmed to belong
+to that run. Preserve complete HTML and do not blindly retry the same path.
+After repairing the cause, rerun from retained JSON using a fresh output filename.
+Unsupported hard links fail closed; choose a filesystem supporting hard links.
+Do not replace this procedure with redirection onto an existing file.
+
+Run the permanent output regression checks with:
+
+```sh
+python3 -m unittest -v test_view_output
+```
+
+The tests include real per-child Linux file-size ceilings and injected link and
+cleanup exceptions. File-size ceilings are not actual disk exhaustion. Crashes,
+fsync/power loss, adversarial directory races, interactive browser appearance,
+accessibility and Windows/macOS behavior are untested. Crashes can leave siblings.
