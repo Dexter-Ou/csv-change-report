@@ -84,6 +84,31 @@ class IndexTests(unittest.TestCase):
     def test_truncated_table(self):
         self.batch(['equal']);p=self.out/'status.tsv';p.write_bytes(p.read_bytes()[:-1]);self.index(1,2);self.assertFalse((self.out/'index.html').exists())
 
+    def test_per_pair_counts_from_validated_summaries(self):
+        self.before.write_text('id,value\n1,a\n2,b\n3,c\n')
+        self.after.write_text('id,value\n1,z\n3,c\n4,d\n')
+        self.batch(['equal','changed','error']);self.index(3,2)
+        text=(self.out/'index.html').read_text()
+        rows=text.split('<tbody>')[1].split('</tbody>')[0].split('</tr>')
+        self.assertIn('<td>0</td><td>0</td><td>0</td><td>3</td>',rows[0])
+        self.assertIn('<td>1</td><td>1</td><td>1</td><td>1</td>',rows[1])
+        self.assertEqual(rows[2].count('<td>Unavailable</td>'),4)
+        for header in ('Added rows','Removed rows','Changed rows','Unchanged rows'):
+            self.assertIn('<th scope="col">'+header+'</th>',text)
+
+    def test_unavailable_counts_never_render_as_zero(self):
+        self.batch(['equal','changed','equal'])
+        (self.out/'pair-0001.json').unlink()
+        p=self.out/'pair-0002.json';report=json.loads(p.read_text())
+        report['counts']['changed']=False;p.write_text(json.dumps(report))
+        p=self.out/'status.tsv';p.write_text('\n'.join(p.read_text().splitlines()[:3])+'\n')
+        self.index(3,2)
+        text=(self.out/'index.html').read_text()
+        self.assertEqual(text.count('<td>Unavailable</td>'),12)
+        self.assertEqual(text.count('ERROR — missing or invalid summary'),2)
+        self.assertIn('INCOMPLETE — no completed status row',text)
+        self.assertNotIn('JSON summary</a>',text)
+
     def test_refusal_guidance_and_recovery(self):
         self.batch(['equal'])
         result=self.index(0,2)
