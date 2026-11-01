@@ -43,6 +43,42 @@ python3 csv_change.py examples/before.csv examples/after.csv --key id --format t
 This also returns 1. These expected nonzero results can stop scripts using
 `set -e`; handle comparison statuses deliberately.
 
+## Save a report and open it as HTML
+
+Use the [pinned preview download](https://github.com/Dexter-Ou/csv-change-report/archive/708201fee61caeac4f29dc99d982460e95e5390d.zip)
+for this walkthrough. After extracting it, enter the inner `csv-change-report`
+folder. Choose a trusted writable directory with hard-link support and fresh
+output names. Run each command separately:
+
+```sh
+python3 csv_change.py examples/before.csv examples/after.csv --key id --check --output export-review.json
+python3 view_report.py export-review.json --before-csv examples/before.csv --after-csv examples/after.csv --output export-review.html
+```
+
+The comparison returns **1** for the expected changes and saves JSON; this is
+not an error. The viewer returns **0** and saves HTML. If automating, accept
+comparison status 0 or 1 before invoking the viewer; stop on 2. Do not connect
+these two commands with `&&`, which would skip the viewer after status 1.
+
+Open `export-review.html` in your local browser. Expect the same counts as above
+and `status` as the changed column, with before/after record positions 1.
+The explicit CSV arguments also check their bytes against the saved hashes;
+this does not prove report provenance or correctness. The viewer reads saved
+JSON rather than recomputing the comparison. Keep the JSON and original CSVs.
+
+Existing output paths are refused with status 2 and preserved. A viewer output
+error can leave complete HTML and a temporary sibling if cleanup fails; status
+2 is not success even when HTML exists. Preserve stderr and failed-run files,
+inspect the trusted directory, and use a fresh output name after correcting the
+cause. See [HTML output recovery](../csv-change-report/VIEWER.md#html-output-failures-and-recovery)
+for the cleanup diagnostics. Do not redirect output over an input file.
+
+HTML has no scripts or external resources, but still exposes report metadata.
+Review it before sharing. JSON over 8 MiB is refused. The commands have synthetic
+Linux coverage; interactive browser appearance, accessibility and Windows/macOS
+behavior are untested. For aggregate-only HTML or other viewer options, see the
+[viewer guide](../csv-change-report/VIEWER.md).
+
 ## Reproduce row-order and changed-key behavior
 
 From the same inner folder, save the following as `try_export_keys.py` in a
