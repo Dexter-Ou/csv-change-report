@@ -172,3 +172,8 @@ Use `examples/batch.json` for a synthetic changed/equal batch.
 ## Saved report viewer
 
 Create a local static HTML view of a saved single-pair JSON report with `python3 view_report.py saved-review.json --output saved-review.html`. See [the viewer guide](VIEWER.md) for fresh-start commands, supported formats and limits.
+
+CSV inputs must be regular files; symlinks to regular files are accepted.
+Directories, devices and FIFOs are rejected. On POSIX, a nonblocking open and
+file-descriptor check also reject a FIFO substituted after the path check.
+This is not a general runtime deadline or a guarantee against all filesystem races.
