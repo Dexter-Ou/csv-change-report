@@ -1,3 +1,11 @@
+# Optional breaks in long HTML text
+
+The HTML viewer inserts inert optional break elements in long ASCII words,
+including column labels and hashes. Reconstructed text and escaping are
+preserved by synthetic parser tests; Unicode words remain intact. CSP is
+unchanged. Actual browser layout, clipboard behavior, screen readers and
+accessibility conformance have not been tested. CLI version stays 0.1.10-preview.
+
 # Failure-safe HTML viewer output
 
 HTML writes now use a private temporary sibling and no-clobber hard link.
