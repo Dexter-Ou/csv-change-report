@@ -75,6 +75,12 @@ class IndexTests(unittest.TestCase):
         self.index(1,2);self.assertIn('missing or invalid summary',(self.out/'index.html').read_text())
         (self.out/'index.html').unlink();(self.out/'index.html').symlink_to(self.root/'absent')
         self.index(1,2);self.assertFalse((self.root/'absent').exists())
+    def test_size_and_count_limits(self):
+        self.batch(['equal']);self.index(101,2);self.assertFalse((self.out/'index.html').exists())
+        (self.out/'pair-0001.json').write_bytes(b' ' * 1048577)
+        self.index(1,2);self.assertIn('missing or invalid summary',(self.out/'index.html').read_text())
+        (self.out/'index.html').unlink();(self.out/'status.tsv').write_bytes(b' ' * 65537)
+        self.index(1,2);self.assertFalse((self.out/'index.html').exists())
     def test_truncated_table(self):
         self.batch(['equal']);p=self.out/'status.tsv';p.write_bytes(p.read_bytes()[:-1]);self.index(1,2);self.assertFalse((self.out/'index.html').exists())
 
