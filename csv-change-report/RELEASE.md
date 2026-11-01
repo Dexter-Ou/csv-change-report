@@ -1,3 +1,13 @@
+# Failure-safe report output
+
+Report-file writes use a private temporary sibling
+and no-clobber hard-link publication. Pre-link write faults normally leave no
+requested destination. Cleanup failure retains conservative error 2 and explicit
+committed/cleanup-required diagnostics. Batch handling remains conservative.
+See evaluation/OUTPUT-FAILURE.md for requirements, regressions and manual recovery.
+Hard-link support is required; crash durability and other platforms are untested.
+CLI version remains 0.1.10-preview.
+
 # JSON manifest preflight
 
 Adds `--validate-only --json` with versioned fixed-code metadata and validated
