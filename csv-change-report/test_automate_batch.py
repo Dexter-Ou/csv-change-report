@@ -169,6 +169,42 @@ class AutomationTests(unittest.TestCase):
                 self.assertEqual({x.name: x.read_bytes() for x in self.reports.iterdir()},
                                  snapshot)
 
+    def test_bom_headers_and_non_ascii_values(self):
+        # BOM handling is per CSV input; Unicode keys/values remain logical records.
+        original = 'id,value\nclé,café\n東京,雪\n🙂,naïve\n'.encode('utf-8')
+        revised = original.replace('雪'.encode('utf-8'), '雨'.encode('utf-8'))
+        for index, (old_bom, new_bom) in enumerate(((True, True), (True, False),
+                                                   (False, True), (False, False))):
+            with self.subTest(before_bom=old_bom, after_bom=new_bom):
+                prefix = b'\xef\xbb\xbf'
+                self.before.write_bytes((prefix if old_bom else b'') + original)
+                equal = self.data / 'equal.csv'
+                equal.write_bytes((prefix if new_bom else b'') + original)
+                self.after.write_bytes((prefix if new_bom else b'') + revised)
+                for offset, (names, code, status, statuses) in enumerate((
+                        ([equal.name], 'EQUAL', 0, [0]),
+                        ([equal.name, self.after.name], 'CHANGED', 1, [0, 1]),
+                        (['missing.csv', equal.name, self.after.name],
+                         'E_COMPARISON', 2, [2, 0, 1]))):
+                    self.reports = self.root / f'bom reports {index}-{offset}'
+                    pairs = [{'before': self.before.name, 'after': name, 'key': 'id'}
+                             for name in names]
+                    self.manifest.write_text(json.dumps({'version': 1, 'pairs': pairs}),
+                                             encoding='utf-8')
+                    self.run_wrapper(code, status, len(pairs))
+                    self.check_table(statuses)
+                    for pair, pair_status in enumerate(statuses, 1):
+                        if pair_status < 2:
+                            payload = json.loads((self.reports /
+                                f'pair-{pair:04d}.json').read_bytes())
+                            self.assertEqual(payload['counts'],
+                                {'before': 3, 'after': 3, 'added': 0, 'removed': 0, 'changed': pair_status,
+                                 'unchanged': 3 - pair_status})
+                    snapshot = {x.name: x.read_bytes() for x in self.reports.iterdir()}
+                    self.run_wrapper('E_OUTPUT', 2, len(pairs))
+                    self.assertEqual({x.name: x.read_bytes() for x in self.reports.iterdir()},
+                                     snapshot)
+
     def test_all_equal(self):
         self.write_manifest(['equal', 'equal'])
         self.run_wrapper('EQUAL', 0, 2)
