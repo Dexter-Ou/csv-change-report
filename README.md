@@ -10,10 +10,10 @@ Requires an existing Python 3.10+ installation; standard library only. No packag
 installation, account, API key or network connection is needed to run the tool.
 Python 3.12.15 on Linux has been tested; Windows/macOS have not been tested.
 
-1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/372dab34792420a393d23499f9921149f74d4aa0).
+1. [Download the complete tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/6bc01c3e9a4e96c85d070da0d6638e1e670aea74).
    This link pins the synthetic-tested code, rather than following future edits.
 2. Extract it into a new folder. Open a terminal in the extracted outer folder
-   named `csv-change-report-372dab34792420a393d23499f9921149f74d4aa0`.
+   named `csv-change-report-6bc01c3e9a4e96c85d070da0d6638e1e670aea74`.
 3. Enter its inner product folder and run the included synthetic example:
 
 ```sh
