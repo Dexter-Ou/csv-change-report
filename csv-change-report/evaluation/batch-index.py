@@ -61,13 +61,19 @@ def main():
     parser.add_argument('directory', type=Path)
     parser.add_argument('--expected-pairs', type=int, required=True)
     args = parser.parse_args()
+    if not 1 <= args.expected_pairs <= 100:
+        print('Cannot create index: --expected-pairs must be 1–100; use the original manifest pair count.', file=sys.stderr)
+        return 2
     try:
         page, status = render(args.directory, args.expected_pairs)
         # Exclusive creation preserves existing files, including dangling symlinks.
         with (args.directory / 'index.html').open('x', encoding='utf-8') as stream:
             stream.write(page)
+    except FileExistsError:
+        print('Cannot create index: index.html already exists; preserve the stopped directory, then deliberately move the old index aside before retrying.', file=sys.stderr)
+        return 2
     except (OSError, UnicodeError, ValueError, TypeError, KeyError, RecursionError):
-        print('Cannot create index: preserve the directory and inspect table, files and output path.', file=sys.stderr)
+        print('Cannot create index: preserve the stopped directory; check status.tsv, linked files and output permissions. See evaluation/BATCH-INDEX.md and evaluation/RECOVERY.md; do not edit saved status rows to force acceptance.', file=sys.stderr)
         return 2
     print('Created index.html; status 0=equal, 1=changed, 2=review required.')
     return status
