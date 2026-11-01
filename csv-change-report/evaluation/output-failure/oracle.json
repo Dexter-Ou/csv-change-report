@@ -1,0 +1,5 @@
+{
+  "write": "output file could not be written",
+  "exists": "output path already exists",
+  "collision": "output path matches an input"
+}
