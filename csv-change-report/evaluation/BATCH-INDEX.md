@@ -23,3 +23,8 @@ A wrong supplied pair count can hide missing work. Regular-file symlinks are
 refused for linked files and the table; trusted, stopped directories are required.
 Tests inspect HTML source and local links; browser interaction and accessibility
 have not been verified. Use RECOVERY.md for a fresh-directory retry.
+
+The supplied expected count must be 1–100. The status table must be at most
+64 KiB; each linked summary must be at most 1 MiB. A larger otherwise valid
+summary is labeled unavailable by this index; preserve it and inspect it with
+the other report tools. These index limits do not change comparator limits.
