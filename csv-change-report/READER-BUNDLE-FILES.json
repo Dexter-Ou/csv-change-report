@@ -54,6 +54,11 @@
     "VIEWER.md": "0d0f836765aa03a8c907d815b04f523bb7301c5a3268f8e4214a3729ba07a9d4",
     "evaluation/batch-index.py": "5ae00aa8839c3ffbc7add2f0cd5cb8df691c191c098a1fcae2448ce18dbfc4ea",
     "evaluation/BATCH-INDEX.md": "2b5ec3112d72c1c050cf7c18cdcdf0b1599be6e1de848a23f7ff8819c6278dfd",
-    "test_batch_index.py": "43d3f1d71fa7a2d582caf8cf12cfe56eadbad6ce1346dc9278b426429301a076"
+    "test_batch_index.py": "43d3f1d71fa7a2d582caf8cf12cfe56eadbad6ce1346dc9278b426429301a076",
+    "examples/mixed-batch/before.csv": "2eb910974bcfb919e9406b728e9f11952971ad2b4afa3babda5fa69d125591ef",
+    "examples/mixed-batch/after.csv": "5eb51e7192b756984726dcb61e4df2f45106f1b961f2449822f1fa7dbbb76ae3",
+    "examples/mixed-batch/duplicate-key.csv": "f0d585267b1fbd5f92c597dfa24562e29489682c972dc20ba982b4fca29bb925",
+    "examples/mixed-batch/manifest.json": "1b461efd55d9a715b65bcc4db9e66de99cedca16be7d218c96e65afaf0cec29a",
+    "examples/mixed-batch/README.md": "706f2512785595a4c771048fb100a9d020ee8f2ee4692098de0c7a138cf6b596"
   }
 }
