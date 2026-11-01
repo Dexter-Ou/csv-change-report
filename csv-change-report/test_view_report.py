@@ -2,6 +2,8 @@
 import copy
 from html.parser import HTMLParser
 import json
+import os
+from unittest import mock
 from pathlib import Path
 import subprocess
 import sys
@@ -37,6 +39,41 @@ class ViewerTests(unittest.TestCase):
         source = self.work / 'saved.json'; source.write_text(raw)
         result = subprocess.run([sys.executable, str(ROOT / 'view_report.py'), str(source), '--output', str(self.work / target), *extra], capture_output=True, text=True)
         return result, self.work / target
+
+
+    def test_nonregular_retained_sources_refused(self):
+        special = [self.work]
+        if hasattr(os, 'mkfifo'):
+            fifo = self.work / 'input.fifo'; os.mkfifo(fifo); special.append(fifo)
+        if Path('/dev/null').exists(): special.append(Path('/dev/null'))
+        source = self.work / 'saved.json'; source.write_text(json.dumps(self.report))
+        for position in ('before', 'after'):
+            for i, path in enumerate(special):
+                with self.subTest(position=position, path=str(path)):
+                    out = self.work / f'{position}-{i}.html'
+                    before = path if position == 'before' else ROOT / 'examples/before.csv'
+                    after = path if position == 'after' else ROOT / 'examples/after.csv'
+                    result = subprocess.run([sys.executable, str(ROOT / 'view_report.py'), str(source), '--before-csv', str(before), '--after-csv', str(after), '--output', str(out)], capture_output=True, timeout=3)
+                    self.assertEqual(result.returncode, 2); self.assertIn(b'E_SOURCE', result.stderr)
+                    self.assertFalse(out.exists())
+        self.assertEqual(json.loads(source.read_text()), self.report)
+
+    @unittest.skipUnless(hasattr(os, 'mkfifo'), 'POSIX FIFO required')
+    def test_opened_descriptor_rechecked_and_closed(self):
+        fifo = self.work / 'swapped.fifo'; os.mkfifo(fifo)
+        fd = os.open(fifo, os.O_RDONLY | os.O_NONBLOCK)
+        # Simulate a path swap after the regular-file stat. This is a synthetic
+        # descriptor injection, not proof of all real concurrent filesystem races.
+        with mock.patch.object(view_report.os, 'open', return_value=fd):
+            with self.assertRaises(ValueError):
+                view_report.compare_sources(self.report, ROOT / 'examples/before.csv', ROOT / 'examples/after.csv')
+        with self.assertRaises(OSError): os.fstat(fd)
+
+    @unittest.skipUnless(hasattr(os, 'symlink'), 'symlink required')
+    def test_regular_symlinks_supported(self):
+        before = self.work / 'before-link.csv'; before.symlink_to(ROOT / 'examples/before.csv')
+        after = self.work / 'after-link.csv'; after.symlink_to(ROOT / 'examples/after.csv')
+        self.assertEqual(view_report.compare_sources(self.report, before, after), [])
 
     def test_fresh_comparator_journeys(self):
         for label, args in [('details', []), ('summary', ['--summary-only']), ('ignored', ['--ignore-column', 'status'])]:
