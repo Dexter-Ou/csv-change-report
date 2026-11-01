@@ -447,6 +447,78 @@ For a literal missing-CSV preflight, failed execution and preserved retry, follo
 [RECOVERY.md, steps 4–5](RECOVERY.md#4-separate-manifest-preflight-from-csv-execution).
 
 
+### Observe a CSV change after successful preflight
+
+Run this self-contained synthetic example from the extracted product directory.
+It creates `preflight-change-demo` and refuses an existing directory. Choose a
+new name in the block before repeating; preserve earlier reports. The block also
+works inside a POSIX shell using `set -e`: Python captures expected CLI statuses.
+No supplied export or bundled example is modified.
+
+```sh
+python3 - <<'PYDEMO'
+from pathlib import Path
+import hashlib
+import json
+import subprocess
+import sys
+
+root = Path('preflight-change-demo')
+root.mkdir(mode=0o700)  # Refuse repeats; never overwrite a previous demonstration.
+cli = [sys.executable, 'evaluation/batch-manifest.py']
+equal = b'id,status\n1,open\n'
+changed = b'id,status\n1,closed\n'
+duplicate = b'id,status\n1,open\n1,closed\n'
+for name, initial, later, expected in [
+    ('changed-to-equal', changed, equal, 0),
+    ('equal-to-changed', equal, changed, 1),
+    ('valid-to-duplicate', equal, duplicate, 2),
+]:
+    work = root / name
+    work.mkdir()
+    before = work / 'before.csv'
+    after = work / 'after.csv'
+    manifest = work / 'pairs.json'
+    before.write_bytes(equal)
+    after.write_bytes(initial)
+    manifest.write_text(json.dumps({'version': 1, 'pairs': [
+        {'before': 'before.csv', 'after': 'after.csv', 'key': 'id'}
+    ]}), encoding='utf-8')
+    command = cli + ['--validate-only', '--json', str(manifest)]
+    first = subprocess.run(command, capture_output=True, check=False)
+    metadata = json.loads(first.stdout)
+    assert first.returncode == 0 and metadata['valid'] is True
+    assert metadata['csv_files_checked'] is False
+    assert metadata['reports_created'] is False
+    assert not (work / 'reports').exists()
+    after.write_bytes(later)  # Deliberately change the CSV after preflight.
+    second = subprocess.run(command, capture_output=True, check=False)
+    assert second.returncode == 0 and second.stdout == first.stdout
+    paths = [manifest, before, after]
+    hashes = [hashlib.sha256(path.read_bytes()).hexdigest() for path in paths]
+    run = subprocess.run(cli + ['--totals', str(manifest), str(work / 'reports')],
+                         capture_output=True, check=False)
+    (work / 'execution.stdout').write_bytes(run.stdout)
+    (work / 'execution.stderr').write_bytes(run.stderr)
+    assert run.returncode == expected, (name, run.returncode)
+    assert hashes == [hashlib.sha256(path.read_bytes()).hexdigest() for path in paths]
+    table = (work / 'reports' / 'status.tsv').read_text(encoding='utf-8')
+    assert table.splitlines()[1].split('\t')[1] == str(expected)
+    assert (work / 'reports' / 'pair-0001.json').exists() == (expected != 2)
+    print(f'{name}: preflight=0 repeated=0 execution={run.returncode}')
+print('Manifest and observed CSV bytes preserved during execution.')
+PYDEMO
+```
+
+Expected execution statuses, in order: 0, 1, 2. Both preflights return identical
+successful metadata for each pair despite the CSV change. The error case retains
+its diagnostic and status table, with no successful pair JSON. Status 2 is an
+error, never equality; inspect the retained diagnostics locally. The block keeps
+execution stdout/stderr alongside reports and checks input bytes after execution.
+It demonstrates sequential reads on synthetic files, not hostile concurrency,
+symlink confinement, atomic snapshots or crash safety. A successful preflight
+validates the manifest only; preserve stable CSV copies for repeatable work.
+
 ### Automate preflight and handle execution separately
 
 Run this synthetic walkthrough from the inner `csv-change-report` directory with
