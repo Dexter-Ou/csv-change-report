@@ -33,9 +33,9 @@ class ViewerTests(unittest.TestCase):
         self.work = Path(self.tmp.name)
         self.report = json.loads((ROOT / 'examples/expected-report.json').read_text())
 
-    def run_view(self, raw, target='view.html'):
+    def run_view(self, raw, target='view.html', extra=()):
         source = self.work / 'saved.json'; source.write_text(raw)
-        result = subprocess.run([sys.executable, str(ROOT / 'view_report.py'), str(source), '--output', str(self.work / target)], capture_output=True, text=True)
+        result = subprocess.run([sys.executable, str(ROOT / 'view_report.py'), str(source), '--output', str(self.work / target), *extra], capture_output=True, text=True)
         return result, self.work / target
 
     def test_fresh_comparator_journeys(self):
@@ -108,6 +108,35 @@ class ViewerTests(unittest.TestCase):
         html = view_report.render(r)
         self.assertIn('Zero details must not be inferred.', html)
         self.assertNotIn('<p>None</p>', html)
+
+    def test_counts_only_preserves_metadata_and_refuses_collision(self):
+        raw = json.dumps(self.report)
+        result, out = self.run_view(raw, extra=('--counts-only',))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        html = out.read_text(); parsed = Tags(); parsed.feed(html)
+        default = Tags(); default.feed(view_report.render(self.report))
+        self.assertEqual(parsed.cells[:12], default.cells[:12])
+        for pair in self.report['changed_cells_by_column'].items():
+            self.assertIn(str(pair[0]), parsed.cells)
+            self.assertIn(str(pair[1]), parsed.cells)
+        for name in ('before_sha256', 'after_sha256'):
+            self.assertIn(self.report[name], parsed.cells)
+        self.assertIn('Counts-only view:', html)
+        self.assertIn('remain in the saved detailed JSON', html)
+        self.assertNotIn('<h3>Changed records</h3>', html)
+        before = out.read_bytes()
+        result, _ = self.run_view(raw, extra=('--counts-only',))
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(out.read_bytes(), before)
+        self.assertEqual((self.work / 'saved.json').read_text(), raw)
+        bad = copy.deepcopy(self.report); bad['changed_records'][0]['before_record'] = 0
+        result, invalid = self.run_view(json.dumps(bad), 'invalid-counts.html', ('--counts-only',))
+        self.assertEqual(result.returncode, 2); self.assertFalse(invalid.exists())
+        summary = copy.deepcopy(self.report)
+        for name in ('added_after_records', 'removed_before_records', 'changed_records'): del summary[name]
+        summary.update(format_version=2, report_mode='summary')
+        html = view_report.render(summary, counts_only=True)
+        self.assertIn('Summary only:', html); self.assertNotIn('Counts-only view:', html)
 
     def test_size_limit_and_missing_input(self):
         result, out = self.run_view(' ' * (view_report.MAX_BYTES + 1))
