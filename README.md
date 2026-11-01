@@ -54,6 +54,8 @@ HTML with status 2; see [viewer output recovery](csv-change-report/VIEWER.md#htm
 
 ## More workflows
 
+- [Review a fictional inventory export and resolve an invalid stock ID](https://github.com/Dexter-Ou/csv-change-report/blob/a38d2a40f42e2c944335df8174cd915c8a129e72/csv-change-report/examples/inventory-reconciliation/README.md).
+
 - [Fix blank or duplicate CSV keys with a worked example](csv-change-report/examples/stable-key/README.md).
 - [Compare CSV exports by ID instead of line number](docs/COMPARE-CSV-EXPORTS.md).
 - [Choose text, detailed JSON, summary or batch reports](csv-change-report/QUICKSTART.md).
