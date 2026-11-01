@@ -59,3 +59,6 @@ and [recovery guidance](evaluation/RECOVERY.md). Index limits include 1–100 ex
 pairs, a 64 KiB status table and 1 MiB per summary. A report is not export approval
 or proof of source authenticity. Synthetic Linux command checks cover these
 examples; interactive browser appearance, accessibility and Windows/macOS are untested.
+
+HTML viewer output also requires hard links. Cleanup failure may leave complete
+HTML with status 2; see [viewer output recovery](VIEWER.md#html-output-failures-and-recovery).
