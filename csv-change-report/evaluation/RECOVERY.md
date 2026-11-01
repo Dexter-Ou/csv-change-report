@@ -278,3 +278,6 @@ For a runnable automation caller that reads partial row and column totals after
 
 For status-only counts versus validated totals and regeneration from retained
 inputs, see [DAMAGED-REPORT-RECOVERY.md](DAMAGED-REPORT-RECOVERY.md).
+
+For a self-contained relative-path bundle moved to a new trusted directory, see
+[RELOCATION-RECOVERY.md](RELOCATION-RECOVERY.md).
