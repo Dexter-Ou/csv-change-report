@@ -1,14 +1,14 @@
 {
   "base_commit": "1abe9da5ab24fd0e699171c0160243a5327e2f82",
-  "status": "Failure-safe HTML viewer output preview",
+  "status": "Optional HTML text breaks preview; synthetic tests only",
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
     "PREVIEW.md": "96d8f3ebe61445b0485effe5d71299bc077fd3c270a35da87ebf556ec4777390",
     "QUICKSTART.md": "81e38d1d454ddc6a381c1f786478fec846d601d4a6f7458a528a4dea5d9b9c48",
     "README.md": "6e57d0523ac7ea607b31496010b6f95744cebc5b80b975bcc5349a00ef2b5d68",
-    "RELEASE-FILES.json": "ece77188d106acd9bf14809741a87d37587aa3b3a09eee2ae6bf9d4910e0eb52",
-    "RELEASE.md": "943bbffb6c39cd948b634432c933c0c83ca3402e1a9519ab2c393a4b454b893b",
-    "VIEWER.md": "7eae7b29cfcd7d22f4aeba9da766bbb7b61858aea4711a9095bac5221022ec63",
+    "RELEASE-FILES.json": "acd59fea162854b4be8f6e24a36b629b1d3c8ec4637356518caaf5932ce181f0",
+    "RELEASE.md": "7382ebbfe74ba5ea88057217c2d150919c99e84e4d69ae3543c348f6c7d5f614",
+    "VIEWER.md": "dae3c18be43bd296aedbfdbf6b8a9f52c540267781ef1dc3777f185e1fcb6233",
     "csv_change.py": "da8f13c49923af38132ee06bba292fcf2967b2b19a5758ffb4539ed0ee1e6b41",
     "evaluation/ANSWER-KEY.md": "98f402ccdb5998dbe127542dc9099b5b941048c2b94ba6b79236615db4ada66f",
     "evaluation/AUTOMATION-TOTALS.md": "a2b6848c3c70cb0afa2248e4b19dfcf7ec71d8168b3847c43fc6c536e23b75b3",
@@ -77,7 +77,8 @@
     "test_input_budget.py": "dc14eab8929615ebb778d6b703d510018918ad32bdc5592c4c44fc2863235e60",
     "test_summary.py": "f2ae998be8ec56a8dba342da612b19dfc6d52bd784768f40a7e15cca125ea7f9",
     "test_view_output.py": "838550b963843b98511bf361afc7553224c49b20fbf1c6600fc76cf99848669d",
-    "test_view_report.py": "60a5f7b07b35d9f814c7988fab4f40c78624769b95df0e897efc843bb2737b54",
-    "view_report.py": "dbac628c770c7380499e20139cad25d8ad61d778652a34a049bede259e944eda"
+    "test_view_report.py": "59ae1e46dcba5e9f465a002d7d3b414fba69384354aa5cc668708f4f65e8bfad",
+    "test_view_wrapping.py": "3d8c1a95bd5f6c964ee2870426fb243f8b5e7b492820e6250c3d27c89a69e453",
+    "view_report.py": "3d8f06ac868bfc124f12e4c3d1474cc4a0b7edfcd25a2c4a330f906f5144fdc8"
   }
 }
