@@ -4,7 +4,7 @@
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
     "QUICKSTART.md": "0e735d7e7440f3050cbd49c4926fe80edb00130a829c0f0548173149420d0d98",
-    "README.md": "09946b914a507cb5e770ee575d0228f228800e8520c4baa90dd675d9e7cf1c5c",
+    "README.md": "447402f485318d4e9d33dbaa48245cad4353c6ffc649fb6fb4714f74f9a8aedd",
     "RELEASE-FILES.json": "9a9d5074226e9a77b8a070b25a72bcffa067c7e4ac1f1727c8cedd6a99992ea7",
     "RELEASE.md": "a20bc9bdc83428915630b8aabfa13e1553e7eda09c214f109a60c1ca5e105bae",
     "csv_change.py": "5ba68a9ca727ebded5c3e7daa9a6d7c4230904bc24d3918c8dd93a6cb6b25389",
@@ -63,6 +63,13 @@
     "examples/interrupted-batch/demo.py": "1a880eae28da01ae3ac0b372e243b3dc7293d80ca29f2429995071fb3119204e",
     "examples/interrupted-batch/manifest.json": "cf336dc1502b2e53a057544a7eacaf3e2bb7ffefa70e6fca918629ff4496e8cd",
     "examples/interrupted-batch/README.md": "992826610b15e5b9db156a673bd3614b0b6bdf4408e32c47be251c69460e48d6",
-    "PREVIEW.md": "ddf5407339c7b80279298919ccb7d07dc0f2472783d354a54f4049b2993dda97"
+    "PREVIEW.md": "ddf5407339c7b80279298919ccb7d07dc0f2472783d354a54f4049b2993dda97",
+    "evaluation/test-multiline-unicode.py": "c1264f730720abff47be6027fc260f4e7762ce9b490c9a2e08a238ecc89f8192",
+    "evaluation/MULTILINE-UNICODE.md": "1a6d4470f9088c179457b4c10893ce4d813386cb84c41d3974f489eeef44ec3b",
+    "evaluation/multiline-unicode/oracle.json": "73f7440c589903f65cf87f30061ad1d4c057053fda8b163d186f03d62477bcb4",
+    "evaluation/multiline-unicode/before-LF.csv": "4d49ca32110987eed0dff1f95a2d16a0384c6c1b4755c7fb0b009b30a902c4c8",
+    "evaluation/multiline-unicode/after-LF.csv": "531d97bc9e611365566f8a0bd8f7eec45da494460f2bfda7efed9437df88eca0",
+    "evaluation/multiline-unicode/before-CRLF.csv": "0a16def14e30c69d36c919e6048b00dcbddae47513c130eb4d0f5df5707fe756",
+    "evaluation/multiline-unicode/after-CRLF.csv": "b986e3bbf0a39a1d2c5556d637b064612e9dd905cdb1e737862796afb5025e04"
   }
 }
