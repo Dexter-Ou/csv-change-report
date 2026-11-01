@@ -750,3 +750,7 @@ is unchanged.
 The synthetic automation regressions also cover quoted commas, escaped quotes,
 embedded LF field newlines, and LF/CRLF record endings. They check logical
 record counts, statuses 0/1/2, and preservation of inputs and existing reports.
+
+Synthetic batch regression coverage includes header-only equality, addition/removal
+against header-only CSVs, and zero-byte input errors with later pairs completing.
+Inputs and existing output bytes are checked for preservation.
