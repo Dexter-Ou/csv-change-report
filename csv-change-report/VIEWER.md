@@ -47,3 +47,35 @@ reading. On POSIX the open is nonblocking and its descriptor is checked again,
 so a path replaced by a FIFO between the checks is refused. The 8 MiB JSON
 limit still applies. This is not a general runtime deadline: slow filesystems,
 large regular inputs and concurrent file changes remain possible.
+
+## Report size and memory
+
+Use comparison `--summary` when you need aggregate counts without per-record
+positions. Use viewer `--counts-only` when a detailed JSON report already exists
+and you want smaller HTML. Both options omit positions from their output, but
+they do different work: comparison still loads both CSV snapshots, and the
+viewer still reads and validates the whole JSON, including its positions.
+Neither option is a streaming mode or a fixed memory bound.
+
+One synthetic Linux run per configuration on Python 3.12.15 measured:
+
+| Input / operation | Default peak RSS (KiB) | With option (KiB) |
+|---|---:|---:|
+| Compare 50,000 rows × 5 columns per CSV | 91,972 | 62,204 (`--summary`) |
+| Compare 9,998,897 bytes per CSV | 95,216 | 95,260 (`--summary`) |
+| View the first detailed report (7,678,349-byte JSON) | 68,388 | 58,120 (`--counts-only`) |
+
+Each CSV row changed in every non-key column. The first fixture reached 250,000
+cells per input; the byte-heavy fixture had 999 rows × 5 columns with
+2,500-character non-key fields. Summary JSON was 501 versus 7,678,349 bytes for
+the first fixture, while counts-only HTML was 1,671 versus 5,479,712 bytes.
+These size reductions do not imply comparable parsing-memory reductions.
+
+RSS includes the interpreter and was measured with Linux `wait4`. Each command
+ran under a test-only 512 MiB address-space ceiling, 30 CPU seconds and 45 wall
+seconds; those ceilings are not imposed by the product. Cache state and machine
+load were uncontrolled, and these ASCII fixtures do not cover all Unicode or
+object-allocation patterns. The 44 KiB difference in the byte-heavy comparison
+is too small to interpret from one sample. These observations are not an upper
+bound or a cross-platform result. Keep the input limits and available memory
+in mind even when choosing smaller output.
