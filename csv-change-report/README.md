@@ -58,8 +58,10 @@ empty. The destination must be new: existing files, directories, hard links and
 symlinks are refused. Paths resolving to either input are rejected. New files use
 owner-only permissions on Linux (subject to a more restrictive process umask).
 Inputs are validated before creating the output. Errors remain fixed JSON on stderr.
-A write failure can leave a partial new report: inspect/remove that report yourself,
-then retry with a new name. No atomic completion or crash durability is promised;
+Report-file writes require hard links. A pre-link write failure normally leaves
+no destination; cleanup failure after linking can leave a complete report with
+error status 2. Preserve failed-run evidence and follow
+[output recovery](evaluation/OUTPUT-FAILURE.md). Crash durability is not promised;
 use a trusted output directory, not one concurrently modified by another process.
 
 The JSON report includes input SHA-256, column names and record positions, but no cell
@@ -190,4 +192,7 @@ Run `python3 evaluation/test-multiline-unicode.py` for the synthetic LF/CRLF ora
 
 Malformed-input regression: [instructions](evaluation/MALFORMED-INPUT.md).
 
-For Linux output-failure checks and partial-report recovery, see [evaluation/OUTPUT-FAILURE.md](evaluation/OUTPUT-FAILURE.md).
+For Linux output-failure checks and report recovery, see [evaluation/OUTPUT-FAILURE.md](evaluation/OUTPUT-FAILURE.md).
+
+Report-file output requires filesystem hard links. Status 2 can retain a complete
+report after temporary cleanup failure; see [output recovery](evaluation/OUTPUT-FAILURE.md).
