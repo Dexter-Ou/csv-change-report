@@ -48,6 +48,10 @@ Comparisons exit 0 by default even when changes exist. Add `--check` in scripts:
 reordering alone is equal. Output errors take precedence and return 2; a report
 that looks complete is not proof of success. Errors use JSON on stderr.
 
+
+HTML viewer output also requires hard links. Cleanup failure may leave complete
+HTML with status 2; see [viewer output recovery](csv-change-report/VIEWER.md#html-output-failures-and-recovery).
+
 ## More workflows
 
 - [Compare CSV exports by ID instead of line number](docs/COMPARE-CSV-EXPORTS.md).
