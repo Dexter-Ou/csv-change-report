@@ -205,6 +205,77 @@ class AutomationTests(unittest.TestCase):
                     self.assertEqual({x.name: x.read_bytes() for x in self.reports.iterdir()},
                                      snapshot)
 
+    def test_quoted_multiline_logical_records(self):
+        # Physical lines differ from logical positions; quote keys and values.
+        import csv
+        import io
+        before_rows = [['id', 'value'], ['a,1', 'same, "quoted"'],
+                       ['b\n2', 'old\nsecond line'], ['gone', 'remove, me']]
+        after_rows = [['id', 'value'], ['b\n2', 'new\nsecond line'],
+                      ['a,1', 'same, "quoted"'], ['new', 'added, "value"\nend']]
+        for variant, ending in enumerate(('\n', '\r\n', '\r')):
+            with self.subTest(record_ending=repr(ending)):
+                def encode(rows):
+                    stream = io.StringIO(newline='')
+                    writer = csv.writer(stream, lineterminator=ending,
+                                        quoting=csv.QUOTE_ALL)
+                    writer.writerows(rows)
+                    return stream.getvalue().encode('utf-8')
+                self.before.write_bytes(encode(before_rows))
+                self.after.write_bytes(encode(after_rows))
+                equal = self.data / 'equal.csv'
+                equal.write_bytes(encode(before_rows))
+                for scenario, (names, code, status, statuses) in enumerate((
+                        ([equal.name], 'EQUAL', 0, [0]),
+                        ([self.after.name], 'CHANGED', 1, [1]),
+                        (['missing.csv', equal.name, self.after.name],
+                         'E_COMPARISON', 2, [2, 0, 1]))):
+                    self.reports = self.root / f'quoted reports {variant}-{scenario}'
+                    pairs = [{'before': self.before.name, 'after': name, 'key': 'id'}
+                             for name in names]
+                    self.manifest.write_text(json.dumps({'version': 1, 'pairs': pairs}),
+                                             encoding='utf-8')
+                    self.run_wrapper(code, status, len(pairs))
+                    self.check_table(statuses)
+                    for pair, pair_status in enumerate(statuses, 1):
+                        if pair_status == 2:
+                            continue
+                        payload = json.loads((self.reports /
+                            f'pair-{pair:04d}.json').read_bytes())
+                        self.assertEqual(payload['counts'],
+                            {'before': 3, 'after': 3, 'added': pair_status,
+                             'removed': pair_status, 'changed': pair_status,
+                             'unchanged': 3 if pair_status == 0 else 1})
+                        self.assertEqual(payload['report_mode'], 'summary')
+                        self.assertNotIn('changed_records', payload)
+                        full = subprocess.run([sys.executable,
+                            *(['-' + 'O' * sys.flags.optimize] if sys.flags.optimize else []),
+                            str(ROOT / 'csv_change.py'), str(self.before),
+                            str(equal if pair_status == 0 else self.after), '--key', 'id', '--check'],
+                            capture_output=True, timeout=20)
+                        self.assertEqual(full.returncode, pair_status, full.stderr)
+                        self.assertEqual(full.stderr, b'')
+                        details = json.loads(full.stdout)
+                        self.assertEqual(details['counts'], payload['counts'])
+                        self.assertEqual(details['changed_records'],
+                            [] if pair_status == 0 else
+                            [{'before_record': 2, 'after_record': 1,
+                              'columns': ['value']}])
+                        self.assertEqual(details['added_after_records'],
+                                         [] if pair_status == 0 else [3])
+                        self.assertEqual(details['removed_before_records'],
+                                         [] if pair_status == 0 else [3])
+                        self.assertEqual(payload['changed_cells_by_column'],
+                                         {'value': pair_status})
+                        self.assertEqual(payload['before_sha256'],
+                            hashlib.sha256(self.before.read_bytes()).hexdigest())
+                        self.assertEqual(payload['after_sha256'], hashlib.sha256(
+                            (equal if pair_status == 0 else self.after).read_bytes()).hexdigest())
+                    snapshot = {x.name: x.read_bytes() for x in self.reports.iterdir()}
+                    self.run_wrapper('E_OUTPUT', 2, len(pairs))
+                    self.assertEqual({x.name: x.read_bytes() for x in self.reports.iterdir()},
+                                     snapshot)
+
     def test_all_equal(self):
         self.write_manifest(['equal', 'equal'])
         self.run_wrapper('EQUAL', 0, 2)
