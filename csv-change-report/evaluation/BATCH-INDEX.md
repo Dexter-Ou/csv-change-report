@@ -28,3 +28,12 @@ The supplied expected count must be 1–100. The status table must be at most
 64 KiB; each linked summary must be at most 1 MiB. A larger otherwise valid
 summary is labeled unavailable by this index; preserve it and inspect it with
 the other report tools. These index limits do not change comparator limits.
+
+## If creation is refused
+
+An out-of-range count message means use the original manifest count (1–100),
+then retry. An existing-index message means preserve the stopped directory,
+then deliberately move the old index aside before regenerating. Other refusals
+point to the saved status table, linked files or output permissions. Keep the
+original snapshot; do not edit status rows to force acceptance. For a malformed
+or interrupted run, follow RECOVERY.md and recompute into a fresh directory.
