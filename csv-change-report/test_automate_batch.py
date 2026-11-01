@@ -276,6 +276,46 @@ class AutomationTests(unittest.TestCase):
                     self.assertEqual({x.name: x.read_bytes() for x in self.reports.iterdir()},
                                      snapshot)
 
+    def test_malformed_quoted_csv_continues_batch(self):
+        # Strict parser errors on either input must not suppress later pairs.
+        for ending_index, ending in enumerate((b'\n', b'\r\n', b'\r')):
+            malformed = [
+                ending.join((b'id,value', b'1,"unclosed')),
+                ending.join((b'id,value', b'1,"closed"junk')) + ending,
+                ending.join((b'id,"value"junk', b'1,a')) + ending,
+                ending.join((b'id,value', b'1,"first', b'second')),
+            ]
+            for case, content in enumerate(malformed):
+                bad = self.data / 'malformed.csv'
+                bad.write_bytes(content)
+                for side in ('before', 'after'):
+                    with self.subTest(ending=repr(ending), case=case, side=side):
+                        self.reports = self.root / f'malformed {ending_index}-{case}-{side}'
+                        invalid = {'before': self.before.name,
+                                   'after': self.after.name, 'key': 'id'}
+                        invalid[side] = bad.name
+                        self.manifest.write_text(json.dumps({'version': 1, 'pairs': [
+                            invalid,
+                            {'before': self.before.name, 'after': self.before.name,
+                             'key': 'id'},
+                            {'before': self.before.name, 'after': self.after.name,
+                             'key': 'id'}]}), encoding='utf-8')
+                        self.run_wrapper('E_COMPARISON', 2, 3)
+                        self.check_table([2, 0, 1])
+                        self.assertEqual(json.loads((self.reports / 'pair-0001.stderr').read_bytes()),
+                            {'error': 'malformed CSV or field exceeds parser limit'})
+                        self.assertEqual(sorted(x.name for x in self.reports.iterdir()),
+                            ['pair-0001.stderr', 'pair-0001.stdout', 'pair-0002.json',
+                             'pair-0002.stderr', 'pair-0002.stdout', 'pair-0003.json',
+                             'pair-0003.stderr', 'pair-0003.stdout', 'status.tsv'])
+                        for pair in range(1, 4):
+                            self.assertEqual((self.reports /
+                                f'pair-{pair:04d}.stdout').read_bytes(), b'')
+                        snapshot = {x.name: x.read_bytes() for x in self.reports.iterdir()}
+                        self.run_wrapper('E_OUTPUT', 2, 3)
+                        self.assertEqual({x.name: x.read_bytes()
+                                          for x in self.reports.iterdir()}, snapshot)
+
     def test_all_equal(self):
         self.write_manifest(['equal', 'equal'])
         self.run_wrapper('EQUAL', 0, 2)
