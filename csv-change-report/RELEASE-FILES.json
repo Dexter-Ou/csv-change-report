@@ -52,6 +52,8 @@
   "evaluation/volatile-before.csv",
   "evaluation/volatile-only.csv",
   "examples/after.csv",
+  "examples/automation/README.md",
+  "examples/automation/check-exports.sh",
   "examples/batch.json",
   "examples/before.csv",
   "examples/expected-report.json",
