@@ -183,3 +183,7 @@ This is not a general runtime deadline or a guarantee against all filesystem rac
 Create an offline table linking saved pair summaries and diagnostics after a batch
 has stopped. It labels comparison errors and incomplete work explicitly. See the
 [batch index guide](evaluation/BATCH-INDEX.md) for commands and snapshot limits.
+
+## Multiline and Unicode regression
+
+Run `python3 evaluation/test-multiline-unicode.py` for the synthetic LF/CRLF oracle and batch/index checks. See [fixtures, expected counts and output cleanup](evaluation/MULTILINE-UNICODE.md).
