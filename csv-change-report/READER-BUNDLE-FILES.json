@@ -3,7 +3,7 @@
   "status": "Reader bundle with JSON manifest preflight",
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
-    "QUICKSTART.md": "a079902c398831158b27e4bec5f678e9e1951f3e01cc5855b18101a7b027d279",
+    "QUICKSTART.md": "0e735d7e7440f3050cbd49c4926fe80edb00130a829c0f0548173149420d0d98",
     "README.md": "09946b914a507cb5e770ee575d0228f228800e8520c4baa90dd675d9e7cf1c5c",
     "RELEASE-FILES.json": "9a9d5074226e9a77b8a070b25a72bcffa067c7e4ac1f1727c8cedd6a99992ea7",
     "RELEASE.md": "a20bc9bdc83428915630b8aabfa13e1553e7eda09c214f109a60c1ca5e105bae",
@@ -62,6 +62,7 @@
     "examples/mixed-batch/README.md": "706f2512785595a4c771048fb100a9d020ee8f2ee4692098de0c7a138cf6b596",
     "examples/interrupted-batch/demo.py": "1a880eae28da01ae3ac0b372e243b3dc7293d80ca29f2429995071fb3119204e",
     "examples/interrupted-batch/manifest.json": "cf336dc1502b2e53a057544a7eacaf3e2bb7ffefa70e6fca918629ff4496e8cd",
-    "examples/interrupted-batch/README.md": "992826610b15e5b9db156a673bd3614b0b6bdf4408e32c47be251c69460e48d6"
+    "examples/interrupted-batch/README.md": "992826610b15e5b9db156a673bd3614b0b6bdf4408e32c47be251c69460e48d6",
+    "PREVIEW.md": "ddf5407339c7b80279298919ccb7d07dc0f2472783d354a54f4049b2993dda97"
   }
 }
