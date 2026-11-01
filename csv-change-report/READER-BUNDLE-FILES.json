@@ -49,8 +49,8 @@
     "evaluation/AUTOMATION-TOTALS.md": "a2b6848c3c70cb0afa2248e4b19dfcf7ec71d8168b3847c43fc6c536e23b75b3",
     "evaluation/DAMAGED-REPORT-RECOVERY.md": "869b6392e842416ff816baa477b1085de484252dc57f6f6e59220f06edd2f72a",
     "evaluation/RELOCATION-RECOVERY.md": "06f4412ae4dafbc91dbeca9634ca586b841e5d779db001ad8156fed377b0f759",
-    "view_report.py": "901f5de8ce7e541912f165605c7649e2e425dfd8f7219a6a81981f65cd5ec3c1",
-    "test_view_report.py": "a09ef7053d58b3a37d398c95aa0d21bfe42f27d99ee9b3b5eb33d9d2f354776d",
-    "VIEWER.md": "389fd144f271de30d719b86f01c863ae63dd87c6566831b7cde4a6ad9d8bd83a"
+    "view_report.py": "6124f3c48da131c45f804c2992e88bcec5b2a58ce2d18e90c87eaa7c810e0d54",
+    "test_view_report.py": "60a5f7b07b35d9f814c7988fab4f40c78624769b95df0e897efc843bb2737b54",
+    "VIEWER.md": "fb064da86e11df2a5fb9247344147eb6d6c03ada315699b57889458ac9c68446"
   }
 }
