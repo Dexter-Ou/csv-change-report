@@ -123,6 +123,8 @@ most 1 MiB. See [the index guide](evaluation/BATCH-INDEX.md) for limits and
 [recovery instructions](evaluation/RECOVERY.md) before a fresh-directory retry.
 Browser interaction and accessibility remain untested.
 
+For a runnable recovery walkthrough, follow [the simulated stopped-batch example](examples/interrupted-batch/README.md). It preserves a synthetic stopped directory and reruns into a fresh one; it does not interrupt or resume a real process.
+
 For your own authorized snapshots, quote paths, replace the key exactly and
 preserve originals. Avoid shell redirection onto inputs. See [the full rules](README.md)
 for limits, exclusive `--output`, optional exclusions and recovery, and
