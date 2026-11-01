@@ -5,6 +5,7 @@ import csv
 import hashlib
 import io
 import json
+import tempfile
 import os
 import stat
 import sys
@@ -211,10 +212,37 @@ def main(argv=None):
         target = Path(args.output)
         if target.resolve() in (Path(args.before).resolve(), Path(args.after).resolve()):
             raise InputError('output path matches an input')
-        # O_EXCL rejects existing paths, including dangling symlinks. No truncation.
-        fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as stream:
-            stream.write(report)
+        # Prototype: fully write a private sibling before publishing without clobber.
+        # lexists also rejects dangling symlinks; link below rechecks atomically.
+        if os.path.lexists(target):
+            raise FileExistsError()
+        fd, temporary = tempfile.mkstemp(prefix='.csv-change-', dir=target.parent)
+        committed = False
+        cleanup_failed = False
+        try:
+            with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as stream:
+                stream.write(report)
+            os.link(temporary, target)
+            committed = True
+        finally:
+            try:
+                os.unlink(temporary)
+            except OSError:
+                # Never mask a write/link exception with a cleanup exception.
+                cleanup_failed = True
+                print(json.dumps({
+                    'error': ('complete output was created but temporary cleanup failed'
+                              if committed else
+                              'temporary cleanup failed before output creation'),
+                    'output_committed': committed,
+                    'cleanup_required': True,
+                    'recovery': ('Verify the report at the requested output path. '
+                                 'Inspect its directory for .csv-change- temporary siblings; '
+                                 'remove only those confirmed to belong to this run. '
+                                 'Do not retry the same output path or delete the report blindly.')
+                }), file=sys.stderr)
+        if cleanup_failed:
+            return 2
     except (InputError, OSError, RuntimeError) as error:
         message = (str(error) if isinstance(error, InputError) else
                    'output path already exists' if isinstance(error, FileExistsError) else
