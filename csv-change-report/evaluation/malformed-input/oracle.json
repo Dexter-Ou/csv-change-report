@@ -1,0 +1,7 @@
+{
+  "duplicate-key": "record 2 repeats a key",
+  "duplicate-header": "header names must be unique",
+  "invalid-utf8": "input must be UTF-8",
+  "short-row": "record 1 has wrong field count",
+  "long-row": "record 1 has wrong field count"
+}
