@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Create a local static HTML view of a saved CSV Change JSON report."""
 import argparse
+import hashlib
 from collections import Counter
 from html import escape
 import json
@@ -75,7 +76,20 @@ def validate(report):
     return report
 
 
-def render(report, counts_only=False):
+def compare_sources(report, before, after):
+    """Compare explicitly supplied bytes; never follow paths from report metadata."""
+    mismatches = []
+    for name, path in [('before', before), ('after', after)]:
+        digest = hashlib.sha256()
+        with Path(path).open('rb') as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b''):
+                digest.update(block)
+        if digest.hexdigest() != report[name + '_sha256']:
+            mismatches.append(name)
+    return mismatches
+
+
+def render(report, counts_only=False, sources_checked=False):
     validate(report)
     def table(headers, rows):
         return '<table><thead><tr>' + ''.join('<th scope="col">' + escape(str(v)) + '</th>' for v in headers) + '</tr></thead><tbody>' + ''.join('<tr>' + ''.join('<td>' + escape(str(v)) + '</td>' for v in row) + '</tr>' for row in rows) + '</tbody></table>'
@@ -87,6 +101,8 @@ def render(report, counts_only=False):
              '<p>Local view of saved metadata. Internal totals checked; source authenticity has not been verified. No CSV cell values are included.</p>',
              '<h2>Record counts</h2>', table(['Measure', 'Records'], c.items()),
              '<h2>Changed cells by column</h2>', table(['Column', 'Changed cells'], report['changed_cells_by_column'].items())]
+    if sources_checked:
+        parts += ['<h2>Retained input comparison</h2><p>Both explicitly supplied CSV files match the SHA-256 hashes saved in this JSON. This checks bytes only; it does not establish source authenticity, provenance or correctness of the reported differences. Files may change after comparison.</p>']
     if report.get('ignored_columns'):
         parts += ['<h2>Ignored columns</h2><ul>' + ''.join('<li>' + escape(n) + '</li>' for n in report['ignored_columns']) + '</ul>']
     if counts_only and report['format_version'] == 1:
@@ -107,17 +123,31 @@ def main():
     parser.add_argument('report', help='saved single-pair JSON report (not a batch manifest)')
     parser.add_argument('--output', required=True, help='new HTML file in a trusted directory; existing paths refused')
     parser.add_argument('--counts-only', action='store_true', help='omit record-position tables from HTML; keep counts and saved JSON unchanged')
+    parser.add_argument('--before-csv', help='retained before CSV; requires --after-csv')
+    parser.add_argument('--after-csv', help='retained after CSV; requires --before-csv')
     args = parser.parse_args()
+    if bool(args.before_csv) != bool(args.after_csv):
+        parser.error('--before-csv and --after-csv must be supplied together')
     try:
         with Path(args.report).open('rb') as stream:
             raw = stream.read(MAX_BYTES + 1)
         if len(raw) > MAX_BYTES:
             raise ValueError('oversize report')
         report = json.loads(raw.decode('utf-8'), object_pairs_hook=unique_object)
-        html = render(report, counts_only=args.counts_only)
+        validate(report)
     except (OSError, UnicodeError, ValueError, TypeError, KeyError, RecursionError):
         print('E_REPORT: unreadable, unsupported or inconsistent report (8 MiB maximum); no HTML created.', file=sys.stderr)
         return 2
+    if args.before_csv:
+        try:
+            mismatches = compare_sources(report, args.before_csv, args.after_csv)
+        except (OSError, ValueError):
+            print('E_SOURCE: cannot read supplied CSV files; no HTML created.', file=sys.stderr)
+            return 2
+        if mismatches:
+            print('E_SOURCE: saved hash mismatch for ' + ', '.join(mismatches) + '; no HTML created.', file=sys.stderr)
+            return 2
+    html = render(report, counts_only=args.counts_only, sources_checked=bool(args.before_csv))
     try:
         with Path(args.output).open('x', encoding='utf-8') as stream:
             stream.write(html)
