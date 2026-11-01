@@ -48,7 +48,7 @@ This also returns 1. These expected nonzero results can stop scripts using
 To inspect the output first, [download a saved synthetic HTML example](examples/README.md).
 The example note explains how to open it locally and what its metadata means.
 
-Use the [pinned preview download](https://github.com/Dexter-Ou/csv-change-report/archive/708201fee61caeac4f29dc99d982460e95e5390d.zip)
+Use the [pinned preview download](https://github.com/Dexter-Ou/csv-change-report/archive/a38d2a40f42e2c944335df8174cd915c8a129e72.zip)
 for this walkthrough. After extracting it, enter the inner `csv-change-report`
 folder. Choose a trusted writable directory with hard-link support and fresh
 output names. Run each command separately:
@@ -81,6 +81,21 @@ Review it before sharing. JSON over 8 MiB is refused. The commands have syntheti
 Linux coverage; interactive browser appearance, accessibility and Windows/macOS
 behavior are untested. For aggregate-only HTML or other viewer options, see the
 [viewer guide](../csv-change-report/VIEWER.md).
+
+## Review inventory exports with ambiguous IDs
+
+For a complete stock-export walkthrough, follow the [fictional inventory review](https://github.com/Dexter-Ou/csv-change-report/blob/a38d2a40f42e2c944335df8174cd915c8a129e72/csv-change-report/examples/inventory-reconciliation/README.md).
+It starts with a duplicate stock ID, stops without creating a report, then uses
+an export whose record identity was confirmed by the fictional source system.
+The corrected comparison finds 1 added, 1 removed, 2 changed and 1 unchanged
+record. It also shows how to save JSON and HTML and locate the affected records
+in the source snapshots.
+
+Use the pinned preview download above; the fixtures are in
+`examples/inventory-reconciliation` inside the product folder. Keep the original
+exports. Do not guess a replacement ID or automate stock adjustments from a
+change report: missing records may reflect export scope, and source hashes
+verify bytes rather than business truth.
 
 ## Reproduce row-order and changed-key behavior
 
