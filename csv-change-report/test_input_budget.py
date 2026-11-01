@@ -72,17 +72,17 @@ class InputBudgetTests(unittest.TestCase):
             self.assertEqual(result.stdout, b'')
             if value == 'private-sentinel':
                 self.assertNotIn(value.encode(), result.stderr)
-        with patch('csv_change.Path.open', side_effect=AssertionError('must validate first')):
+        with patch('csv_change.os.open', side_effect=AssertionError('must validate first')):
             for value in (0, -1, MAX_BYTES + 1, True, 9.0, '9'):
                 with self.assertRaises(InputError): load(self.before, 'id', value)
 
     def test_bounded_read_and_ceiling_cannot_be_raised(self):
         stream = io.BytesIO(b'id\na\nTRAILING')
-        with patch('csv_change.Path.open') as opened:
+        with patch('csv_change.os.fdopen') as opened:
             opened.return_value.__enter__.return_value = stream
             with self.assertRaises(InputError): load(self.before, 'id', 5)
             self.assertEqual(stream.tell(), 6)
-        with patch('csv_change.Path.open') as opened:
+        with patch('csv_change.os.open') as opened:
             with self.assertRaises(InputError): load(self.before, 'id', MAX_BYTES + 1)
             opened.assert_not_called()
 
