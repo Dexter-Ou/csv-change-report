@@ -31,7 +31,11 @@ invalid UTF-8, malformed quoting and NUL bytes fail closed. A changed key appear
 as one removal and one addition; it is not inferred to be the same entity.
 Header-only exports are valid. Limits per input: 10 MiB, 50,000 records, 256 columns and 250,000 data
 cells (records times columns). Header-only files also obey the column limit; parser
-field-size defaults also apply. Both snapshots and the report are held in memory;
+field-size defaults also apply. A synthetic Linux worker test observed a default
+maximum of 131072 decoded characters per field (not UTF-8 bytes): a quoted ASCII
+or accented field at that boundary was accepted, and one character above it
+returned status 2. The default belongs to the Python runtime; this tool does not
+raise it. Increasing `--max-input-bytes` does not raise the field limit. Both snapshots and the report are held in memory;
 these limits reduce object amplification but are not a benchmark or an adversarial
 resource guarantee. Output lists follow source record order; changed column lists
 follow the before-header order. Identical input bytes produce identical JSON
