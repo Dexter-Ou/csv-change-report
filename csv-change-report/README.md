@@ -199,3 +199,9 @@ report after temporary cleanup failure; see [output recovery](evaluation/OUTPUT-
 
 HTML viewer output also requires hard links. Cleanup failure may leave complete
 HTML with status 2; see [viewer output recovery](VIEWER.md#html-output-failures-and-recovery).
+
+## Troubleshoot blank or repeated keys
+
+Follow the [stable-key example](examples/stable-key/README.md) to reproduce
+blank-key and duplicate-key errors, then compare source-corrected fictional
+exports and create a source-checked HTML report.
