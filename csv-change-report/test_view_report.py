@@ -41,6 +41,43 @@ class ViewerTests(unittest.TestCase):
         return result, self.work / target
 
 
+    def test_saved_report_special_files_and_regular_symlink(self):
+        special = [self.work]
+        if hasattr(os, 'mkfifo'):
+            fifo = self.work / 'saved.fifo'; os.mkfifo(fifo); special.append(fifo)
+        if Path('/dev/null').exists(): special.append(Path('/dev/null'))
+        for i, source in enumerate(special):
+            out = self.work / f'special-{i}.html'
+            result = subprocess.run([sys.executable, str(ROOT / 'view_report.py'), str(source), '--output', str(out)], capture_output=True, timeout=3)
+            self.assertEqual(result.returncode, 2); self.assertIn(b'E_REPORT', result.stderr)
+            self.assertFalse(out.exists())
+        if hasattr(os, 'symlink'):
+            source = self.work / 'saved-link.json'; source.symlink_to(ROOT / 'examples/expected-report.json')
+            out = self.work / 'link.html'
+            result = subprocess.run([sys.executable, str(ROOT / 'view_report.py'), str(source), '--output', str(out)], capture_output=True, timeout=3)
+            self.assertEqual(result.returncode, 0, result.stderr); self.assertTrue(out.exists())
+
+    @unittest.skipUnless(hasattr(os, 'mkfifo'), 'POSIX FIFO required')
+    def test_report_descriptor_swap_refused_and_closed(self):
+        fifo = self.work / 'report-swap.fifo'; os.mkfifo(fifo)
+        fd = os.open(fifo, os.O_RDONLY | os.O_NONBLOCK)
+        with mock.patch.object(view_report.os, 'open', return_value=fd):
+            with self.assertRaises(ValueError):
+                view_report.read_report_bytes(ROOT / 'examples/expected-report.json')
+        with self.assertRaises(OSError): os.fstat(fd)
+
+    def test_report_descriptor_closed_on_success_and_read_failure(self):
+        source = ROOT / 'examples/expected-report.json'
+        for fail in (False, True):
+            fd = os.open(source, os.O_RDONLY)
+            with mock.patch.object(view_report.os, 'open', return_value=fd):
+                if fail:
+                    with mock.patch.object(view_report.os, 'fdopen', side_effect=OSError('synthetic failure')):
+                        with self.assertRaises(OSError): view_report.read_report_bytes(source)
+                else:
+                    self.assertEqual(view_report.read_report_bytes(source), source.read_bytes())
+            with self.assertRaises(OSError): os.fstat(fd)
+
     def test_nonregular_retained_sources_refused(self):
         special = [self.work]
         if hasattr(os, 'mkfifo'):
