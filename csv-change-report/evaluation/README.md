@@ -662,7 +662,8 @@ python3 -O -m unittest -v test_automate_batch
 
 These offline synthetic tests use temporary CSV fixtures and report directories.
 They check equal and mixed batches, error precedence and continuation, preservation
-of existing outputs, invalid manifests and arguments, and missing or file-valued
+of existing outputs, spaces and Unicode in CSV/manifest/report filenames from
+another working directory, invalid manifests and arguments, and missing or file-valued
 output parents. Two POSIX permission tests first observe a real directory-creation
 denial; they skip explicitly on other platforms or when the runtime bypasses
 permissions (for example, root). They check denied-parent failure, preservation of
