@@ -1,0 +1,5 @@
+stock_id,sku,bin,quantity,status
+S-101,WIDGET-A,NORTH,8,available
+S-101,WIDGET-A,EAST,7,available
+S-104,WIDGET-C,WEST,2,available
+S-105,WIDGET-D,SOUTH,4,available
