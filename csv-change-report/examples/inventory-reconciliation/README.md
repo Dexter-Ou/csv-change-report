@@ -5,6 +5,19 @@ exports; it does not update inventory or decide whether a stock movement is vali
 Requires Python 3.10+. From the product folder containing csv_change.py, run each
 command separately. Use a fresh output name on repeat runs.
 
+## Stop when the key column is missing
+
+If either export lacks the exact `stock_id` header, the comparison exits 2 with
+`key column is missing` and creates no report. Check the header in both exports:
+`--key stock_id` is case-sensitive and spaces are significant. Keep the original
+files unchanged. Ask the source system administrator for an export containing
+the confirmed unique record identifier; do not invent IDs or substitute SKU,
+which repeats across bins in this example. If the source uses a different header,
+confirm that it identifies the same records in both exports before changing
+`--key` to that exact name. Retry with the source-confirmed exports and a fresh
+output name. The supplied `after-corrected.csv` is fictional example data, not a
+repair for a real export.
+
 ## Stop on ambiguous identity
 
 ```sh
