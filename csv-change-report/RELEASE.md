@@ -102,3 +102,8 @@ attempts remain available for review. Commands use synthetic fixtures; Linux
 execution is checked. No CSV existence check was added to preflight.
 
 Leading UTF-8 BOM manifests now receive fixed E_BOM guidance. Strict refusal is retained; evaluation/RECOVERY.md documents a separate same-directory copy. Synthetic Linux tests cover refusal privacy, no reports, LF/CRLF recovery and literal interior U+FEFF.
+
+### Saved-report section links
+
+The HTML viewer now includes local links to each displayed report section.
+The offline inventory example includes the same viewer and regenerated HTML.
