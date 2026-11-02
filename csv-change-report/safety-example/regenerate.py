@@ -26,8 +26,13 @@ commands = [
      "--before-csv", str(example / "before.csv"), "--after-csv",
      str(example / "after.csv"), "--output", str(example / "new-report.html")],
 ]
-for command in commands:
+for stage, command in enumerate(commands):
     result = subprocess.run([sys.executable, "-B", *command], check=False)
     if result.returncode:
+        if stage == 1:
+            print("Viewer failed. Any generated outputs have been left in place. "
+                  f"Inspect {example / 'new-report.json'} and "
+                  f"{example / 'new-report.html'} before moving or removing "
+                  "generated files and rerunning.", file=sys.stderr)
         raise SystemExit(result.returncode)
 print("Open safety-example/new-report.html locally to review the output.")
