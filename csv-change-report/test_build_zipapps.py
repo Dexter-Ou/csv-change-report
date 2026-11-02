@@ -1,5 +1,6 @@
 """Regression tests for reproducible portable builds and safe failure paths."""
 import contextlib
+import errno
 import importlib.util
 import io
 from pathlib import Path
@@ -99,7 +100,7 @@ class BuildZipappsTests(unittest.TestCase):
 
         def fail_second(path, *args, **kwargs):
             if Path(path).name == 'view_report.pyz':
-                raise OSError('synthetic write failure')
+                raise OSError(errno.ENOSPC, 'synthetic second-archive write failure')
             return real_zipfile(path, *args, **kwargs)
 
         error = io.StringIO()
@@ -118,6 +119,31 @@ class BuildZipappsTests(unittest.TestCase):
         before = first.read_bytes()
         self.assertEqual(self.run_builder(destination).returncode, 2)
         self.assertEqual(first.read_bytes(), before)
+        self.assertEqual(sorted(p.name for p in destination.iterdir()),
+                         ['csv_change.pyz'])
+        fresh = self.root / 'recovered'
+        result = self.run_builder(fresh)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, '')
+        self.assertEqual(result.stderr, '')
+        self.assertEqual(sorted(p.name for p in fresh.iterdir()),
+                         ['csv_change.pyz', 'view_report.pyz'])
+        self.assertEqual(first.read_bytes(), before)
+        self.assertEqual((fresh / first.name).read_bytes(), before)
+        for program in ('csv_change', 'view_report'):
+            with self.subTest(recovered_program=program):
+                recovered = fresh / (program + '.pyz')
+                with real_zipfile(recovered) as archive:
+                    self.assertIsNone(archive.testzip())
+                    self.assertEqual(archive.namelist(), ['__main__.py', 'LICENSE'])
+                    self.assertEqual(archive.read('__main__.py'),
+                                     self.originals[program + '.py'])
+                    self.assertEqual(archive.read('LICENSE'), self.originals['LICENSE'])
+                help_result = subprocess.run(
+                    [sys.executable, '-I', str(recovered), '--help'],
+                    capture_output=True, text=True, cwd=self.root)
+                self.assertEqual(help_result.returncode, 0, help_result.stderr)
+                self.assertIn('usage:', help_result.stdout)
         # Import can create bytecode; the source and license bytes remain exact.
         for name, data in self.originals.items():
             self.assertEqual((self.source / name).read_bytes(), data)
