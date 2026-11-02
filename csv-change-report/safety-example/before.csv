@@ -1,0 +1,2 @@
+id,<script>alert(1)</script>,"<img src=""https://example.invalid/x"" onerror=""alert(1)"">","A & B ""quoted""",温度 🌡️ é,</td><svg onload=alert(1)>,https://example.invalid/plain-text,"<iframe src=""https://example.invalid/ignored"">"
+sample-1,old,old,old,old,old,old,old
