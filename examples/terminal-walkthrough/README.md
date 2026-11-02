@@ -12,7 +12,7 @@ archive exits 2 before extraction. Reports omit cell values but expose column
 names, counts and positions; treat real report metadata as potentially sensitive.
 
 Source: https://github.com/Dexter-Ou/csv-change-report/tree/6dffce2b04e7e5b88100287611773e500ae0e6d9
-The bundled source archive is Base64 encoded in package.zip.b64 (plain transport
+The bundled source archive is Base64 encoded across package.zip.b64.part* files (plain transport
 encoding, not encryption). The runner decodes it and checks SHA-256 before temporary
 extraction; this
 checks consistency, not an independent signature. The archive includes the MIT
