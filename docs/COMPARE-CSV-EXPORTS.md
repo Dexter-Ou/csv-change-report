@@ -107,6 +107,18 @@ only to reproduce the report. The example includes an invalid duplicate ID and
 a corrected export; all data is fictional. Review sensitive metadata before
 sharing reports. Interactive browser layout and accessibility are untested.
 
+## Generate a 10,000-row inventory example
+
+[Follow the reproducible inventory recipe](../examples/inventory-scale/README.md)
+to generate fictional exports, compare them by stock ID and save JSON/HTML.
+The expected synthetic result is 100 added, 100 removed, 300 changed and 9,600
+unchanged records. A reorder-only export compares equal. The folder includes
+the tools, generator, license and SHA-256 manifest; Python 3.10+ is required,
+with no third-party packages. [Download the source archive](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/e0fe51f6e0f4fa6d6c3216bcc3e2107eb00eeea9).
+Extract it and enter `examples/inventory-scale` before following the commands.
+This is a correctness example within documented limits, not a maximum-capacity
+or performance guarantee. Keep real exports and report metadata private.
+
 ## Reproduce row-order and changed-key behavior
 
 From the same inner folder, save the following as `try_export_keys.py` in a
