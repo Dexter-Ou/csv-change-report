@@ -5,6 +5,18 @@ import sys
 
 example = Path(__file__).resolve().parent
 product = example.parent
+# Refuse predictable failures before either output is created. The child tools
+# still perform exclusive output creation; this preflight is not a transaction.
+for name in ("new-report.json", "new-report.html"):
+    output = example / name
+    if output.exists() or output.is_symlink():
+        print(f"Output already exists: {output}", file=sys.stderr)
+        raise SystemExit(2)
+for source in (product / "csv_change.py", product / "view_report.py",
+               example / "before.csv", example / "after.csv"):
+    if not source.is_file():
+        print(f"Required source file missing: {source}", file=sys.stderr)
+        raise SystemExit(2)
 ignored = '<iframe src="https://example.invalid/ignored">'
 commands = [
     [str(product / "csv_change.py"), str(example / "before.csv"),
