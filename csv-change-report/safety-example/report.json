@@ -1,0 +1,41 @@
+{
+  "format_version": 1,
+  "tool_version": "0.1.10-preview",
+  "before_sha256": "146eb84792306472fd02b166fac70ac2be862729d9dd8f91b3aee2fb53339388",
+  "after_sha256": "cd90629fcc1a4651829e51cd12aac1f01e7899489e32534158995ef136d730eb",
+  "counts": {
+    "before": 1,
+    "after": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "unchanged": 0
+  },
+  "added_after_records": [],
+  "removed_before_records": [],
+  "changed_records": [
+    {
+      "before_record": 1,
+      "after_record": 1,
+      "columns": [
+        "<script>alert(1)</script>",
+        "<img src=\"https://example.invalid/x\" onerror=\"alert(1)\">",
+        "A & B \"quoted\"",
+        "\u6e29\u5ea6 \ud83c\udf21\ufe0f e\u0301",
+        "</td><svg onload=alert(1)>",
+        "https://example.invalid/plain-text"
+      ]
+    }
+  ],
+  "changed_cells_by_column": {
+    "<script>alert(1)</script>": 1,
+    "<img src=\"https://example.invalid/x\" onerror=\"alert(1)\">": 1,
+    "A & B \"quoted\"": 1,
+    "\u6e29\u5ea6 \ud83c\udf21\ufe0f e\u0301": 1,
+    "</td><svg onload=alert(1)>": 1,
+    "https://example.invalid/plain-text": 1
+  },
+  "ignored_columns": [
+    "<iframe src=\"https://example.invalid/ignored\">"
+  ]
+}
