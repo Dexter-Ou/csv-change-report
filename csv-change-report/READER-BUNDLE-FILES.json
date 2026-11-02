@@ -1,14 +1,14 @@
 {
-  "base_commit": "9a2e93134c310563c854d7eb749a04c71c1504b2",
-  "status": "Saved-report section navigation; fictional inventory example",
+  "base_commit": "ae35b2929874c5d7b58fd9de5ea27206fe16d7bc",
+  "status": "Saved-report section navigation and descriptive table captions",
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
     "PREVIEW.md": "96d8f3ebe61445b0485effe5d71299bc077fd3c270a35da87ebf556ec4777390",
     "QUICKSTART.md": "93667d420f58c9892af942bc8df945b4d578a1b7438df5efd18d3b08d773beed",
     "README.md": "533125646a710965a10f8802ec6f071d1b1f6950a343a025acdc65a23d460011",
-    "RELEASE-FILES.json": "45d8ffb1c10c401b0ec4bacd57e78a570fd363f203057ae41de06840c5a4918c",
+    "RELEASE-FILES.json": "4cc9a3802fabb0b5ebd92fc3f99d6d6c082c3e92e08692fc05aac461b19eb83c",
     "RELEASE.md": "a3ed8c9d1086bcc8d78907fbd6dcfb3254a005f339934e3c1e3c0373254e548f",
-    "VIEWER.md": "513faee730ab9ca7f1822ca9b854f6e9c737fe0defee4bcf616276f3b8dcb70b",
+    "VIEWER.md": "ee9625995bacb8a44441177498dd973dd526fd1b769185d6342059de0e9f808b",
     "csv_change.py": "da8f13c49923af38132ee06bba292fcf2967b2b19a5758ffb4539ed0ee1e6b41",
     "evaluation/ANSWER-KEY.md": "98f402ccdb5998dbe127542dc9099b5b941048c2b94ba6b79236615db4ada66f",
     "evaluation/AUTOMATION-TOTALS.md": "a2b6848c3c70cb0afa2248e4b19dfcf7ec71d8168b3847c43fc6c536e23b75b3",
@@ -91,6 +91,7 @@
     "test_view_output.py": "838550b963843b98511bf361afc7553224c49b20fbf1c6600fc76cf99848669d",
     "test_view_report.py": "9c88c91b4ae511b6535f181cbfd7ebdea4f5ad9cbc3f867b91c7fbb08f8f3779",
     "test_view_wrapping.py": "f69200ea162968be0e0b6ddf039d6246bea3e6cdeeba9705c741f0216e450aaf",
-    "view_report.py": "7a3b7aaa8573a7a20d51822bd66e4518a3ec0b995af5253336abc817e9929fc2"
+    "view_report.py": "bf2cbc8f010f841ef26b9d1b10a09a39f7580989cc09f9223eb7fdaca7b24071",
+    "test_view_captions.py": "a1b618f6da127127e86a9d8a4852f7b8958258263e51ff4f93f2164023464e9c"
   }
 }
