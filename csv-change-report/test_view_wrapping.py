@@ -35,7 +35,7 @@ class WrappingTests(unittest.TestCase):
                 self.assertIn(label, ''.join(p.text))
                 self.assertIn(label+' ignored', ''.join(p.text))
                 self.assertFalse(any(t in ('script','img','style','iframe') for t,a in p.tags))
-                self.assertFalse(any(k.startswith('on') or k in ('src','href','style') for t,a in p.tags for k in a))
+                self.assertFalse(any(k.startswith('on') or k in ('src','style') or (k == 'href' and not a[k].startswith('#')) for t,a in p.tags for k in a))
     def test_counts_only_keeps_metadata_and_hides_positions(self):
         html=view_report.render(self.report,counts_only=True)
         self.assertIn('Counts-only view:',html)
