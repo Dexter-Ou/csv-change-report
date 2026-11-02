@@ -119,3 +119,10 @@ layout and clipboard behavior remain untested.
 Saved HTML includes a labelled list of links to its report sections. Only sections
 present in the report appear in that list. Links stay inside the local document;
 no script or network request is required.
+
+## Table names
+
+Each table has a descriptive caption, including distinct names for added and
+removed record positions. These names identify tables during screen-reader table
+navigation. Static markup tests check caption placement and names; browser and
+assistive-technology interaction remain untested.
