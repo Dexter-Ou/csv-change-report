@@ -113,3 +113,9 @@ accessibility and Windows/macOS behavior are untested. Crashes can leave sibling
 Long ASCII words in column labels and hashes include optional line breaks.
 Unicode words remain intact. Parser tests preserve reconstructed text; browser
 layout and clipboard behavior remain untested.
+
+## Section navigation
+
+Saved HTML includes a labelled list of links to its report sections. Only sections
+present in the report appear in that list. Links stay inside the local document;
+no script or network request is required.
