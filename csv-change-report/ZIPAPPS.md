@@ -16,11 +16,20 @@ From the same source directory, with your original snapshots retained separately
 use the archives inside `portable-tools/`:
 
 ```sh
-python3 portable-tools/csv_change.pyz before.csv after.csv --key id --check --output review.json
+if python3 portable-tools/csv_change.pyz before.csv after.csv --key id --check --output review.json; then
+  compare_status=0
+else
+  compare_status=$?
+fi
+case "$compare_status" in
+  0|1) ;;
+  *) exit "$compare_status" ;;
+esac
 python3 portable-tools/view_report.pyz review.json --output review.html --before-csv before.csv --after-csv after.csv
 ```
 
-Handle the comparator's status before running the viewer: `--check` returns
+This block handles the comparator's status before running the viewer, including
+in shells using `set -eu`: `--check` returns
 0 for equal, 1 for changed, and 2 for error. An error must stop the workflow.
 The viewer returns 0 on successful creation and 2 for error. Open the HTML in
 your local browser after successful creation. All original input, report-size,
