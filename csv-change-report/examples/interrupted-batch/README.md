@@ -38,6 +38,9 @@ invalid inputs with their data owner before changing a separate copy. Difference
 still need review. Hash checks here cover ordinary trusted files at observation
 time. Keep private exports and generated reports private.
 
+For an optional experiment that terminates its own synthetic batch process group,
+see [actual Linux process termination](TERMINATION.md).
+
 See [the recovery walkthrough](../../evaluation/RECOVERY.md) and
 [batch index limits](../../evaluation/BATCH-INDEX.md).
 Tested on Linux only; browser interaction/accessibility and Windows/macOS untested.
