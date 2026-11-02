@@ -54,6 +54,8 @@ HTML with status 2; see [viewer output recovery](csv-change-report/VIEWER.md#htm
 
 ## More workflows
 
+- [Run six synthetic terminal examples with automatic checks](https://github.com/Dexter-Ou/csv-change-report/tree/9fdb7ca10ec25ba6c46695aa5b2ed8cff8be5864/examples/terminal-walkthrough). Download that revision, then run `python3 examples/terminal-walkthrough/run_tour.py` from the extracted outer folder.
+
 - [Review a fictional inventory export and resolve an invalid stock ID](https://github.com/Dexter-Ou/csv-change-report/blob/a38d2a40f42e2c944335df8174cd915c8a129e72/csv-change-report/examples/inventory-reconciliation/README.md).
 
 - [Fix blank or duplicate CSV keys with a worked example](csv-change-report/examples/stable-key/README.md).
