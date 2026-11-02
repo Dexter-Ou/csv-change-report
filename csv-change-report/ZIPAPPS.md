@@ -38,6 +38,13 @@ VIEWER.md. Output writes require hard links. Existing report/HTML destinations
 are refused; cleanup failures can leave complete files with status 2. Preserve
 failed-run evidence rather than deleting or retrying the same path blindly.
 
+If `review.json` already exists, the comparator stops before the viewer. Choose
+new report and HTML names in the block above, changing both uses of the report
+name. If only `review.html` exists, comparison can create `review.json` before
+the viewer stops. Keep both files for inspection, then run the block with a
+fresh pair such as `review-next.json` and `review-next.html`. This preserves
+the earlier report and HTML; do not delete them just to repeat the commands.
+
 The build also refuses any existing destination directory. A failed build can
 leave a partial directory: preserve it for inspection and select a fresh path.
 Use a trusted parent without concurrent writers. Deterministic archive metadata
