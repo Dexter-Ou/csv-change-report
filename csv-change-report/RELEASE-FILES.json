@@ -85,6 +85,7 @@
   "test_ignore_columns.py",
   "test_input_budget.py",
   "test_summary.py",
+  "test_view_navigation.py",
   "test_view_output.py",
   "test_view_report.py",
   "test_view_wrapping.py",
