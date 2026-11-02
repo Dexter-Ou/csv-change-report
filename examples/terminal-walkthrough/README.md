@@ -16,8 +16,7 @@ The bundled source archive is Base64 encoded across package.zip.b64.part* files 
 encoding, not encryption). The runner decodes it and checks SHA-256 before temporary
 extraction; this
 checks consistency, not an independent signature. The archive includes the MIT
-license. The runner reads only its adjacent package and temporary synthetic data;
-it offers no user-data path argument. Temporary extraction is cleaned after the
+license. In default mode the runner reads its adjacent package and temporary synthetic data. Temporary extraction is cleaned after the
 run, including failed checks. If interrupted by a hard process kill, the OS temp
 directory may retain synthetic source files; no real CSV data is used.
 
@@ -25,3 +24,19 @@ TERMINAL-TOUR.md is a prior recorded Linux transcript. The runnable tour prints
 fresh subprocess results. These are synthetic command tests, not screenshots. Linux tested; Windows/macOS untested. Interactive browser
 behavior is untested. No hosted service is required. Restore/re-extract the original
 bundle if its hash check fails; the runner never overwrites the source archive.
+
+To test a trusted current checkout instead of the historical bundle, run:
+
+```sh
+python3 examples/terminal-walkthrough/run_tour.py --source csv-change-report
+```
+
+Run this command from the repository root, or use absolute paths for both the
+runner and source directory. `--source` names the inner product directory that
+contains `csv_change.py`, not a CSV file. This executes the selected Python code;
+use only source you trust in an appropriate isolated environment. It reads the
+selected source's synthetic fixtures and does not accept real CSV input paths.
+No bundled archive is needed in this mode. A missing product or fixture exits 2;
+it never silently falls back to the historical bundle. Both modes print the
+comparator SHA-256, and standalone mode identifies its historical commit. These
+six comparator examples do not test the HTML viewer or constitute a full suite.
