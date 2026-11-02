@@ -127,8 +127,8 @@ def render(report, counts_only=False, sources_checked=False):
                        if word.isascii() and not word.isspace() else escape(word)
                        for word in re.split(r'(\s+)', str(value)))
 
-    def table(headers, rows):
-        return '<table><thead><tr>' + ''.join('<th scope="col">' + text(v) + '</th>' for v in headers) + '</tr></thead><tbody>' + ''.join('<tr>' + ''.join('<td>' + text(v) + '</td>' for v in row) + '</tr>' for row in rows) + '</tbody></table>'
+    def table(caption, headers, rows):
+        return '<table><caption>' + text(caption) + '</caption><thead><tr>' + ''.join('<th scope="col">' + text(v) + '</th>' for v in headers) + '</tr></thead><tbody>' + ''.join('<tr>' + ''.join('<td>' + text(v) + '</td>' for v in row) + '</tr>' for row in rows) + '</tbody></table>'
     sections = []
     def heading(title, target, level=2):
         sections.append((target, title))
@@ -140,8 +140,8 @@ def render(report, counts_only=False, sources_checked=False):
              '<meta http-equiv="Content-Security-Policy" content="default-src &#39;none&#39;; base-uri &#39;none&#39;; form-action &#39;none&#39;">',
              '<title>Saved CSV change report</title><main><h1>Saved CSV change report</h1>',
              '<p>Local view of saved metadata. Internal totals checked; source authenticity has not been verified. No CSV cell values are included.</p>',
-             heading('Record counts', 'record-counts') + '', table(['Measure', 'Records'], c.items()),
-             heading('Changed cells by column', 'changed-columns') + '', table(['Column', 'Changed cells'], report['changed_cells_by_column'].items())]
+             heading('Record counts', 'record-counts') + '', table('Record counts', ['Measure', 'Records'], c.items()),
+             heading('Changed cells by column', 'changed-columns') + '', table('Changed cells by column', ['Column', 'Changed cells'], report['changed_cells_by_column'].items())]
     if sources_checked:
         parts += [heading('Retained input comparison', 'retained-inputs') + '<p>Both explicitly supplied CSV files match the SHA-256 hashes saved in this JSON. This checks bytes only; it does not establish source authenticity, provenance or correctness of the reported differences. Files may change after comparison.</p>']
     if report.get('ignored_columns'):
@@ -153,9 +153,9 @@ def render(report, counts_only=False, sources_checked=False):
     else:
         parts += [heading('Record positions', 'record-positions') + '<p>Positions are 1-based data records, excluding the header; they are not physical line numbers when fields contain newlines.</p>']
         for field, title in [('added_after_records', 'Added positions in after CSV'), ('removed_before_records', 'Removed positions in before CSV')]:
-            parts += [heading(title, field.replace('_', '-'), 3), table(['Record'], ((n,) for n in report[field])) if report[field] else '<p>None</p>']
-        parts += [heading('Changed records', 'changed-records', 3), table(['Before record', 'After record', 'Columns'], ((r['before_record'], r['after_record'], json.dumps(r['columns'], ensure_ascii=True)) for r in report['changed_records'])) if report['changed_records'] else '<p>None</p>']
-    parts += [heading('Saved source hashes', 'source-hashes') + '', table(['Input', 'SHA-256'], ((n, report[n + '_sha256']) for n in ('before', 'after'))), '<p>Tool version: ' + escape(report['tool_version']) + '</p></main></html>']
+            parts += [heading(title, field.replace('_', '-'), 3), table(title, ['Record'], ((n,) for n in report[field])) if report[field] else '<p>None</p>']
+        parts += [heading('Changed records', 'changed-records', 3), table('Changed records', ['Before record', 'After record', 'Columns'], ((r['before_record'], r['after_record'], json.dumps(r['columns'], ensure_ascii=True)) for r in report['changed_records'])) if report['changed_records'] else '<p>None</p>']
+    parts += [heading('Saved source hashes', 'source-hashes') + '', table('Saved source hashes', ['Input', 'SHA-256'], ((n, report[n + '_sha256']) for n in ('before', 'after'))), '<p>Tool version: ' + escape(report['tool_version']) + '</p></main></html>']
     navigation = '<nav aria-label="Report sections"><ul>' + ''.join(
         '<li><a href="#' + target + '">' + title + '</a></li>'
         for target, title in sections) + '</ul></nav>'
