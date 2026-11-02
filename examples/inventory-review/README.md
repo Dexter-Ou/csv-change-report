@@ -12,8 +12,11 @@ sha256sum -c SHA256SUMS
 ```
 
 This manifest detects accidental changes; it is not a signature or independent
-proof of origin. The tools are copied unchanged from CSV Change preview
-0.1.10 at product revision a38d2a40f42e2c944335df8174cd915c8a129e72:
+proof of origin. The comparison engine is unchanged from CSV Change preview
+0.1.10 at product revision a38d2a40f42e2c944335df8174cd915c8a129e72.
+The included viewer matches the source archive's csv-change-report/view_report.py
+and adds links to report sections. SHA256SUMS records the exact included bytes.
+Historical comparison source:
 https://github.com/Dexter-Ou/csv-change-report/tree/a38d2a40f42e2c944335df8174cd915c8a129e72/csv-change-report
 
 Run these commands separately to reproduce the JSON and HTML. Use fresh output
