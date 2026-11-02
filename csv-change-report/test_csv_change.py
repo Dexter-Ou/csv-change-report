@@ -462,6 +462,35 @@ class ProcessTests(unittest.TestCase):
                                  {'error': 'invalid arguments; use --help for usage'})
                 self.assertNotIn('Private-', result.stderr)
 
+    def test_process_key_header_requires_exact_match(self):
+        before = self.root / 'before.csv'
+        after = self.root / 'after.csv'
+        for alternate in ('Stock_ID', ' stock_id '):
+            for left, right in ((alternate, 'stock_id'),
+                                ('stock_id', alternate), (alternate, alternate)):
+                with self.subTest(left=left, right=right):
+                    before.write_text(f'{left},quantity\na,1\n', encoding='utf-8')
+                    after.write_text(f'{right},quantity\na,2\n', encoding='utf-8')
+                    snapshots = (before.read_bytes(), after.read_bytes())
+                    output = self.root / 'refused-report.json'
+                    result = self.run_cli(before, after, '--key', 'stock_id',
+                                          '--output', output)
+                    self.assertEqual((result.returncode, result.stdout), (2, ''))
+                    self.assertEqual(json.loads(result.stderr),
+                                     {'error': 'key column is missing'})
+                    self.assertFalse(output.exists())
+                    self.assertEqual((before.read_bytes(), after.read_bytes()), snapshots)
+            # Both headers now use the same alternate spelling. Selecting that
+            # exact, source-confirmed header permits comparison without rewriting inputs.
+            snapshots = (before.read_bytes(), after.read_bytes())
+            output = self.root / ('case.json' if alternate == 'Stock_ID' else 'spaces.json')
+            result = self.run_cli(before, after, '--key', alternate, '--output', output)
+            self.assertEqual((result.returncode, result.stdout, result.stderr), (0, '', ''))
+            self.assertEqual(json.loads(output.read_text())['counts'],
+                             {'before': 1, 'after': 1, 'added': 0, 'removed': 0,
+                              'changed': 1, 'unchanged': 0})
+            self.assertEqual((before.read_bytes(), after.read_bytes()), snapshots)
+
     def test_process_input_errors(self):
         valid = self.root / 'valid.csv'
         valid.write_text('id,value\na,Private-Value\n', encoding='utf-8')
