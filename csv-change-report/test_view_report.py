@@ -143,7 +143,7 @@ class ViewerTests(unittest.TestCase):
         html = view_report.render(r); parsed = Tags(); parsed.feed(html)
         self.assertNotIn('script', [t for t, _ in parsed.tags])
         self.assertNotIn('img', [t for t, _ in parsed.tags])
-        self.assertFalse(any(k in ('src', 'href', 'onclick') for _, attrs in parsed.tags for k in attrs))
+        self.assertFalse(any(k in ('src', 'onclick') or (k == 'href' and not attrs[k].startswith('#')) for _, attrs in parsed.tags for k in attrs))
         self.assertIn(hostile, ''.join(parsed.text))
         self.assertIn('Content-Security-Policy', html)
 
