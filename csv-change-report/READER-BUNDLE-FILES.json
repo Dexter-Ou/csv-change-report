@@ -1,14 +1,14 @@
 {
   "base_commit": "9a2e93134c310563c854d7eb749a04c71c1504b2",
-  "status": "Inventory reconciliation example; fictional CSV fixtures",
+  "status": "Saved-report section navigation; fictional inventory example",
   "files": {
     "LICENSE": "4ce4fdbcb2ce6bab8c7b05b7ffff000b646dddebf23250cd376ea2c7503aa1a3",
     "PREVIEW.md": "96d8f3ebe61445b0485effe5d71299bc077fd3c270a35da87ebf556ec4777390",
     "QUICKSTART.md": "93667d420f58c9892af942bc8df945b4d578a1b7438df5efd18d3b08d773beed",
     "README.md": "533125646a710965a10f8802ec6f071d1b1f6950a343a025acdc65a23d460011",
-    "RELEASE-FILES.json": "824b8d99a9111dd9f1e6ccdc808d66b8d516628248dccf1e81309d2ff5fe1cc7",
-    "RELEASE.md": "2e941595cc4c0830487a59171fa44480f78773a69b834041bf4de3b1926df6f8",
-    "VIEWER.md": "dae3c18be43bd296aedbfdbf6b8a9f52c540267781ef1dc3777f185e1fcb6233",
+    "RELEASE-FILES.json": "45d8ffb1c10c401b0ec4bacd57e78a570fd363f203057ae41de06840c5a4918c",
+    "RELEASE.md": "a3ed8c9d1086bcc8d78907fbd6dcfb3254a005f339934e3c1e3c0373254e548f",
+    "VIEWER.md": "513faee730ab9ca7f1822ca9b854f6e9c737fe0defee4bcf616276f3b8dcb70b",
     "csv_change.py": "da8f13c49923af38132ee06bba292fcf2967b2b19a5758ffb4539ed0ee1e6b41",
     "evaluation/ANSWER-KEY.md": "98f402ccdb5998dbe127542dc9099b5b941048c2b94ba6b79236615db4ada66f",
     "evaluation/AUTOMATION-TOTALS.md": "a2b6848c3c70cb0afa2248e4b19dfcf7ec71d8168b3847c43fc6c536e23b75b3",
@@ -87,9 +87,10 @@
     "test_ignore_columns.py": "2350310b08888512ebe4017b53cb1ce87b0fb2e881d56d739d6768844cef8f7b",
     "test_input_budget.py": "dc14eab8929615ebb778d6b703d510018918ad32bdc5592c4c44fc2863235e60",
     "test_summary.py": "f2ae998be8ec56a8dba342da612b19dfc6d52bd784768f40a7e15cca125ea7f9",
+    "test_view_navigation.py": "ea1c4727546a05550cb49751d9968518763884e77d3b676fe5bb8b2e6f56d251",
     "test_view_output.py": "838550b963843b98511bf361afc7553224c49b20fbf1c6600fc76cf99848669d",
-    "test_view_report.py": "59ae1e46dcba5e9f465a002d7d3b414fba69384354aa5cc668708f4f65e8bfad",
-    "test_view_wrapping.py": "3d8c1a95bd5f6c964ee2870426fb243f8b5e7b492820e6250c3d27c89a69e453",
-    "view_report.py": "3d8f06ac868bfc124f12e4c3d1474cc4a0b7edfcd25a2c4a330f906f5144fdc8"
+    "test_view_report.py": "9c88c91b4ae511b6535f181cbfd7ebdea4f5ad9cbc3f867b91c7fbb08f8f3779",
+    "test_view_wrapping.py": "f69200ea162968be0e0b6ddf039d6246bea3e6cdeeba9705c741f0216e450aaf",
+    "view_report.py": "7a3b7aaa8573a7a20d51822bd66e4518a3ec0b995af5253336abc817e9929fc2"
   }
 }
