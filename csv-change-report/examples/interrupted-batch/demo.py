@@ -28,7 +28,12 @@ def main():
         raise SystemExit('Run from the extracted csv-change-report directory.')
     base = Path(sys.argv[1])
     # Exclusive creation preserves previous runs; no cleanup or resume is attempted.
-    base.mkdir()
+    try:
+        base.mkdir()
+    except FileExistsError:
+        print('Output path already exists; choose a new directory. Existing files were preserved.',
+              file=sys.stderr)
+        return 2
     manifest = example / 'manifest.json'
     source = base / 'completed-reference'
     stopped = base / 'simulated-stopped'
