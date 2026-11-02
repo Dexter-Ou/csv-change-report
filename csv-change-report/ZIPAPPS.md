@@ -12,11 +12,12 @@ and MIT license. Copy either archive to another trusted directory; it needs no
 adjacent source files, extraction, install, account or network. Python 3.10+ must
 already be installed. These are Python archives, not native executables.
 
-With the original snapshots retained separately, use:
+From the same source directory, with your original snapshots retained separately,
+use the archives inside `portable-tools/`:
 
 ```sh
-python3 csv_change.pyz before.csv after.csv --key id --check --output review.json
-python3 view_report.pyz review.json --output review.html --before-csv before.csv --after-csv after.csv
+python3 portable-tools/csv_change.pyz before.csv after.csv --key id --check --output review.json
+python3 portable-tools/view_report.pyz review.json --output review.html --before-csv before.csv --after-csv after.csv
 ```
 
 Handle the comparator's status before running the viewer: `--check` returns
