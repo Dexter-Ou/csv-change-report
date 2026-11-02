@@ -97,6 +97,16 @@ exports. Do not guess a replacement ID or automate stock adjustments from a
 change report: missing records may reflect export scope, and source hashes
 verify bytes rather than business truth.
 
+## Open a ready-made inventory report offline
+
+[Open the fictional inventory example instructions](../examples/inventory-review/README.md)
+for a saved HTML/JSON review, source CSVs, unchanged command-line tools and a
+SHA-256 manifest. [Download the source archive](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/325b4bfead4ee874ec762c5e551fe3ed4267b399), extract it, then
+open `examples/inventory-review/inventory-report.html` locally. Python is needed
+only to reproduce the report. The example includes an invalid duplicate ID and
+a corrected export; all data is fictional. Review sensitive metadata before
+sharing reports. Interactive browser layout and accessibility are untested.
+
 ## Reproduce row-order and changed-key behavior
 
 From the same inner folder, save the following as `try_export_keys.py` in a
