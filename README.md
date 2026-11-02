@@ -10,9 +10,9 @@ Requires Python 3.10+; standard library only. No installation, account, API key
 or network connection is needed to run. Tested on Linux with Python 3.12.15;
 Windows and macOS have not been tested.
 
-1. [Download the tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/f4105a50e8ab2962b4d102fdaca218f6ac697d48).
+1. [Download the tested source ZIP](https://codeload.github.com/Dexter-Ou/csv-change-report/zip/a43c8f3ce430c30ae2739c943cea8f2f24cf1ed3).
 2. Extract into a new folder and open a terminal in the outer
-   `csv-change-report-f4105a50e8ab2962b4d102fdaca218f6ac697d48` folder.
+   `csv-change-report-a43c8f3ce430c30ae2739c943cea8f2f24cf1ed3` folder.
 3. Run the included synthetic example:
 
 ```sh
@@ -58,7 +58,7 @@ HTML with status 2; see [viewer output recovery](csv-change-report/VIEWER.md#htm
 
 - [Inspect markup-like column labels in an offline HTML report](csv-change-report/safety-example/README.md). Includes fictional CSVs, saved output and regeneration instructions.
 
-- [Run six synthetic terminal examples with automatic checks](https://github.com/Dexter-Ou/csv-change-report/tree/f4105a50e8ab2962b4d102fdaca218f6ac697d48/examples/terminal-walkthrough). Download that revision, then run `python3 examples/terminal-walkthrough/run_tour.py` from the extracted outer folder.
+- [Run six synthetic terminal examples with automatic checks](https://github.com/Dexter-Ou/csv-change-report/tree/a43c8f3ce430c30ae2739c943cea8f2f24cf1ed3/examples/terminal-walkthrough). Download that revision, then run `python3 examples/terminal-walkthrough/run_tour.py` from the extracted outer folder.
 
 - [Review a fictional inventory export and resolve an invalid stock ID](https://github.com/Dexter-Ou/csv-change-report/blob/a38d2a40f42e2c944335df8174cd915c8a129e72/csv-change-report/examples/inventory-reconciliation/README.md).
 
