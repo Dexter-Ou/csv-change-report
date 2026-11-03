@@ -1,6 +1,6 @@
 # CSV Change Report — tested preview
 
-Compare two UTF-8 CSV exports by one stable unique key and produce a JSON or text change
+Compare two UTF-8 CSV exports by a stable unique key or combination of columns and produce a JSON or text change
 summary. For an operator reviewing recurring exports who wants to locate changed
 records without uploading their data. Free, MIT-licensed preview from Gong LLC.
 
@@ -71,7 +71,7 @@ opened read-only. No network, telemetry, formula evaluation, automatic cleaning
 or spreadsheet export. Do not redirect output onto either input path: shell
 redirection can truncate it before this program starts. Invalid command arguments produce a fixed message without echoing supplied text;
 long option abbreviations are rejected. `--help` prints usage and exits 0. `--version` prints
-`csv-change-report 0.1.10-preview` and exits 0 without input files. Include this
+`csv-change-report 0.1.11-preview` and exits 0 without input files. Include this
 version when voluntarily reporting a problem; do not include private CSV data.
 Failures exit 2 with JSON
 on stderr. By default successful comparisons exit 0, including when changes exist.
@@ -211,3 +211,18 @@ exports and create a source-checked HTML report.
 Follow the [local shell recipe](examples/automation/README.md) to branch on
 `--check` statuses 0 (unchanged), 1 (changed), and 2 (invalid input), including
 a caller using `set -eu`. The recipe runs locally and creates no reports.
+
+## Compound keys (0.1.11-preview)
+
+When no single column identifies a row, repeat `--key` to select a unique
+combination: `python3 csv_change.py before.csv after.csv --key tenant --key sku`.
+Each component must be nonblank, each selected column must exist, and the exact
+combination must be unique within each input. Repeating the same column name
+is rejected. Components are compared as tuples, without joining delimiters.
+Changing any key component counts as a removal and addition. Key components
+cannot be ignored. Report formats and single-key API calls remain compatible.
+
+The comparator and its zipapp accept compound keys. The existing batch manifest
+format and batch command still accept one key column per pair; they do not
+accept arrays or repeated-key specifications. Use the comparator directly for
+compound keys. Existing input, metadata and output-safety limits apply.
