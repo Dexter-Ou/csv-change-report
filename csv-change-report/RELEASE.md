@@ -1,3 +1,12 @@
+# 0.1.11-preview: compound CSV keys
+
+Repeat `--key NAME` to compare rows by an exact combination of columns.
+Blank components, duplicate tuples, repeated column names and ignored key
+components are rejected. Single-key calls and JSON report formats remain
+compatible. Compound keys work in the comparator and generated zipapp; batch
+manifest schema remains single-key. Linux/Python 3.12.15 synthetic comparator,
+viewer and packaging journeys were exercised. Windows/macOS remain untested.
+
 # Stable-key troubleshooting example
 
 Adds four fictional CSV fixtures and runnable steps for blank and repeated key
