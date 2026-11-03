@@ -81,6 +81,7 @@
   "test_batch_manifest.py",
   "test_batch_reports.py",
   "test_column_tally.py",
+  "test_composite.py",
   "test_csv_change.py",
   "test_ignore_columns.py",
   "test_input_budget.py",
