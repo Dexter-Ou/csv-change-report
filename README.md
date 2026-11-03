@@ -1,6 +1,6 @@
 # CSV Change Report
 
-Compare two CSV exports by a stable unique key, offline, without uploading data.
+Compare two CSV exports by a stable unique key or combination of columns, offline, without uploading data.
 Find added, removed and changed records and the columns that changed, without
 including cell values. Free, MIT-licensed preview from Gong LLC.
 
@@ -100,3 +100,5 @@ include your OS, Python/tool versions, whether setup worked, where you got stuck
 and any missing capability relevant to your export-review workflow.
 Do not upload CSVs, reports, private paths, customer names, credentials or other
 sensitive material. No response or support turnaround is promised.
+
+For a compound key, repeat `--key`, for example `--key tenant --key sku`. See [compound-key rules and batch limits](csv-change-report/README.md#compound-keys-0111-preview).
