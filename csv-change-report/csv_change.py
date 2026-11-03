@@ -11,7 +11,7 @@ import stat
 import sys
 from pathlib import Path
 
-VERSION = '0.1.10-preview'
+VERSION = '0.1.11-preview'
 
 MAX_BYTES = 10 * 1024 * 1024
 MAX_ROWS = 50000
@@ -36,8 +36,19 @@ def input_byte_limit(value):
     return value
 
 
+def key_columns(key):
+    """Normalize the public single-column API or an explicit compound key."""
+    names = (key,) if isinstance(key, str) else tuple(key) if isinstance(key, (tuple, list)) else ()
+    if not names or any(not isinstance(name, str) or not name.strip() for name in names):
+        raise InputError('key columns must be nonblank names')
+    if len(names) > MAX_COLUMNS or len(set(names)) != len(names):
+        raise InputError('key columns must be distinct and at most 256')
+    return names
+
+
 def load(path, key, max_input_bytes=None):
     """Read one bounded snapshot; reject ambiguity instead of guessing."""
+    keys = key_columns(key)
     limit = MAX_BYTES if max_input_bytes is None else input_byte_limit(max_input_bytes)
     if not stat.S_ISREG(Path(path).stat().st_mode):
         raise InputError('input must be a regular file')
@@ -67,9 +78,9 @@ def load(path, key, max_input_bytes=None):
             raise InputError('input exceeds 256 columns')
         if len(set(header)) != len(header):
             raise InputError('header names must be unique')
-        if key not in header:
+        if any(name not in header for name in keys):
             raise InputError('key column is missing')
-        key_index = header.index(key)
+        key_indices = [header.index(name) for name in keys]
         rows = {}
         for number, row in enumerate(reader, 1):
             if number > MAX_ROWS:
@@ -78,8 +89,9 @@ def load(path, key, max_input_bytes=None):
                 raise InputError('input exceeds 250000 data cells')
             if len(row) != len(header):
                 raise InputError(f'record {number} has wrong field count')
-            value = row[key_index]
-            if not value.strip():
+            parts = tuple(row[index] for index in key_indices)
+            value = parts[0] if len(parts) == 1 else parts
+            if any(not part.strip() for part in parts):
                 raise InputError(f'record {number} has a blank key')
             if value in rows:
                 raise InputError(f'record {number} repeats a key')
@@ -90,13 +102,14 @@ def load(path, key, max_input_bytes=None):
 
 
 def compare(before, after, key, ignore_columns=(), summary_only=False, max_input_bytes=None):
-    old_header, old, old_hash = load(before, key, max_input_bytes)
-    new_header, new, new_hash = load(after, key, max_input_bytes)
+    keys = key_columns(key)
+    old_header, old, old_hash = load(before, keys, max_input_bytes)
+    new_header, new, new_hash = load(after, keys, max_input_bytes)
     # Header order may differ; column additions/removals require explicit review.
     if set(old_header) != set(new_header):
         raise InputError('column sets differ; reconcile schemas before comparison')
     ignored = set(ignore_columns)
-    if key in ignored:
+    if ignored.intersection(keys):
         raise InputError('key column cannot be ignored')
     if not ignored.issubset(old_header):
         raise InputError('ignored column is missing')
@@ -105,7 +118,7 @@ def compare(before, after, key, ignore_columns=(), summary_only=False, max_input
     changed = []
     changed_count = 0
     unchanged = 0
-    by_column = {name: 0 for name in old_header if name != key and name not in ignored}
+    by_column = {name: 0 for name in old_header if name not in keys and name not in ignored}
     for value in sorted(set(old) & set(new), key=lambda k: old[k][0]):
         columns = [name for name in by_column if old[value][1][name] != new[value][1][name]]
         if columns:
@@ -173,7 +186,8 @@ def main(argv=None):
     parser = SafeArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('before')
     parser.add_argument('after')
-    parser.add_argument('--key', required=True, help='exact, case-sensitive unique column name')
+    parser.add_argument('--key', required=True, action='append', metavar='NAME',
+                        help='exact key column; repeat for a unique combination of columns')
     parser.add_argument('--format', choices=('json', 'text'), default='json',
                         help='output format (default: json); text omits input hashes')
     parser.add_argument('--check', action='store_true',
