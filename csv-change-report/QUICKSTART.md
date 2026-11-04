@@ -15,12 +15,18 @@ No install, account or network is needed to run. Examples below are invented.
 All reports can reveal column names and counts; JSON also reveals hashes.
 They are not anonymized. If you need old/new values, inspect your original
 snapshots locally. Input must be comma-separated UTF-8 with matching column sets
-and one nonblank unique key per record. UTF-8 with or without a leading BOM and
+and a nonblank unique key or combination of key columns per record. UTF-8 with or without a leading BOM and
 LF or CRLF record endings are supported. BOM and record-ending differences alone
 do not count as data changes, but the raw input hashes can differ. Other formats
 need a different tool.
 
 For a repository-readable tour, see [the report and batch preview](PREVIEW.md).
+
+For a compound key, repeat `--key`, for example `--key tenant --key sku`.
+Each component must be nonblank and the combination must be unique in each
+input. A changed component counts as a removal plus an addition. Use the
+comparator directly: the batch helpers below accept one key column per pair.
+See [the compound-key rules](README.md#compound-keys-0111-preview).
 
 ## Try three views of the same synthetic change
 
