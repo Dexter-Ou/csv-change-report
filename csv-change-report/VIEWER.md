@@ -23,7 +23,7 @@ The viewer checks structure and internal totals. By default it does not reopen t
 
 Treat report headers and generated HTML as potentially sensitive metadata. The HTML escapes report text, contains no scripts or external resources, and requests a restrictive content security policy. It still contains column names, positions and source hashes; share only after review. Work in a trusted directory. Existing output paths are refused, including the input path. HTML is written to a private temporary sibling, closed, then hard-linked without replacing the requested path. Hard-link support is required. A pre-link write failure normally leaves no requested HTML. Cleanup failure can leave a complete HTML file with status 2; preserve failed-run evidence and follow the recovery steps below.
 
-This preview has synthetic Linux command and HTML parser tests. Interactive browser appearance, accessibility and Windows/macOS behavior have not been tested.
+This preview has synthetic Linux command, HTML parser and Chromium browser tests. See the browser checks and limits below; accessibility and Windows/macOS behavior have not been tested.
 
 Run the focused synthetic checks with:
 
@@ -107,12 +107,13 @@ python3 -m unittest -v test_view_output
 
 The tests include real per-child Linux file-size ceilings and injected link and
 cleanup exceptions. File-size ceilings are not actual disk exhaustion. Crashes,
-fsync/power loss, adversarial directory races, interactive browser appearance,
-accessibility and Windows/macOS behavior are untested. Crashes can leave siblings.
+fsync/power loss, adversarial directory races, accessibility and Windows/macOS
+behavior are untested. Crashes can leave siblings.
 
 Long ASCII words in column labels and hashes include optional line breaks.
-Unicode words remain intact. Parser tests preserve reconstructed text; browser
-layout and clipboard behavior remain untested.
+Unicode words remain intact. Parser tests preserve reconstructed text. The tested
+browser cases had no horizontal document overflow; clipboard behavior remains
+untested.
 
 ## Section navigation
 
@@ -124,5 +125,26 @@ no script or network request is required.
 
 Each table has a descriptive caption, including distinct names for added and
 removed record positions. These names identify tables during screen-reader table
-navigation. Static markup tests check caption placement and names; browser and
-assistive-technology interaction remain untested.
+navigation. Static markup tests check caption placement and names;
+assistive-technology interaction remains untested.
+
+## Browser checks and limits
+
+Synthetic checks on Linux with Chromium 156.0.8078.4 used 1280 × 900 and
+390 × 844 viewports. Detailed, counts-only and summary reports displayed the
+expected counts; Tab/Enter reached the record-count and source-hash sections.
+Source-checked cases displayed the expected CSV-byte comparison result. No page
+errors, HTTP requests or horizontal document overflow were observed in those
+cases. Retained narrow-view screenshots showed no visible clipping.
+
+A separate synthetic pair with 10,000 records changed produced 640,818-byte
+detailed HTML, with a 261,892-pixel document height at the narrow viewport.
+Using `--counts-only` with the same saved JSON produced 2,464-byte HTML and a
+1,567-pixel narrow document. Use this option for compact aggregate review when
+you do not need the record-position tables. The detailed JSON stays unchanged.
+These are single-run observations for specific fixtures, not size or performance
+guarantees.
+
+Screen readers, touch, zoom, clipboard behavior, other browsers and Windows/macOS
+remain untested. The browser checks do not cover every report shape or larger
+inputs. Keep the 8 MiB JSON limit and memory considerations above in mind.
