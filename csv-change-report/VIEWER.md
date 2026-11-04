@@ -50,7 +50,7 @@ large regular inputs and concurrent file changes remain possible.
 
 ## Report size and memory
 
-Use comparison `--summary` when you need aggregate counts without per-record
+Use comparison `--summary-only` when you need aggregate counts without per-record
 positions. Use viewer `--counts-only` when a detailed JSON report already exists
 and you want smaller HTML. Both options omit positions from their output, but
 they do different work: comparison still loads both CSV snapshots, and the
@@ -61,8 +61,8 @@ One synthetic Linux run per configuration on Python 3.12.15 measured:
 
 | Input / operation | Default peak RSS (KiB) | With option (KiB) |
 |---|---:|---:|
-| Compare 50,000 rows × 5 columns per CSV | 91,972 | 62,204 (`--summary`) |
-| Compare 9,998,897 bytes per CSV | 95,216 | 95,260 (`--summary`) |
+| Compare 50,000 rows × 5 columns per CSV | 91,972 | 62,204 (`--summary-only`) |
+| Compare 9,998,897 bytes per CSV | 95,216 | 95,260 (`--summary-only`) |
 | View the first detailed report (7,678,349-byte JSON) | 68,388 | 58,120 (`--counts-only`) |
 
 Each CSV row changed in every non-key column. The first fixture reached 250,000
