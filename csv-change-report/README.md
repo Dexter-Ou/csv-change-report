@@ -10,6 +10,8 @@ This is a preview, not a hardened parser.
 Requires Python 3.10+; standard library only, no installation or service.
 
 Start with [the short report-choice guide](QUICKSTART.md) for a local review.
+For explicit record-level percentages from an existing JSON report, see the
+[optional aggregate recipe](evaluation/AGGREGATE-STATS.md).
 
 From this directory on the isolated worker:
 
