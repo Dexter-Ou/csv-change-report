@@ -100,6 +100,7 @@
   "test_input_budget.py",
   "test_regenerate.py",
   "test_summary.py",
+  "test_view_arguments.py",
   "test_view_captions.py",
   "test_view_navigation.py",
   "test_view_output.py",
