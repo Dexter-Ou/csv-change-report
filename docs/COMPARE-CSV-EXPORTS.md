@@ -173,6 +173,37 @@ status 1 is expected and explicitly checked. The key `a` becoming `z` produces
 an addition and removal even though its other cell is identical. This does not
 establish identity across changed keys; choose a stable key for real exports.
 
+## Compare two build artifacts manually
+
+Obtain the CSV artifacts from the two revisions through your own authorized
+build process, and keep them in separate local folders. Confirm that both
+exports cover the same scope and use the same schema and stable unique key.
+CSV Change does not build revisions, fetch artifacts or post PR comments.
+
+From the inner `csv-change-report` folder, use the current download linked
+above. Replace the quoted paths and `id` with your actual inputs. Choose fresh
+report names in a trusted writable directory with hard-link support. Run these
+commands separately:
+
+```sh
+python3 csv_change.py "before build/export.csv" "after build/export.csv" --key id --check --output build-review.json
+python3 view_report.py build-review.json --before-csv "before build/export.csv" --after-csv "after build/export.csv" --output build-review.html
+```
+
+Run the viewer only after comparison status 0 (equal) or 1 (changed); stop on
+status 2 and inspect stderr. A changed comparison saves JSON while returning 1,
+so `&&` would skip the viewer. Existing output names are refused; use fresh
+names for each review rather than overwriting reports.
+
+Open the HTML locally. It lists changed columns and record positions, not old
+or new cell values. To review values, retain both original artifacts and locate
+the records using a CSV parser: embedded newlines make physical line numbers
+unsuitable. Record positions are one-based data records, excluding the header.
+The viewer checks supplied originals against the report's hashes; byte matches
+do not authenticate the report or establish that the builds were correct.
+Review metadata before sharing. This is a manual local review; it does not
+attach reports to a PR or automate CI.
+
 ## Apply it to your snapshots
 
 Choose a key that is present, unique, nonblank and stable in both exports.
