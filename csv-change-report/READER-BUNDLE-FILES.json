@@ -8,8 +8,8 @@
     "PREVIEW.md": "96d8f3ebe61445b0485effe5d71299bc077fd3c270a35da87ebf556ec4777390",
     "QUICKSTART.md": "b7497c384ad9fe5f9dca69a82959f04cc5cbe6fea23c0e22ba1c41e13cf1b0c1",
     "README.md": "838b486388169dfb6c1d0506fe89d227e7a494cd4ca7a8dc6ecc4e5704eec919",
-    "RELEASE-FILES.json": "63003e9c515c0630af0fc356e894e874b8ace89860d4f1fe2541e173c971ac5a",
-    "RELEASE.md": "23e6cf6659970e56c608e2e2661aacb086fe524044545a4caa89e59812c43f1a",
+    "RELEASE-FILES.json": "96382264e6df817b7077947b890ac65d25dd3949edebb56d3f59c1ad363af5de",
+    "RELEASE.md": "5e516f6006639502267317c73daafd7cc8753c2c2f9fd2cd0629481b7c28c0b3",
     "VIEWER.md": "851c2f1d565287decc8ef441111d6e9563d4e61faa65a99b99254d32f169d982",
     "ZIPAPPS.md": "16ead3e340292c90a5f1f74db1045dd32ced1ff8a674a66d2e32ad5f4fbe75e0",
     "build_zipapps.py": "a2b155dc4e4ba49ca55674750cd2ae35fa6a43b9c9d967ba5a903e16e635d975",
@@ -109,6 +109,7 @@
     "test_view_output.py": "838550b963843b98511bf361afc7553224c49b20fbf1c6600fc76cf99848669d",
     "test_view_report.py": "9c88c91b4ae511b6535f181cbfd7ebdea4f5ad9cbc3f867b91c7fbb08f8f3779",
     "test_view_wrapping.py": "f69200ea162968be0e0b6ddf039d6246bea3e6cdeeba9705c741f0216e450aaf",
-    "view_report.py": "bf2cbc8f010f841ef26b9d1b10a09a39f7580989cc09f9223eb7fdaca7b24071"
+    "view_report.py": "16b13299574e54c02728b00942d536aecf58b5379c45144c61072b960447587b",
+    "test_view_arguments.py": "8e8c0b774e82c37a3f6ff2a6f7cbcaee997971734287bdfa5be7aa1276599738"
   }
 }
