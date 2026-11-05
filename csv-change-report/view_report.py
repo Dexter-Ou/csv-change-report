@@ -163,8 +163,14 @@ def render(report, counts_only=False, sources_checked=False):
     return '\n'.join(parts) + '\n'
 
 
+class SafeArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        # Default argparse errors echo unrecognized arguments and invocation paths.
+        self.exit(2, 'E_ARGUMENT: invalid arguments; use --help for usage.\n')
+
+
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = SafeArgumentParser(prog='csv-change-view', description=__doc__)
     parser.add_argument('report', help='saved single-pair JSON report (not a batch manifest)')
     parser.add_argument('--output', required=True, help='new HTML file in a trusted directory; existing paths refused')
     parser.add_argument('--counts-only', action='store_true', help='omit record-position tables from HTML; keep counts and saved JSON unchanged')
