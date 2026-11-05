@@ -1,3 +1,11 @@
+# HTML viewer argument diagnostics
+
+Malformed viewer commands now return status 2 with a fixed diagnostic instead of
+including supplied argument text. Help uses the stable `csv-change-view` program
+name. Five malformed-command scenarios and help naming have synthetic regression
+tests. This does not hide arguments from the shell history or process list.
+Normal report generation and CLI version remain unchanged.
+
 # 0.1.11-preview: compound CSV keys
 
 Repeat `--key NAME` to compare rows by an exact combination of columns.
